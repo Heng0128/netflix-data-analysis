@@ -1,0 +1,230 @@
+{
+  "type_distribution": {
+    "Movie": 6131,
+    "TV Show": 2676
+  },
+  "year_trend": {
+    "1967": 1,
+    "1977": 1,
+    "1988": 1,
+    "1990": 1,
+    "1992": 1,
+    "1998": 1,
+    "2005": 2,
+    "2008": 2,
+    "2009": 3,
+    "2010": 4,
+    "2011": 14,
+    "2012": 10,
+    "2013": 15,
+    "2014": 32,
+    "2015": 82,
+    "2016": 441,
+    "2017": 1180,
+    "2018": 1631,
+    "2019": 1999,
+    "2020": 1888,
+    "2021": 1498
+  },
+  "country_distribution": {
+    "United States": 3211,
+    "India": 1008,
+    "Unknown": 831,
+    "United Kingdom": 628,
+    "Canada": 271,
+    "Japan": 259,
+    "France": 213,
+    "South Korea": 212,
+    "Spain": 181,
+    "Mexico": 134,
+    "Australia": 117,
+    "Egypt": 112,
+    "Turkey": 111,
+    "Germany": 103,
+    "China": 100
+  },
+  "genre_distribution": {
+    "Dramas": 1600,
+    "Comedies": 1210,
+    "Action & Adventure": 859,
+    "Documentaries": 829,
+    "International TV Shows": 774,
+    "Children & Family Movies": 605,
+    "Crime TV Shows": 399,
+    "Kids' TV": 388,
+    "Stand-Up Comedy": 334,
+    "Horror Movies": 275,
+    "British TV Shows": 253,
+    "Docuseries": 221,
+    "Anime Series": 176,
+    "International Movies": 128,
+    "TV Comedies": 120
+  },
+  "rating_distribution": {
+    "TV-MA": 3211,
+    "TV-14": 2160,
+    "TV-PG": 863,
+    "R": 799,
+    "PG-13": 490,
+    "TV-Y7": 334,
+    "TV-Y": 307,
+    "PG": 287,
+    "TV-G": 220,
+    "NR": 80,
+    "G": 41,
+    "TV-Y7-FV": 6,
+    "NC-17": 3,
+    "UR": 3,
+    "74 min": 1,
+    "84 min": 1,
+    "66 min": 1
+  },
+  "movie_duration_stats": {
+    "count": 6131.0,
+    "mean": 99.52895123144674,
+    "std": 28.367575668206516,
+    "min": 1.0,
+    "25%": 87.0,
+    "50%": 98.0,
+    "75%": 114.0,
+    "max": 312.0
+  },
+  "tv_seasons_distribution": {
+    "1": 1793,
+    "2": 425,
+    "3": 199,
+    "4": 95,
+    "5": 65,
+    "6": 33,
+    "7": 23,
+    "8": 17,
+    "9": 9,
+    "10": 7
+  },
+  "heatmap_data": {
+    "Movie": {
+      "1967": 0,
+      "1977": 0,
+      "1988": 0,
+      "1990": 0,
+      "1992": 0,
+      "1998": 0,
+      "2005": 0,
+      "2008": 1,
+      "2009": 2,
+      "2010": 1,
+      "2011": 13,
+      "2012": 3,
+      "2013": 6,
+      "2014": 19,
+      "2015": 56,
+      "2016": 253,
+      "2017": 839,
+      "2018": 1237,
+      "2019": 1424,
+      "2020": 1284,
+      "2021": 993
+    },
+    "TV Show": {
+      "1967": 1,
+      "1977": 1,
+      "1988": 1,
+      "1990": 1,
+      "1992": 1,
+      "1998": 1,
+      "2005": 2,
+      "2008": 1,
+      "2009": 1,
+      "2010": 3,
+      "2011": 1,
+      "2012": 7,
+      "2013": 9,
+      "2014": 13,
+      "2015": 26,
+      "2016": 188,
+      "2017": 341,
+      "2018": 394,
+      "2019": 575,
+      "2020": 604,
+      "2021": 505
+    }
+  },
+  "correlation_matrix": {
+    "release_year": {
+      "release_year": 1.0,
+      "year_added": 0.13841264391328872,
+      "duration_num": -0.24908948888730625,
+      "genre_count": -0.040876502368347174,
+      "country_count": -0.03751841361381704,
+      "cast_count": -0.09804502050467429
+    },
+    "year_added": {
+      "release_year": 0.13841264391328872,
+      "year_added": 1.0,
+      "duration_num": 0.05458467026985012,
+      "genre_count": 0.04690096955514969,
+      "country_count": -0.011513875804066022,
+      "cast_count": 0.1076010214810842
+    },
+    "duration_num": {
+      "release_year": -0.24908948888730625,
+      "year_added": 0.05458467026985012,
+      "duration_num": 1.0,
+      "genre_count": 0.08718441899076192,
+      "country_count": 0.10893344648472725,
+      "cast_count": 0.11073643262395634
+    },
+    "genre_count": {
+      "release_year": -0.040876502368347174,
+      "year_added": 0.04690096955514969,
+      "duration_num": 0.08718441899076192,
+      "genre_count": 1.0,
+      "country_count": -0.0089074535261462,
+      "cast_count": 0.21773886309376186
+    },
+    "country_count": {
+      "release_year": -0.03751841361381704,
+      "year_added": -0.011513875804066022,
+      "duration_num": 0.10893344648472725,
+      "genre_count": -0.0089074535261462,
+      "country_count": 1.0,
+      "cast_count": 0.06089986883620446
+    },
+    "cast_count": {
+      "release_year": -0.09804502050467429,
+      "year_added": 0.1076010214810842,
+      "duration_num": 0.11073643262395634,
+      "genre_count": 0.21773886309376186,
+      "country_count": 0.06089986883620446,
+      "cast_count": 1.0
+    }
+  },
+  "anomalies_count": 8,
+  "anomalies_samples": [
+    {
+      "title": "Cops and Robbers",
+      "duration": "8 min",
+      "type": "Movie"
+    },
+    {
+      "title": "Canvas",
+      "duration": "9 min",
+      "type": "Movie"
+    },
+    {
+      "title": "Sol Levante",
+      "duration": "5 min",
+      "type": "Movie"
+    },
+    {
+      "title": "Silent",
+      "duration": "3 min",
+      "type": "Movie"
+    },
+    {
+      "title": "Black Mirror: Bandersnatch",
+      "duration": "312 min",
+      "type": "Movie"
+    }
+  ]
+}
