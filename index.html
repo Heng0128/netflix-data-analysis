@@ -478,9 +478,9 @@ fetch('netflix_titles_cleaned.csv')
   .container {
     position: relative;
     z-index: 1;
-    max-width: 1520px;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 0 40px;
+    padding: 0 24px;
   }
 
   /* ===== HERO 头部 ===== */
@@ -584,7 +584,7 @@ fetch('netflix_titles_cleaned.csv')
   .team-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 12px;
   }
 
   .team-card {
@@ -592,9 +592,9 @@ fetch('netflix_titles_cleaned.csv')
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 32px;
+    padding: 18px;
     display: flex;
-    gap: 20px;
+    gap: 14px;
     align-items: flex-start;
     transition: all 0.4s ease;
     position: relative;
@@ -622,13 +622,13 @@ fetch('netflix_titles_cleaned.csv')
   .team-card:hover::before { opacity: 1; }
 
   .team-card .avatar {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: 20px;
     flex-shrink: 0;
   }
 
@@ -636,19 +636,19 @@ fetch('netflix_titles_cleaned.csv')
   .team-card:nth-child(2) .avatar { background: linear-gradient(135deg, rgba(78,205,196,0.2), rgba(78,205,196,0.05)); }
 
   .team-card .info .role {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
-    margin-bottom: 6px;
-    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
   }
 
   .team-card:nth-child(1) .role { color: var(--red); }
   .team-card:nth-child(2) .role { color: var(--teal); }
 
   .team-card .info .task {
-    font-size: 13px;
+    font-size: 11px;
     color: var(--text-dim);
-    line-height: 1.7;
+    line-height: 1.5;
   }
 
   /* ===== 概览数据卡片 ===== */
@@ -659,7 +659,7 @@ fetch('netflix_titles_cleaned.csv')
   .overview-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 16px;
+    gap: 10px;
   }
 
   .stat-card {
@@ -667,7 +667,7 @@ fetch('netflix_titles_cleaned.csv')
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 28px 20px;
+    padding: 18px 12px;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -703,15 +703,15 @@ fetch('netflix_titles_cleaned.csv')
 
   .stat-card .label {
     color: var(--text-muted);
-    font-size: 11px;
+    font-size: 9px;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .stat-card .value {
-    font-size: 30px;
+    font-size: 24px;
     font-weight: 900;
     font-variant-numeric: tabular-nums;
     background: linear-gradient(135deg, #fff 30%, rgba(255,107,107,0.9));
@@ -724,39 +724,39 @@ fetch('netflix_titles_cleaned.csv')
   .section-header {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin: 56px 0 28px;
+    gap: 12px;
+    margin: 32px 0 16px;
   }
 
   .section-header .line {
-    width: 4px;
-    height: 28px;
+    width: 3px;
+    height: 22px;
     background: linear-gradient(180deg, var(--red), var(--gold));
-    border-radius: 4px;
+    border-radius: 3px;
     flex-shrink: 0;
   }
 
   .section-header h2 {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
   }
 
   .section-header .tag {
-    font-size: 11px;
+    font-size: 9px;
     font-weight: 600;
     color: var(--text-muted);
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     margin-left: auto;
   }
 
-  /* ===== 图表网格 ===== */
+  /* ===== 图表网格 - 紧凑布局 ===== */
   .charts-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
   }
 
   .chart-card {
@@ -764,7 +764,7 @@ fetch('netflix_titles_cleaned.csv')
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 28px;
+    padding: 16px;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     position: relative;
     overflow: hidden;
@@ -805,37 +805,37 @@ fetch('netflix_titles_cleaned.csv')
   }
 
   .chart-card .title {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
-  .chart-card .title .emoji { font-size: 20px; }
+  .chart-card .title .emoji { font-size: 16px; }
 
   .chart-card .badge {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 3px 8px;
+    border-radius: 5px;
     background: rgba(229, 9, 20, 0.1);
     color: var(--red);
     border: 1px solid rgba(229, 9, 20, 0.2);
   }
 
   .chart-card .desc {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
-    margin-bottom: 18px;
-    line-height: 1.5;
+    margin-bottom: 12px;
+    line-height: 1.4;
   }
 
   .chart-card .chart-container {
     width: 100%;
-    height: 400px;
+    height: 280px;
     position: relative;
   }
 
@@ -846,7 +846,7 @@ fetch('netflix_titles_cleaned.csv')
   }
 
   .chart-card .chart-container.tall {
-    height: 480px;
+    height: 320px;
   }
 
   /* ===== 结论区 ===== */
@@ -885,14 +885,14 @@ fetch('netflix_titles_cleaned.csv')
   .findings-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 32px;
+    gap: 10px;
+    margin-bottom: 20px;
   }
 
   .finding {
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.04);
-    padding: 20px 24px;
+    padding: 14px 16px;
     border-radius: var(--radius-sm);
     transition: all 0.3s ease;
     position: relative;
@@ -918,14 +918,14 @@ fetch('netflix_titles_cleaned.csv')
   .finding .num {
     color: var(--gold);
     font-weight: 800;
-    font-size: 20px;
-    margin-right: 8px;
+    font-size: 16px;
+    margin-right: 6px;
   }
 
   .finding .text {
     color: rgba(255,255,255,0.8);
-    font-size: 13px;
-    line-height: 1.8;
+    font-size: 12px;
+    line-height: 1.6;
   }
 
   .finding .text b { color: #fff; }
@@ -933,18 +933,18 @@ fetch('netflix_titles_cleaned.csv')
   .suggestions {
     background: linear-gradient(135deg, rgba(229,9,20,0.06), rgba(255,215,0,0.03));
     border: 1px solid rgba(229,9,20,0.12);
-    padding: 28px 32px;
+    padding: 18px 20px;
     border-radius: var(--radius-sm);
   }
 
   .suggestions h3 {
     color: var(--gold);
-    margin-bottom: 16px;
-    font-size: 16px;
+    margin-bottom: 12px;
+    font-size: 14px;
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
 
   .suggestions ul {
@@ -954,9 +954,9 @@ fetch('netflix_titles_cleaned.csv')
 
   .suggestions li {
     color: rgba(255,255,255,0.75);
-    font-size: 13px;
-    line-height: 1.9;
-    padding-left: 20px;
+    font-size: 12px;
+    line-height: 1.7;
+    padding-left: 16px;
     position: relative;
   }
 
@@ -964,9 +964,9 @@ fetch('netflix_titles_cleaned.csv')
     content: '';
     position: absolute;
     left: 0;
-    top: 10px;
-    width: 6px;
-    height: 6px;
+    top: 8px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: var(--red);
   }
