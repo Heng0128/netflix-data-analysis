@@ -299,26 +299,66 @@ function renderAll(d) {
     ]
   });
 
-  // ==== 图 8：词云 ====
+  // ==== 图 8：词云（使用 Force Graph 布局）====
   const c8 = initChart('chart8');
   const cloudData = d.genres.map((x, i) => ({
-    name: x.流派, value: x.数量,
-    textSize: Math.max(16, Math.min(48, 12 + x.数量 / 60)),
-    color: palette[i % palette.length],
-    x: 10 + (i % 5) * 18 + Math.random() * 8,
-    y: 15 + Math.floor(i / 5) * 35 + Math.random() * 10
-  }));
+    name: x.流派, 
+    value: x.数量,
+    symbolSize: Math.max(12, Math.min(40, 12 + x.数量 / 60)),
+    itemStyle: { 
+      color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+        { offset: 0, color: '#E50914' },
+        { offset: 1, color: '#B20710' }
+      ]),
+      borderColor: '#fff',
+      borderWidth: 1,
+      shadowBlur: 10,
+      shadowColor: 'rgba(229, 9, 20, 0.5)'
+    }
+  })).slice(0, 50); // 取前 50 个
+  
   c8.setOption({
     backgroundColor: 'transparent',
-    tooltip: { ...tooltipStyle, formatter: p => `${p.data.name}: ${p.data.value} titles` },
-    xAxis: { show: false, min: 0, max: 100 },
-    yAxis: { show: false, min: 0, max: 100 },
+    tooltip: { 
+      ...tooltipStyle, 
+      formatter: p => `${p.data.name}: ${p.data.value} 部作品` 
+    },
     series: [{
-      type: 'scatter', symbolSize: 0,
-      data: cloudData.map(d => ({ value: [d.x, d.y, d.value], name: d.name, color: d.color, textSize: d.textSize })),
-      label: { show: true, position: 'inside', formatter: p => p.data.name, color: p => p.data.color, fontSize: p => p.data.textSize, fontWeight: 700, fontFamily: 'Inter, Noto Sans SC' },
-      emphasis: { scale: 1.5 }
+      type: 'graph',
+      layout: 'force',
+      data: cloudData,
+      force: {
+        repulsion: 120,
+        edgeLength: 10,
+        gravity: 0.08
+      },
+      roam: true,
+      label: {
+        show: true,
+        position: 'inside',
+        color: '#fff',
+        fontSize: p => Math.max(10, p.data.symbolSize * 0.5),
+        fontWeight: 'bold',
+        formatter: '{b}'
+      },
+      emphasis: {
+        focus: 'adjacency',
+        label: { show: true, color: '#fff', fontSize: 14 },
+        itemStyle: {
+          color: '#fff',
+          borderColor: '#E50914',
+          borderWidth: 2
+        }
+      }
     }]
+  });
+  
+  // 绑定词云点击事件 - 下钻到表格
+  c8.on('click', (params) => {
+    if (params.dataType === 'node') {
+      const genreName = params.name;
+      updateDrillTable(genreName, d.raw_data || []);
+    }
   });
 
   // ==== 图 9：季数玫瑰图 ====
@@ -366,3 +406,42 @@ function renderAll(d) {
 
 // ===== 启动 =====
 loadData().then(renderAll).catch(() => {});
+
+// ===== 词云下钻表格更新函数 =====
+function updateDrillTable(genreName, rawData) {
+  const tableBody = document.getElementById('drillTableBody');
+  const drillTitle = document.getElementById('drillTitle');
+  
+  if (!tableBody || !drillTitle) return;
+  
+  // 更新标题
+  drillTitle.innerHTML = `🔍 聚焦流派：<span style="color:#E50914">${genreName}</span>`;
+  
+  // 显示加载中
+  tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;">正在加载...</td></tr>';
+  
+  // 过滤数据：查找包含该流派的作品
+  const filtered = rawData.filter(item => {
+    if (item.listed_in && typeof item.listed_in === 'string') {
+      return item.listed_in.includes(genreName);
+    }
+    return false;
+  }).slice(0, 10); // 最多显示 10 条
+  
+  setTimeout(() => {
+    if (filtered.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;">暂无相关数据</td></tr>';
+      return;
+    }
+    
+    const html = filtered.map(item => `
+      <tr>
+        <td style="font-weight:600">${item.title || 'Unknown'}</td>
+        <td>${item.release_year || '-'}</td>
+        <td><span class="badge">${item.rating || 'NR'}</span></td>
+      </tr>
+    `).join('');
+    
+    tableBody.innerHTML = html;
+  }, 200);
+}

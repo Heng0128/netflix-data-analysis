@@ -89,7 +89,21 @@
       <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🔞</span>内容评级分布</div><span class="badge">FUNNEL CHART</span></div><p class="desc">不同年龄分级内容占比</p><div class="chart-container" id="chart5"></div></div>
       <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">⏱️</span>电影时长分布</div><span class="badge">HISTOGRAM</span></div><p class="desc">电影时长的频率分布直方图</p><div class="chart-container" id="chart6"></div></div>
       <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">📊</span>流派×类型对比</div><span class="badge">STACKED BAR</span></div><p class="desc">各流派中电影与电视节目构成</p><div class="chart-container" id="chart7"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">☁️</span>流派词云</div><span class="badge">WORD CLOUD</span></div><p class="desc">流派关键词视觉化展示</p><div class="chart-container tall" id="chart8"></div></div>
+      
+      <!-- 词云模块：包含交互式下钻表格 -->
+      <div class="chart-card full-width" style="grid-column: span 3;">
+        <div class="card-head"><div class="title"><span class="emoji">☁️</span>流派关键词云</div><span class="badge">WORD CLOUD + DRILL-DOWN</span></div>
+        <p class="desc">点击任意流派关键词，下方表格将显示该流派的代表作品</p>
+        <div class="chart-container tall" id="chart8"></div>
+        <div class="drill-table-container">
+          <h4 id="drillTitle">🔍 点击词云中的流派查看详情</h4>
+          <table class="drill-table">
+            <thead><tr><th>作品名称</th><th>年份</th><th>评级</th></tr></thead>
+            <tbody id="drillTableBody"><tr><td colspan="3" style="text-align:center;color:#888;">等待交互...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      
       <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🌹</span>TV 剧集季数分布</div><span class="badge">ROSE CHART</span></div><p class="desc">电视节目的季数分布情况</p><div class="chart-container" id="chart9"></div></div>
       <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🔥</span>年份×评级热力图</div><span class="badge">HEATMAP</span></div><p class="desc">不同年份与各评级的内容密度</p><div class="chart-container tall" id="chart10"></div></div>
     </div>
