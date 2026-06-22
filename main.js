@@ -1,176 +1,21 @@
 // ============================================================
-//  Netflix 数据分析看板 — 直接读取预处理后的 CSV 文件
-//  数据链路：netflix_titles_cleaned.csv → 浏览器解析 → ECharts 渲染
+//  Netflix 数据分析看板 — 前端数据渲染模块
+//  数据链路：data/analysis_data.json → ECharts 渲染
 // ============================================================
 
-// ===== Canvas 渲染优化配置 =====
-const DPR = Math.min(window.devicePixelRatio || 1, 2);
-const chartInstances = [];
-
-// ===== 纯 JS CSV 解析器 =====
-function parseCSV(text) {
-  const rows = [];
-  let row = [], cell = '', inQuote = false;
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    if (inQuote) {
-      if (ch === '"') {
-        if (text[i+1] === '"') { cell += '"'; i++; }
-        else inQuote = false;
-      } else cell += ch;
-    } else {
-      if (ch === '"') inQuote = true;
-      else if (ch === ',') { row.push(cell.trim()); cell = ''; }
-      else if (ch === '\n' || (ch === '\r' && text[i+1] === '\n')) {
-        row.push(cell.trim());
-        rows.push(row);
-        row = [];
-        cell = '';
-        if (ch === '\r') i++;
-      } else if (ch !== '\r') cell += ch;
-    }
+// ===== 配置常量 =====
+const CONFIG = {
+  DPR: Math.min(window.devicePixelRatio || 1, 2),
+  ANIMATION_DURATION: 2000,
+  COLORS: {
+    primary: '#E50914',
+    gold: '#FFD700',
+    teal: '#4ECDC4',
+    palette: ['#E50914','#FF6B6B','#FFD700','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD','#A29BFE','#81ECEC']
   }
-  if (cell || row.length) { row.push(cell.trim()); rows.push(row); }
-  return rows;
-}
+};
 
-// ===== 数据聚合引擎 =====
-function aggregate(rows, headers) {
-  const idx = h => headers.indexOf(h);
-
-  // 基础统计
-  const movies = rows.filter(r => r[idx('type')] === 'Movie');
-  const shows = rows.filter(r => r[idx('type')] === 'TV Show');
-
-  const overview = {
-    total: rows.length,
-    movies: movies.length,
-    tvshows: shows.length,
-    countries: new Set(rows.map(r => r[idx('primary_country')]).filter(v => v && v !== 'Unknown')).size,
-    genres: new Set(rows.map(r => r[idx('primary_genre')])).size,
-    directors: new Set(rows.map(r => r[idx('director')]).filter(v => v && v !== 'Unknown')).size,
-  };
-
-  // 类型分布
-  const typeDist = [
-    { 类型：'Movie', 数量：movies.length, 占比：+(movies.length / rows.length * 100).toFixed(2) },
-    { 类型：'TV Show', 数量：shows.length, 占比：+(shows.length / rows.length * 100).toFixed(2) },
-  ];
-
-  // 年份趋势
-  const yearMap = {};
-  rows.forEach(r => {
-    const y = parseInt(r[idx('release_year')]) || 0;
-    if (!yearMap[y]) yearMap[y] = { Movie: 0, 'TV Show': 0 };
-    yearMap[y][r[idx('type')]]++;
-  });
-  const yearTrend = Object.entries(yearMap).sort((a,b) => a[0]-b[0]).map(([year, v]) => ({
-    year: +year, Movie: v.Movie, 'TV Show': v['TV Show'], total: v.Movie + v['TV Show']
-  }));
-
-  // 国家 Top15
-  const countryCount = {};
-  rows.forEach(r => {
-    const c = r[idx('primary_country')];
-    if (c && c !== 'Unknown') countryCount[c] = (countryCount[c]||0)+1;
-  });
-  const countries = Object.entries(countryCount).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([k,v])=>({国家:k,数量:v}));
-
-  // 流派 Top10
-  const genreCount = {};
-  rows.forEach(r => {
-    const g = r[idx('primary_genre')];
-    genreCount[g] = (genreCount[g]||0)+1;
-  });
-  const genres = Object.entries(genreCount).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v])=>({流派:k,数量:v}));
-
-  // 评级分布
-  const ratingCount = {};
-  rows.forEach(r => {
-    const rt = r[idx('rating')];
-    ratingCount[rt] = (ratingCount[rt]||0)+1;
-  });
-  const ratings = Object.entries(ratingCount).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v])=>({评级:k,数量:v}));
-
-  // 电影时长统计 & 直方图分箱
-  const durNums = movies.map(r => parseInt(r[idx('duration_num')]) || 0).filter(d => d > 0);
-  const durationStats = {
-    mean: +(durNums.reduce((a,b)=>a+b,0)/durNums.length).toFixed(1),
-    median: +(durNums.slice().sort((a,b)=>a-b)[Math.floor(durNums.length/2)]),
-    min: Math.min(...durNums),
-    max: Math.max(...durNums.length ? durNums : [0]),
-    count: durNums.length,
-  };
-
-  // 直方图分箱（bin=15min）
-  const binSize = 15;
-  const maxDur = Math.max(...durNums);
-  const bins = [];
-  for (let start = 0; start <= maxDur + binSize; start += binSize) bins.push(start);
-  const histCounts = new Array(bins.length-1).fill(0);
-  durNums.forEach(d => {
-    const bi = Math.min(Math.floor(d/binSize), bins.length-2);
-    histCounts[bi]++;
-  });
-  const durationHistogram = histCounts.map((c,i) => ({ range: `${bins[i]}-${bins[i+1]}`, count: c }));
-
-  // 流派 × 类型交叉
-  const topGenres = genres.slice(0,8).map(g => g.流派);
-  const genreTypeBreakdown = topGenres.map(genre => {
-    let mC = 0, sC = 0;
-    rows.forEach(r => {
-      if (r[idx('primary_genre')] === genre) {
-        if (r[idx('type')] === 'Movie') mC++;
-        else sC++;
-      }
-    });
-    return { 流派：genre, 电影：mC, 电视节目：sC };
-  });
-
-  // TV Show 季数分布
-  const seasonCount = {};
-  shows.forEach(r => {
-    let s = parseInt(r[idx('duration_num')]) || 1;
-    s = s > 6 ? '6+' : s;
-    seasonCount[s] = (seasonCount[s]||0)+1;
-  });
-  const seasonDist = Object.entries(seasonCount)
-    .sort((a,b) => typeof a[0]==='number'?a[0]-b[0]:String(a[0]).localeCompare(String(b[0])))
-    .map(([k,v]) => ({ 季数：k, 数量：v }));
-
-  // 热力图：年份 × 评级
-  const hmYears = [...new Set(yearTrend.map(y => y.year))].sort((a,b)=>a-b);
-  const hmRatings = ratings.slice(0,8).map(r => r.评级);
-  const heatmapData = [];
-  hmYears.forEach(y => {
-    hmRatings.forEach(rt => {
-      let cnt = 0;
-      rows.forEach(r => {
-        if (+r[idx('release_year')]==y && r[idx('rating')]==rt) cnt++;
-      });
-      heatmapData.push({ year: y, rating: rt, count: cnt });
-    });
-  });
-
-  return {
-    overview,
-    type_dist: typeDist,
-    year_trend: yearTrend,
-    countries,
-    genres,
-    ratings,
-    duration_stats: durationStats,
-    genre_type_breakdown: genreTypeBreakdown,
-    season_distribution: seasonDist,
-    heatmap_data: heatmapData,
-    heatmap_meta: { years: hmYears, ratings: hmRatings },
-    duration_histogram: durationHistogram
-  };
-}
-
-// ===== ECharts 通用配置 =====
-const palette = ['#E50914','#FF6B6B','#FFD700','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD','#A29BFE','#81ECEC'];
-
+// ===== ECharts 通用样式 =====
 const tooltipStyle = {
   backgroundColor: 'rgba(10, 10, 10, 0.96)',
   borderColor: 'rgba(229, 9, 20, 0.4)',
@@ -185,32 +30,40 @@ const axisStyle = {
   splitLine: { lineStyle: { color: 'rgba(255,255,255,0.04)', type: 'dashed' } }
 };
 
-/** 统一初始化图表（高清 + 脏矩形优化） */
-function initChart(elId) {
-  const el = document.getElementById(elId);
-  if (!el) return null;
-  const inst = echarts.init(el, null, {
-    renderer: 'canvas',
-    devicePixelRatio: DPR,
-    useDirtyRect: true,
-  });
-  chartInstances.push(inst);
-  return inst;
-}
+// ===== 图表实例管理 =====
+const chartManager = {
+  instances: [],
+  
+  create(elId) {
+    const el = document.getElementById(elId);
+    if (!el) return null;
+    const chart = echarts.init(el, null, {
+      renderer: 'canvas',
+      devicePixelRatio: CONFIG.DPR,
+      useDirtyRect: true,
+    });
+    this.instances.push(chart);
+    return chart;
+  },
+  
+  resize() {
+    this.instances.forEach(c => { try { c.resize(); } catch(e) {} });
+  },
+  
+  dispose() {
+    this.instances.forEach(c => c.dispose());
+    this.instances = [];
+  }
+};
 
-/** 统一防抖 ResizeObserver */
+// ===== 响应式布局 =====
 function setupResizeObserver() {
   let rafId = null;
   const ro = new ResizeObserver(() => {
     cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(() => {
-      chartInstances.forEach(c => { try { c.resize(); } catch(e) {} });
-    });
+    rafId = requestAnimationFrame(() => chartManager.resize());
   });
-  chartInstances.forEach(c => {
-    const dom = c.getDom();
-    if (dom) ro.observe(dom.parentElement || dom);
-  });
+  document.querySelectorAll('.chart-container').forEach(el => ro.observe(el));
 }
 
 // ===== 数字动画 =====
@@ -236,7 +89,7 @@ function renderAll(d) {
   animateNumbers(d.overview);
 
   // ==== 图 1：环形图 ====
-  const c1 = initChart('chart1');
+  const c1 = chartManager.create('chart1');
   c1.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...tooltipStyle, formatter: '{b}: {c} ({d}%)' },
@@ -261,7 +114,7 @@ function renderAll(d) {
   });
 
   // ==== 图 2：趋势折线 ====
-  const c2 = initChart('chart2');
+  const c2 = chartManager.create('chart2');
   c2.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', ...tooltipStyle, axisPointer: { type: 'cross', label: { backgroundColor: '#E50914' }, crossStyle: { color: '#999' } } },
@@ -290,7 +143,7 @@ function renderAll(d) {
   });
 
   // ==== 图 3：国家 Top15 ====
-  const c3 = initChart('chart3');
+  const c3 = chartManager.create('chart3');
   const countries = d.countries.slice().reverse();
   c3.setOption({
     backgroundColor: 'transparent',
@@ -314,7 +167,7 @@ function renderAll(d) {
   });
 
   // ==== 图 4：流派 Top10 ====
-  const c4 = initChart('chart4');
+  const c4 = chartManager.create('chart4');
   const genres = d.genres.slice().reverse();
   c4.setOption({
     backgroundColor: 'transparent',
@@ -338,7 +191,7 @@ function renderAll(d) {
   });
 
   // ==== 图 5：评级漏斗 ====
-  const c5 = initChart('chart5');
+  const c5 = chartManager.create('chart5');
   c5.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...tooltipStyle, formatter: '{b}: {c} ({d}%)' },
@@ -351,12 +204,12 @@ function renderAll(d) {
       labelLine: { show: false },
       itemStyle: { borderColor: 'rgba(8,8,8,0.8)', borderWidth: 3, borderRadius: 6 },
       emphasis: { label: { fontSize: 14 } },
-      data: d.ratings.map((x, i) => ({ name: x.评级，value: x.数量，itemStyle: { color: palette[i % palette.length] } }))
+      data: d.ratings.map((x, i) => ({ name: x.评级，value: x.数量，itemStyle: { color: CONFIG.COLORS.palette[i % CONFIG.COLORS.palette.length] } }))
     }]
   });
 
   // ==== 图 6：电影时长直方图 ====
-  const c6 = initChart('chart6');
+  const c6 = chartManager.create('chart6');
   const ds = d.duration_stats;
   const histData = d.duration_histogram || [];
   const activeBins = histData.filter(b => b.count > 5);
@@ -389,7 +242,7 @@ function renderAll(d) {
   });
 
   // ==== 图 7：流派×类型堆叠 ====
-  const c7 = initChart('chart7');
+  const c7 = chartManager.create('chart7');
   const gtData = d.genre_type_breakdown || [];
   c7.setOption({
     backgroundColor: 'transparent',
@@ -415,12 +268,12 @@ function renderAll(d) {
   });
 
   // ==== 图 8：词云 ====
-  const c8 = initChart('chart8');
+  const c8 = chartManager.create('chart8');
   const cloudData = d.genres.map((x, i) => ({
     name: x.流派，
     value: x.数量，
     textSize: Math.max(16, Math.min(48, 12 + x.数量 / 60)),
-    color: palette[i % palette.length],
+    color: CONFIG.COLORS.palette[i % CONFIG.COLORS.palette.length],
     x: 10 + (i % 5) * 18 + Math.random() * 8,
     y: 15 + Math.floor(i / 5) * 35 + Math.random() * 10
   }));
@@ -446,7 +299,7 @@ function renderAll(d) {
   });
 
   // ==== 图 9：季数玫瑰图 ====
-  const c9 = initChart('chart9');
+  const c9 = chartManager.create('chart9');
   const sd = (d.season_distribution || []).map(s => ({
     name: (typeof s.季数 === 'number' ? s.季数 + ' Season' : s.季数),
     value: s.数量
@@ -465,14 +318,14 @@ function renderAll(d) {
       data: sd.map((x, i) => ({
         ...x,
         itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{ offset: 0, color: palette[i % palette.length] }, { offset: 1, color: palette[(i + 3) % palette.length] + '88' }])
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{ offset: 0, color: CONFIG.COLORS.palette[i % CONFIG.COLORS.palette.length] }, { offset: 1, color: CONFIG.COLORS.palette[(i + 3) % CONFIG.COLORS.palette.length] + '88' }])
         }
       }))
     }]
   });
 
   // ==== 图 10：热力图 ====
-  const c10 = initChart('chart10');
+  const c10 = chartManager.create('chart10');
   const hmMeta = d.heatmap_meta || { years: [], ratings: [] };
   const hmYears = hmMeta.years, hmRatings = hmMeta.ratings;
   const hmRaw = d.heatmap_data || [], hmData = [];
@@ -536,21 +389,17 @@ function showError(msg) {
   `;
 }
 
-// ===== 启动：直接从 CSV 加载数据 =====
-fetch('netflix_titles_cleaned.csv')
+// ===== 启动：从 JSON 加载数据 =====
+fetch('data/analysis_data.json')
   .then(r => {
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.text();
+    return r.json();
   })
-  .then(csvText => {
-    const rows = parseCSV(csvText);
-    if (!rows.length) throw new Error('CSV 解析结果为空');
-    const headers = rows.shift();
-    console.log(`CSV 加载成功：${rows.length} 条记录，${headers.length} 列`);
-    const data = aggregate(rows, headers);
+  .then(data => {
+    console.log('数据加载成功:', data.overview);
     renderAll(data);
   })
   .catch(err => {
     console.error(err);
-    showError(err.message || '无法加载 netflix_titles_cleaned.csv，请确认文件存在。');
+    showError(err.message || '无法加载 analysis_data.json，请确认文件存在。');
   });
