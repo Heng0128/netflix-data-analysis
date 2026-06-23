@@ -7,6 +7,35 @@
 <meta name="description" content="Netflix 电影与电视节目数据分析可视化看板 — 8,807 部作品 × 10 张交互式图表">
 <meta name="keywords" content="Netflix，数据分析，可视化,ECharts,Python，数据科学">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
+
+<!-- SEO & Social Sharing -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Netflix 数据分析 · 可视化看板">
+<meta property="og:description" content="8,807部作品 × 10个交互式图表，深度分析Netflix内容库。">
+<meta property="og:url" content="https://heng0128.github.io/netflix-data-analysis/">
+<meta property="og:image" content="https://heng0128.github.io/netflix-data-analysis/preview.png">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Netflix 数据分析 · 可视化看板">
+<meta name="theme-color" content="#E50914">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Netflix Titles Dataset Analysis",
+  "description": "Netflix 电影与电视节目数据分析可视化看板，包含8807部作品的多维度分析",
+  "creator": {
+    "@type": "Organization",
+    "name": "数据分析小组"
+  },
+  "temporalCoverage": "2000-2024",
+  "measurementTechnique": "数据可视化",
+  "variableMeasured": [
+    "内容类型", "发布年份", "制片国家", "流派", "评级", "时长", "季数"
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -89,15 +118,15 @@
       <span class="tag">INTERACTIVE CHARTS</span>
     </div>
     <div class="charts-grid">
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🍩</span>内容类型分布</div><span class="badge">PIE CHART</span></div><p class="desc">电影与电视节目的整体占比情况</p><div class="chart-container" id="chart1"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">📈</span>年度发布趋势</div><span class="badge">LINE CHART</span></div><p class="desc">2000-2024 年内容发布数量变化</p><div class="chart-container tall" id="chart2"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🌏</span>制片国家 TOP15</div><span class="badge">BAR CHART</span></div><p class="desc">各国制作内容数量排名</p><div class="chart-container" id="chart3"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🎭</span>热门流派 TOP10</div><span class="badge">BAR CHART</span></div><p class="desc">最受欢迎的内容流派排名</p><div class="chart-container" id="chart4"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🔞</span>内容评级分布</div><span class="badge">FUNNEL CHART</span></div><p class="desc">不同年龄分级内容占比</p><div class="chart-container" id="chart5"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">⏱️</span>电影时长分布</div><span class="badge">HISTOGRAM</span></div><p class="desc">电影时长的频率分布直方图</p><div class="chart-container" id="chart6"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">📊</span>流派×类型对比</div><span class="badge">STACKED BAR</span></div><p class="desc">各流派中电影与电视节目构成</p><div class="chart-container" id="chart7"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🌹</span>TV 剧集季数分布</div><span class="badge">ROSE CHART</span></div><p class="desc">电视节目的季数分布情况</p><div class="chart-container" id="chart8"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🔥</span>年份×评级热力图</div><span class="badge">HEATMAP</span></div><p class="desc">不同年份与各评级的内容密度</p><div class="chart-container tall" id="chart9"></div></div>
+      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🍩</span>内容类型分布</div><span class="badge">PIE CHART</span></div><p class="desc">电影与电视节目的整体占比情况</p><div class="chart-container" id="chart1" role="img" aria-label="内容类型分布饼图：电影 69.6%，电视节目 30.4%"></div></div>
+      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">📈</span>年度发布趋势</div><span class="badge">LINE CHART</span></div><p class="desc">2000-2024 年内容发布数量变化</p><div class="chart-container tall" id="chart2" role="img" aria-label="年度发布趋势折线图：显示 2008-2024 年电影和电视节目发布数量的变化趋势"></div></div>
+      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🌏</span>制片国家 TOP15</div><span class="badge">BAR CHART</span></div><p class="desc">各国制作内容数量排名</p><div class="chart-container" id="chart3" role="img" aria-label="制片国家 TOP15 条形图：美国位居第一，共 3690 部作品"></div></div>
+      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🎭</span>热门流派 TOP10</div><span class="badge">BAR CHART</span></div><p class="desc">最受欢迎的内容流派排名</p><div class="chart-container" id="chart4" role="img" aria-label="热门流派 TOP10 条形图：International Movies 以 1689 部位居第一"></div></div>
+      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🔞</span>内容评级分布</div><span class="badge">BAR CHART</span></div><p class="desc">不同年龄分级内容占比</p><div class="chart-container" id="chart5" role="img" aria-label="内容评级分布条形图：TV-MA 占比最高 36.5%"></div></div>
+      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">⏱️</span>电影时长分布</div><span class="badge">HISTOGRAM</span></div><p class="desc">电影时长的频率分布直方图</p><div class="chart-container" id="chart6" role="img" aria-label="电影时长分布直方图：平均时长约 100 分钟"></div></div>
+      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">📊</span>流派×类型对比</div><span class="badge">STACKED BAR</span></div><p class="desc">各流派中电影与电视节目构成</p><div class="chart-container" id="chart7" role="img" aria-label="流派×类型堆叠条形图：展示各流派中电影和电视节目的数量分布"></div></div>
+      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🌹</span>TV 剧集季数分布</div><span class="badge">ROSE CHART</span></div><p class="desc">电视节目的季数分布情况</p><div class="chart-container" id="chart8" role="img" aria-label="TV 剧集季数玫瑰图：1 季节目占比最大（52%）"></div></div>
+      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🔥</span>年份×评级热力图</div><span class="badge">HEATMAP</span></div><p class="desc">不同年份与各评级的内容密度</p><div class="chart-container tall" id="chart9" role="img" aria-label="年份×评级热力图：显示 2008-2024 年各评级内容密度的变化"></div></div>
     </div>
   </section>
 

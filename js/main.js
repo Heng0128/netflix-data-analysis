@@ -5,6 +5,26 @@
  * ============================================================
  */
 
+// ===== 配置常量 =====
+const CONFIG = Object.freeze({
+  CHART_YEAR_START: 2008,
+  DURATION_BIN_SIZE: 15,
+  TOP_COUNTRIES_COUNT: 15,
+  TOP_GENRES_COUNT: 10,
+  RARE_DURATION_THRESHOLD: 5,
+  SEASON_GROUP_THRESHOLD: 6,
+  SCROLL_NAV_THRESHOLD: 40,
+  NUMBER_ANIM_DURATION: 2000,
+  CHART_ENTRY_STAGGER: 80,
+  MAX_DPR: 2,
+  COLORS: {
+    red: '#E50914',
+    gold: '#FFD700',
+    teal: '#4ECDC4',
+    bg: '#080808'
+  }
+});
+
 // ===== 导航栏滚动效果 =====
 const nav = document.getElementById('nav');
 let scrollTicking = false;
@@ -17,6 +37,42 @@ window.addEventListener('scroll', () => {
     scrollTicking = true;
   }
 });
+// ===== 汉堡菜单交互 =====
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.querySelector('.nav-links');
+if (hamburger) {
+  hamburger.addEventListener('click', function() {
+    this.classList.toggle('open');
+    navLinks.classList.toggle('open');
+  });
+  // 点击导航链接后自动关闭菜单
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      navLinks.classList.remove('open');
+    });
+  });
+}
+
+// ===== 导航栏当前章节高亮 =====
+function setupNavHighlight() {
+  const sections = ['team', 'overview', 'charts', 'conclusion'].map(id => document.getElementById(id));
+  const links = document.querySelectorAll('.nav-links a');
+  
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        links.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+        });
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-64px 0px 0px 0px' });
+  
+  sections.forEach(s => s && navObserver.observe(s));
+}
+
 // ===== 滚动入场动画 =====
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
@@ -280,11 +336,17 @@ function loadData() {
     });
 }
 
-// ===== 数字动画 =====
+// ===== 数字动画（支持 prefers-reduced-motion）=====
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function animateNumbers(overview) {
   const values = [overview.total, overview.movies, overview.tvshows, overview.countries, overview.genres, overview.directors];
   document.querySelectorAll('#overviewGrid .value').forEach((el, i) => {
     const target = values[i];
+    if (prefersReducedMotion) {
+      el.textContent = target.toLocaleString();
+      return;
+    }
     const duration = 2000;
     const startTime = performance.now();
     function step(now) {
@@ -442,22 +504,36 @@ function renderAll(d) {
     }]
   });
 
-  // ==== 图 5：评级漏斗 ====
+  // ==== 图 5：评级分布（水平条形图）====
   const c5 = initChart('chart5');
+  const ratingSorted = d.ratings.slice().reverse();
   c5.setOption({
     backgroundColor: 'transparent',
-    tooltip: { trigger: 'item', ...tooltipStyle, formatter: '{b}: {c} ({d}%)' },
-    legend: { top: 0, textStyle: { color: 'rgba(255,255,255,0.6)' }, itemGap: 12, icon: 'circle', itemWidth: 10 },
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle,
+      formatter: p => `${p[0].name}<br/>数量：<b>${p[0].value}</b> (${(p[0].value/d.overview.total*100).toFixed(1)}%)`
+    },
+    grid: { left: '2%', right: '10%', top: 8, bottom: 8, containLabel: true },
+    xAxis: { type: 'value', ...axisStyle },
+    yAxis: {
+      type: 'category',
+      data: ratingSorted.map(x => x.rating),
+      axisLine: { show: false },
+      axisLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11 }
+    },
     series: [{
-      name: '评级', type: 'funnel',
-      top: 50, left: '8%', width: '84%',
-      minSize: '18%', maxSize: '100%',
-      sort: 'descending', gap: 3,
-      label: { show: true, position: 'inside', color: '#fff', fontWeight: 700, formatter: '{b}\\n{c}', fontSize: 12, lineHeight: 20 },
-      labelLine: { show: false },
-      itemStyle: { borderColor: 'rgba(8,8,8,0.8)', borderWidth: 3, borderRadius: 6 },
-      emphasis: { label: { fontSize: 14 } },
-      data: d.ratings.map((x, i) => ({ name: x.rating, value: x.count, itemStyle: { color: palette[i % palette.length] } }))
+      type: 'bar',
+      data: ratingSorted.map((x, i) => ({
+        value: x.count,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+            { offset: 0, color: 'rgba(229, 9, 20, 0.4)' },
+            { offset: 1, color: '#E50914' }
+          ]),
+          borderRadius: [0, 8, 8, 0]
+        }
+      })),
+      barWidth: '55%',
+      label: { show: true, position: 'right', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 11 }
     }]
   });
 
@@ -558,6 +634,10 @@ function renderAll(d) {
 
   // 启动统一 Resize Observer
   setupResizeObserver();
+  
+  // 启动导航高亮
+  setupNavHighlight();
+  
   hideLoader();
 }
 

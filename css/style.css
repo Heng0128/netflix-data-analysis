@@ -772,7 +772,26 @@ body {
 @media (max-width: 900px) {
   .container { padding: 0 20px; }
   .nav { padding: 0 20px; }
-  .nav-links { display: none; }
+  .nav-links { 
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: rgba(8, 8, 8, 0.98);
+    padding: 20px;
+    gap: 4px;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+  }
+  .nav-links.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
   .charts-grid { grid-template-columns: 1fr; }
   .team-grid { grid-template-columns: 1fr; }
   .findings-grid { grid-template-columns: 1fr; }
@@ -780,6 +799,12 @@ body {
   .hero h1 { font-size: 20px; letter-spacing: 3px; }
   .overview-grid { grid-template-columns: repeat(2, 1fr); }
   .conclusion { padding: 28px 20px; }
+}
+
+/* 导航链接高亮 */
+.nav-links a.active {
+  color: #fff;
+  background: rgba(229, 9, 20, 0.25);
 }
 
 /* ===== 滚动条 ===== */
