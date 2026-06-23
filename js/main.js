@@ -299,75 +299,13 @@ function renderAll(d) {
     ]
   });
 
-  // ==== 图 8：词云（使用 Force Graph 布局）====
+  // ==== 图 8：季数玫瑰图 ====
   const c8 = initChart('chart8');
-  const cloudData = d.genres.map((x, i) => ({
-    name: x.流派, 
-    value: x.数量,
-    symbolSize: Math.max(12, Math.min(40, 12 + x.数量 / 60)),
-    itemStyle: { 
-      color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-        { offset: 0, color: '#E50914' },
-        { offset: 1, color: '#B20710' }
-      ]),
-      borderColor: '#fff',
-      borderWidth: 1,
-      shadowBlur: 10,
-      shadowColor: 'rgba(229, 9, 20, 0.5)'
-    }
-  })).slice(0, 50); // 取前 50 个
-  
-  c8.setOption({
-    backgroundColor: 'transparent',
-    tooltip: { 
-      ...tooltipStyle, 
-      formatter: p => `${p.data.name}: ${p.data.value} 部作品` 
-    },
-    series: [{
-      type: 'graph',
-      layout: 'force',
-      data: cloudData,
-      force: {
-        repulsion: 120,
-        edgeLength: 10,
-        gravity: 0.08
-      },
-      roam: true,
-      label: {
-        show: true,
-        position: 'inside',
-        color: '#fff',
-        fontSize: p => Math.max(10, p.data.symbolSize * 0.5),
-        fontWeight: 'bold',
-        formatter: '{b}'
-      },
-      emphasis: {
-        focus: 'adjacency',
-        label: { show: true, color: '#fff', fontSize: 14 },
-        itemStyle: {
-          color: '#fff',
-          borderColor: '#E50914',
-          borderWidth: 2
-        }
-      }
-    }]
-  });
-  
-  // 绑定词云点击事件 - 下钻到表格
-  c8.on('click', (params) => {
-    if (params.dataType === 'node') {
-      const genreName = params.name;
-      updateDrillTable(genreName, d.raw_data || []);
-    }
-  });
-
-  // ==== 图 9：季数玫瑰图 ====
-  const c9 = initChart('chart9');
   const seasonData = (d.season_distribution || []).map(s => ({
     name: typeof s.季数 === 'number' ? `${s.季数} Season` : s.季数,
     value: s.数量
   }));
-  c9.setOption({
+  c8.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...tooltipStyle, formatter: '{b}: {c} ({d}%)' },
     legend: { orient: 'vertical', right: 10, top: 'middle', textStyle: { color: 'rgba(255,255,255,0.6)', fontSize: 12 }, icon: 'circle', itemGap: 12 },
@@ -385,11 +323,11 @@ function renderAll(d) {
     }]
   });
 
-  // ==== 图 10：热力图 ====
-  const c10 = initChart('chart10');
+  // ==== 图 9：热力图 ====
+  const c9 = initChart('chart9');
   const hmMeta = d.heatmap_meta || { years: [], ratings: [] };
   const hmData = (d.heatmap_data || []).map(pt => [hmMeta.years.indexOf(pt.year), hmMeta.ratings.indexOf(pt.rating), pt.count]);
-  c10.setOption({
+  c9.setOption({
     backgroundColor: 'transparent',
     tooltip: { ...tooltipStyle, position: 'top', formatter: p => `${p.data[0]} 年 / ${p.data[1]}<br/>数量：<b>${p.data[2]}</b>` },
     grid: { left: '4%', right: '8%', top: 8, bottom: 30, containLabel: true },
@@ -402,46 +340,6 @@ function renderAll(d) {
   // 启动统一 Resize Observer
   setupResizeObserver();
   hideLoader();
-}
 
 // ===== 启动 =====
 loadData().then(renderAll).catch(() => {});
-
-// ===== 词云下钻表格更新函数 =====
-function updateDrillTable(genreName, rawData) {
-  const tableBody = document.getElementById('drillTableBody');
-  const drillTitle = document.getElementById('drillTitle');
-  
-  if (!tableBody || !drillTitle) return;
-  
-  // 更新标题
-  drillTitle.innerHTML = `🔍 聚焦流派：<span style="color:#E50914">${genreName}</span>`;
-  
-  // 显示加载中
-  tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;">正在加载...</td></tr>';
-  
-  // 过滤数据：查找包含该流派的作品
-  const filtered = rawData.filter(item => {
-    if (item.listed_in && typeof item.listed_in === 'string') {
-      return item.listed_in.includes(genreName);
-    }
-    return false;
-  }).slice(0, 10); // 最多显示 10 条
-  
-  setTimeout(() => {
-    if (filtered.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#888;">暂无相关数据</td></tr>';
-      return;
-    }
-    
-    const html = filtered.map(item => `
-      <tr>
-        <td style="font-weight:600">${item.title || 'Unknown'}</td>
-        <td>${item.release_year || '-'}</td>
-        <td><span class="badge">${item.rating || 'NR'}</span></td>
-      </tr>
-    `).join('');
-    
-    tableBody.innerHTML = html;
-  }, 200);
-}
