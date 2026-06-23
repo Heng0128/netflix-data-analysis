@@ -394,7 +394,7 @@ function renderAll(d) {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle },
     grid: { left: '2%', right: '10%', top: 8, bottom: 8, containLabel: true },
     xAxis: { type: 'value', ...axisStyle },
-    yAxis: { type: 'category', data: countries.map(x => x.国家), axisLine: { show: false }, axisLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 12 } },
+    yAxis: { type: 'category', data: countries.map(x => x.country), axisLine: { show: false }, axisLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 12 } },
     series: [{
       type: 'bar',
       data: countries.map((x, i) => ({
@@ -415,7 +415,7 @@ function renderAll(d) {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle },
     grid: { left: '2%', right: '12%', top: 8, bottom: 8, containLabel: true },
     xAxis: { type: 'value', ...axisStyle },
-    yAxis: { type: 'category', data: genres.map(x => x.流派), axisLine: { show: false }, axisLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11 } },
+    yAxis: { type: 'category', data: genres.map(x => x.genre), axisLine: { show: false }, axisLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11 } },
     series: [{
       type: 'bar',
       data: genres.map((x, i) => ({
@@ -443,7 +443,7 @@ function renderAll(d) {
       labelLine: { show: false },
       itemStyle: { borderColor: 'rgba(8,8,8,0.8)', borderWidth: 3, borderRadius: 6 },
       emphasis: { label: { fontSize: 14 } },
-      data: d.ratings.map((x, i) => ({ name: x.评级, value: x.count, itemStyle: { color: palette[i % palette.length] } }))
+      data: d.ratings.map((x, i) => ({ name: x.rating, value: x.count, itemStyle: { color: palette[i % palette.length] } }))
     }]
   });
 
@@ -486,20 +486,20 @@ function renderAll(d) {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle },
     legend: { top: 0, textStyle: { color: 'rgba(255,255,255,0.6)' }, icon: 'roundRect', itemGap: 24 },
     grid: { left: '2%', right: '3%', top: 40, bottom: 50, containLabel: true },
-    xAxis: { type: 'category', data: gtData.map(x => x.流派), ...axisStyle, axisLabel: { ...axisStyle.axisLabel, rotate: 20, fontSize: 10, color: 'rgba(255,255,255,0.6)' } },
+    xAxis: { type: 'category', data: gtData.map(x => x.genre), ...axisStyle, axisLabel: { ...axisStyle.axisLabel, rotate: 20, fontSize: 10, color: 'rgba(255,255,255,0.6)' } },
     yAxis: { type: 'value', ...axisStyle },
     series: [
       {
         name: '电影', type: 'bar', stack: 'total', barWidth: '50%',
         itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#E50914' }, { offset: 1, color: '#831010' }]), borderRadius: [0, 0, 0, 0] },
         emphasis: { focus: 'series' },
-        data: gtData.map(x => x.电影)
+        data: gtData.map(x => x.movie)
       },
       {
         name: '电视节目', type: 'bar', stack: 'total', barWidth: '50%',
         itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#4ECDC4' }, { offset: 1, color: '#2E8B8B' }]), borderRadius: [6, 6, 0, 0] },
         emphasis: { focus: 'series' },
-        data: gtData.map(x => x['电视节目'])
+        data: gtData.map(x => x.tvshow)
       }
     ]
   });
@@ -507,8 +507,8 @@ function renderAll(d) {
   // ==== 图 8：季数玫瑰图 ====
   const c8 = initChart('chart8');
   const seasonData = (d.season_distribution || []).map(s => ({
-    name: typeof s.季数 === 'number' ? `${s.季数} Season` : s.季数,
-    value: s.数量
+    name: typeof s.seasonNum === 'number' ? `${s.seasonNum} Season` : s.seasonNum,
+    value: s.count
   }));
   c8.setOption({
     backgroundColor: 'transparent',
