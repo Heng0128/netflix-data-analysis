@@ -1,7 +1,7 @@
 /**
  * ============================================================
  * Netflix 数据分析看板 - 主脚本
- * 数据链路：analysis_data.json → ECharts 渲染
+ * 数据链路：netflix_titles_cleaned.csv → PapaParse 解析 → 前端聚合计算 → ECharts 渲染
  * ============================================================
  */
 
@@ -26,7 +26,7 @@ document.querySelectorAll('.chart-card').forEach(el => observer.observe(el));
 // ===== 加载数据（带 Loading / Error 状态） =====
 const loader = document.createElement('div');
 loader.id = 'data-loader';
-loader.innerHTML = '<div class="spinner"></div><p>正在加载数据...</p>';
+loader.innerHTML = '<div class="spinner"></div><p>正在加载 CSV 数据...</p>';
 Object.assign(loader.style, {
   position: 'fixed', inset: 0, zIndex: 9999,
   background: 'rgba(8,8,8,0.92)', backdropFilter: 'blur(12px)',
@@ -48,15 +48,220 @@ function showError(msg) {
   loader.innerHTML = `<div style="color:#E50914;font-size:18px;font-weight:700;margin-bottom:8px;">数据加载失败</div><p style="color:#999;font-size:13px;max-width:400px;text-align:center;line-height:1.6">${msg}</p><button onclick="location.reload()" style="margin-top:20px;padding:10px 28px;background:#E50914;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;">重新加载</button>`;
 }
 
+/**
+ * 从 CSV 数据计算所有分析指标
+ */
+function computeAnalysisData(rows) {
+  const data = rows;
+  
+  // 基础统计
+  const total = data.length;
+  const movies = data.filter(r => r.type === 'Movie').length;
+  const tvshows = data.filter(r => r.type === 'TV Show').length;
+  
+  // 国家统计
+  const countryMap = {};
+  data.forEach(r => {
+    if (r.primary_country && r.primary_country !== 'Unknown') {
+      countryMap[r.primary_country] = (countryMap[r.primary_country] || 0) + 1;
+    }
+  });
+  const countries = Object.entries(countryMap)
+    .map(([国家，数量]) => ({ 国家，数量 }))
+    .sort((a, b) => b.数量 - a.数量)
+    .slice(0, 15);
+  
+  // 流派统计
+  const genreMap = {};
+  data.forEach(r => {
+    if (r.primary_genre) {
+      genreMap[r.primary_genre] = (genreMap[r.primary_genre] || 0) + 1;
+    }
+  });
+  const genres = Object.entries(genreMap)
+    .map(([流派，数量]) => ({ 流派，数量 }))
+    .sort((a, b) => b.数量 - a.数量)
+    .slice(0, 10);
+  
+  // 类型分布
+  const type_dist = [
+    { 类型：'Movie', 数量：movies, '占比(%)': +(movies / total * 100).toFixed(2) },
+    { 类型：'TV Show', 数量：tvshows, '占比(%)': +(tvshows / total * 100).toFixed(2) }
+  ];
+  
+  // 年度趋势
+  const yearMap = {};
+  data.forEach(r => {
+    const year = parseInt(r.release_year);
+    const type = r.type;
+    if (year >= 2008) {
+      if (!yearMap[year]) yearMap[year] = { Movie: 0, 'TV Show': 0 };
+      yearMap[year][type]++;
+    }
+  });
+  const year_trend = Object.entries(yearMap)
+    .map(([year, counts]) => ({
+      year: parseInt(year),
+      Movie: counts.Movie,
+      'TV Show': counts['TV Show'],
+      total: counts.Movie + counts['TV Show']
+    }))
+    .sort((a, b) => a.year - b.year);
+  
+  // 评级分布
+  const ratingMap = {};
+  data.forEach(r => {
+    if (r.rating) {
+      ratingMap[r.rating] = (ratingMap[r.rating] || 0) + 1;
+    }
+  });
+  const ratings = Object.entries(ratingMap)
+    .map(([评级，数量]) => ({ 评级，数量 }))
+    .sort((a, b) => b.数量 - a.数量);
+  
+  // 电影时长统计
+  const movieDurations = data
+    .filter(r => r.type === 'Movie' && r.duration_num)
+    .map(r => parseFloat(r.duration_num))
+    .filter(d => !isNaN(d));
+  
+  const duration_stats = {
+    mean: movieDurations.reduce((a, b) => a + b, 0) / movieDurations.length || 0,
+    median: 0,
+    min: Math.min(...movieDurations),
+    max: Math.max(...movieDurations),
+    count: movieDurations.length
+  };
+  
+  // 计算中位数
+  const sortedDurs = [...movieDurations].sort((a, b) => a - b);
+  const mid = Math.floor(sortedDurs.length / 2);
+  duration_stats.median = sortedDurs.length % 2 === 0 
+    ? (sortedDurs[mid - 1] + sortedDurs[mid]) / 2 
+    : sortedDurs[mid];
+  
+  // 时长直方图
+  const bins = [
+    ['0-15', 0, 15], ['15-30', 15, 30], ['30-45', 30, 45], ['45-60', 45, 60],
+    ['60-75', 60, 75], ['75-90', 75, 90], ['90-105', 90, 105], ['105-120', 105, 120],
+    ['120-135', 120, 135], ['135-150', 135, 150], ['150-165', 150, 165],
+    ['165-180', 165, 180], ['180-195', 180, 195], ['195-210', 195, 210],
+    ['210-225', 210, 225], ['225-240', 225, 240], ['240-255', 240, 255],
+    ['255-270', 255, 270], ['270-285', 270, 285], ['285-300', 285, 300],
+    ['300-315', 300, 315]
+  ];
+  
+  const duration_histogram = bins.map(([range, min, max]) => ({
+    range,
+    count: movieDurations.filter(d => d >= min && d < max).length
+  }));
+  
+  // 流派 × 类型分解
+  const genreTypeMap = {};
+  data.forEach(r => {
+    const genre = r.primary_genre || 'Unknown';
+    if (!genreTypeMap[genre]) genreTypeMap[genre] = { 电影：0, '电视节目': 0 };
+    if (r.type === 'Movie') genreTypeMap[genre].电影++;
+    else genreTypeMap[genre]['电视节目']++;
+  });
+  const genre_type_breakdown = Object.entries(genreTypeMap)
+    .map(([流派，counts]) => ({ 流派，...counts }))
+    .sort((a, b) => (b.电影 + b['电视节目']) - (a.电影 + a['电视节目']))
+    .slice(0, 10);
+  
+  // 季数分布
+  const seasonMap = {};
+  data.filter(r => r.type === 'TV Show').forEach(r => {
+    const seasons = r.duration_num ? parseInt(r.duration_num) : 0;
+    if (seasons >= 6) {
+      seasonMap['6+'] = (seasonMap['6+'] || 0) + 1;
+    } else if (seasons > 0) {
+      seasonMap[seasons] = (seasonMap[seasons] || 0) + 1;
+    }
+  });
+  const season_distribution = Object.entries(seasonMap)
+    .map(([季数，数量]) => ({ 季数：parseInt(季数) || 季数，数量 }))
+    .sort((a, b) => (typeof a.季数 === 'number' ? a.季数 : 99) - (typeof b.季数 === 'number' ? b.季数 : 99));
+  
+  // 热力图数据
+  const heatmapData = {};
+  data.forEach(r => {
+    const year = parseInt(r.release_year);
+    const rating = r.rating;
+    if (year >= 2008 && rating) {
+      const key = `${year}-${rating}`;
+      heatmapData[key] = (heatmapData[key] || 0) + 1;
+    }
+  });
+  
+  const hmYears = [...new Set(Object.keys(heatmapData).map(k => parseInt(k.split('-')[0])))].sort((a, b) => a - b);
+  const hmRatings = [...new Set(Object.keys(heatmapData).map(k => k.split('-')[1]))].sort();
+  
+  const heatmap_data = [];
+  const heatmap_meta = { years: hmYears, ratings: hmRatings };
+  
+  hmYears.forEach(year => {
+    hmRatings.forEach(rating => {
+      const count = heatmapData[`${year}-${rating}`] || 0;
+      if (count > 0) heatmap_data.push({ year, rating, count });
+    });
+  });
+  
+  // 导演数量
+  const directors = new Set(data.filter(r => r.director && r.director !== 'Unknown').map(r => r.director)).size;
+  
+  return {
+    overview: {
+      total,
+      movies,
+      tvshows,
+      countries: Object.keys(countryMap).length,
+      genres: Object.keys(genreMap).length,
+      directors
+    },
+    type_dist,
+    year_trend,
+    countries,
+    genres,
+    ratings,
+    duration_stats,
+    duration_histogram,
+    genre_type_breakdown,
+    season_distribution,
+    heatmap_data,
+    heatmap_meta
+  };
+}
+
 function loadData() {
-  return fetch('data/analysis_data.json')
+  return fetch('netflix_titles_cleaned.csv')
     .then(r => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
+      return r.text();
+    })
+    .then(csvText => {
+      return new Promise((resolve, reject) => {
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            if (results.errors && results.errors.length > 0) {
+              console.warn('CSV parsing warnings:', results.errors);
+            }
+            try {
+              const analysisData = computeAnalysisData(results.data);
+              resolve(analysisData);
+            } catch (err) {
+              reject(err);
+            }
+          },
+          error: (err) => reject(err)
+        });
+      });
     })
     .catch(err => {
       console.error('Data load error:', err);
-      showError(err.message || '无法连接到数据文件，请确认网络连接正常后重试。');
+      showError(err.message || '无法加载 CSV 数据文件，请确认网络连接正常后重试。');
       throw err;
     });
 }
