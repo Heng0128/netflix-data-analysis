@@ -545,6 +545,7 @@ function renderAll(d) {
   // 启动统一 Resize Observer
   setupResizeObserver();
   hideLoader();
+}
 
 // ===== 启动 =====
 loadData().then(renderAll).catch(() => {});
