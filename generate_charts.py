@@ -5,7 +5,7 @@ import os
 from collections import Counter
 from pyecharts import options as opts
 from pyecharts.charts import (
-    Bar, Pie, Line, WordCloud, HeatMap, Funnel, Page,
+    Bar, Pie, Line, HeatMap, Funnel, Page,
 )
 from pyecharts.globals import ThemeType, CurrentConfig
 
@@ -319,25 +319,6 @@ def chart_genre_type():
     )
     return c
 
-# 图8 词云
-def chart_wordcloud():
-    words = [[g, int(c)] for g, c in Counter(all_genres).most_common()]
-    c = (
-        WordCloud(init_opts=opts.InitOpts(theme=ThemeType.DARK, width="100%", height="550px"))
-        .add(
-            "", words,
-            word_size_range=[16, 80], shape="cardioid",
-            textstyle_opts=opts.TextStyleOpts(font_family="Microsoft YaHei"),
-        )
-        .set_global_opts(
-            title_opts=opts.TitleOpts(
-                title="☁️ Netflix 流派词云",
-                title_textstyle_opts=opts.TextStyleOpts(color="#fff", font_size=22, font_weight="bold"),
-                pos_left="center",
-            ),
-        )
-    )
-    return c
 
 # 图9 季数玫瑰图
 def chart_season_rose():
@@ -412,7 +393,7 @@ def chart_heatmap():
 # 生成所有图表
 charts = []
 for i, fn in enumerate([chart_type_pie, chart_year_line, chart_country_bar, chart_genre_bar,
-                        chart_rating_funnel, chart_duration, chart_genre_type, chart_wordcloud,
+                        chart_rating_funnel, chart_duration, chart_genre_type,
                         chart_season_rose, chart_heatmap], 1):
     c = fn()
     c.render(f'charts/chart{i}.html')
