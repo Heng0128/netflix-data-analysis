@@ -7,10 +7,16 @@
 
 // ===== 导航栏滚动效果 =====
 const nav = document.getElementById('nav');
+let scrollTicking = false;
 window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 40);
+  if (!scrollTicking) {
+    requestAnimationFrame(() => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+      scrollTicking = false;
+    });
+    scrollTicking = true;
+  }
 });
-
 // ===== 滚动入场动画 =====
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
@@ -54,51 +60,94 @@ function showError(msg) {
 function computeAnalysisData(rows) {
   const data = rows;
   
-  // 基础统计
-  const total = data.length;
-  const movies = data.filter(r => r.type === 'Movie').length;
-  const tvshows = data.filter(r => r.type === 'TV Show').length;
-  
-  // 国家统计
+  // ====== 单次遍历完成所有统计 ======
   const countryMap = {};
-  data.forEach(r => {
+  const genreMap = {};
+  const yearMap = {};
+  const ratingMap = {};
+  const genreTypeMap = {};
+  const seasonMap = {};
+  const heatmapData = {};
+  const movieDurations = [];
+  const directorSet = new Set();
+  
+  let total = 0, movies = 0, tvshows = 0;
+  
+  rows.forEach(r => {
+    total++;
+    const year = parseInt(r.release_year);
+    const type = r.type;
+    
+    // 类型统计
+    if (type === 'Movie') {
+      movies++;
+      const dur = parseFloat(r.duration_num);
+      if (!isNaN(dur)) movieDurations.push(dur);
+    } else if (type === 'TV Show') {
+      tvshows++;
+      const seasons = r.duration_num ? parseInt(r.duration_num) : 0;
+      if (seasons > 0) {
+        const key = seasons >= 6 ? '6+' : String(seasons);
+        seasonMap[key] = (seasonMap[key] || 0) + 1;
+      }
+    }
+    
+    // 国家统计
     if (r.primary_country && r.primary_country !== 'Unknown') {
       countryMap[r.primary_country] = (countryMap[r.primary_country] || 0) + 1;
     }
+    
+    // 流派统计
+    const genre = r.primary_genre || 'Unknown';
+    if (r.primary_genre) {
+      genreMap[genre] = (genreMap[genre] || 0) + 1;
+    }
+    
+    // 流派×类型
+    if (!genreTypeMap[genre]) genreTypeMap[genre] = { movie: 0, tvshow: 0 };
+    if (type === 'Movie') genreTypeMap[genre].movie++;
+    else genreTypeMap[genre].tvshow++;
+    
+    // 年度趋势（2008 年起）
+    if (year >= 2008) {
+      if (!yearMap[year]) yearMap[year] = { Movie: 0, 'TV Show': 0 };
+      yearMap[year][type]++;
+    }
+    
+    // 评级
+    if (r.rating) {
+      ratingMap[r.rating] = (ratingMap[r.rating] || 0) + 1;
+    }
+    
+    // 热力图
+    if (year >= 2008 && r.rating) {
+      const key = `${year}-${r.rating}`;
+      heatmapData[key] = (heatmapData[key] || 0) + 1;
+    }
+    
+    // 导演
+    if (r.director && r.director !== 'Unknown') {
+      directorSet.add(r.director);
+    }
   });
+  
   const countries = Object.entries(countryMap)
     .map(([country, count]) => ({ country, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 15);
   
-  // 流派统计
-  const genreMap = {};
-  data.forEach(r => {
-    if (r.primary_genre) {
-      genreMap[r.primary_genre] = (genreMap[r.primary_genre] || 0) + 1;
-    }
-  });
+
   const genres = Object.entries(genreMap)
     .map(([genre, count]) => ({ genre, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
   
-  // 类型分布
   const type_dist = [
     { type: 'Movie', count: movies, percentage: +(movies / total * 100).toFixed(2) },
     { type: 'TV Show', count: tvshows, percentage: +(tvshows / total * 100).toFixed(2) }
   ];
   
-  // 年度趋势
-  const yearMap = {};
-  data.forEach(r => {
-    const year = parseInt(r.release_year);
-    const type = r.type;
-    if (year >= 2008) {
-      if (!yearMap[year]) yearMap[year] = { Movie: 0, 'TV Show': 0 };
-      yearMap[year][type]++;
-    }
-  });
+
   const year_trend = Object.entries(yearMap)
     .map(([year, counts]) => ({
       year: parseInt(year),
@@ -108,22 +157,12 @@ function computeAnalysisData(rows) {
     }))
     .sort((a, b) => a.year - b.year);
   
-  // 评级分布
-  const ratingMap = {};
-  data.forEach(r => {
-    if (r.rating) {
-      ratingMap[r.rating] = (ratingMap[r.rating] || 0) + 1;
-    }
-  });
+
   const ratings = Object.entries(ratingMap)
     .map(([rating, count]) => ({ rating, count }))
     .sort((a, b) => b.count - a.count);
   
-  // 电影时长统计
-  const movieDurations = data
-    .filter(r => r.type === 'Movie' && r.duration_num)
-    .map(r => parseFloat(r.duration_num))
-    .filter(d => !isNaN(d));
+  // movieDurations already collected in single loop above
   
   const duration_stats = {
     mean: movieDurations.reduce((a, b) => a + b, 0) / movieDurations.length || 0,
@@ -151,48 +190,24 @@ function computeAnalysisData(rows) {
     ['300-315', 300, 315]
   ];
   
-  const duration_histogram = bins.map(([range, min, max]) => ({
-    range,
-    count: movieDurations.filter(d => d >= min && d < max).length
-  }));
-  
-  // 流派 × 类型分解
-  const genreTypeMap = {};
-  data.forEach(r => {
-    const genre = r.primary_genre || 'Unknown';
-    if (!genreTypeMap[genre]) genreTypeMap[genre] = { movie: 0, tvshow: 0 };
-    if (r.type === 'Movie') genreTypeMap[genre].movie++;
-    else genreTypeMap[genre].tvshow++;
+  const BIN_SIZE = 15;
+  const duration_histogram = bins.map(b => ({ range: b[0], count: 0 }));
+  movieDurations.forEach(d => {
+    const binIdx = Math.min(Math.floor(d / BIN_SIZE), bins.length - 1);
+    if (binIdx >= 0) duration_histogram[binIdx].count++;
   });
+  
   const genre_type_breakdown = Object.entries(genreTypeMap)
     .map(([genre, counts]) => ({ genre, ...counts }))
     .sort((a, b) => (b.movie + b.tvshow) - (a.movie + a.tvshow))
     .slice(0, 10);
   
-  // 季数分布
-  const seasonMap = {};
-  data.filter(r => r.type === 'TV Show').forEach(r => {
-    const seasons = r.duration_num ? parseInt(r.duration_num) : 0;
-    if (seasons >= 6) {
-      seasonMap['6+'] = (seasonMap['6+'] || 0) + 1;
-    } else if (seasons > 0) {
-      seasonMap[seasons] = (seasonMap[seasons] || 0) + 1;
-    }
-  });
+
   const season_distribution = Object.entries(seasonMap)
     .map(([seasons, count]) => ({ seasonNum: parseInt(seasons) || seasons, count }))
     .sort((a, b) => (typeof a.seasonNum === 'number' ? a.seasonNum : 99) - (typeof b.seasonNum === 'number' ? b.seasonNum : 99));
   
-  // 热力图数据
-  const heatmapData = {};
-  data.forEach(r => {
-    const year = parseInt(r.release_year);
-    const rating = r.rating;
-    if (year >= 2008 && rating) {
-      const key = `${year}-${rating}`;
-      heatmapData[key] = (heatmapData[key] || 0) + 1;
-    }
-  });
+
   
   const hmYears = [...new Set(Object.keys(heatmapData).map(k => parseInt(k.split('-')[0])))].sort((a, b) => a - b);
   const hmRatings = [...new Set(Object.keys(heatmapData).map(k => k.split('-')[1]))].sort();
@@ -207,8 +222,7 @@ function computeAnalysisData(rows) {
     });
   });
   
-  // 导演数量
-  const directors = new Set(data.filter(r => r.director && r.director !== 'Unknown').map(r => r.director)).size;
+  const directors = directorSet.size;
   
   return {
     overview: {
@@ -534,7 +548,7 @@ function renderAll(d) {
   const hmData = (d.heatmap_data || []).map(pt => [hmMeta.years.indexOf(pt.year), hmMeta.ratings.indexOf(pt.rating), pt.count]);
   c9.setOption({
     backgroundColor: 'transparent',
-    tooltip: { ...tooltipStyle, position: 'top', formatter: p => `${p.data[0]} 年 / ${p.data[1]}<br/>数量：<b>${p.data[2]}</b>` },
+    tooltip: { ...tooltipStyle, position: 'top', formatter: p => { const yearIdx = p.data[0]; const ratingIdx = p.data[1]; const actualYear = hmMeta.years[yearIdx]; const actualRating = hmMeta.ratings[ratingIdx]; return `${actualYear} 年 / ${actualRating}<br/>数量：<b>${p.data[2]}</b>`; } },
     grid: { left: '4%', right: '8%', top: 8, bottom: 30, containLabel: true },
     xAxis: { type: 'category', data: hmMeta.years, splitArea: { show: false }, ...axisStyle, axisLabel: { ...axisStyle.axisLabel, rotate: 45, fontSize: 9 } },
     yAxis: { type: 'category', data: hmMeta.ratings, splitArea: { show: false }, ...axisStyle },
@@ -548,4 +562,4 @@ function renderAll(d) {
 }
 
 // ===== 启动 =====
-loadData().then(renderAll).catch(() => {});
+loadData().then(renderAll).catch(err => { console.error('Bootstrap error:', err); });

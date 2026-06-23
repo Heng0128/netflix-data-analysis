@@ -8,9 +8,12 @@
 <meta name="keywords" content="Netflix，数据分析，可视化,ECharts,Python，数据科学">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"
+        onerror="this.onerror=null;this.src='https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
+        onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'"></script>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -24,6 +27,9 @@
     <div class="logo-mark">N</div>
     <span>NETFLIX</span>
   </a>
+  <button class="hamburger" id="hamburger" aria-label="菜单">
+    <span></span><span></span><span></span>
+  </button>
   <ul class="nav-links">
     <li><a href="#team">小组分工</a></li>
     <li><a href="#overview">数据概览</a></li>
