@@ -59,9 +59,36 @@ if (hamburger) {
   });
 }
 
+// ===== 代码标签页切换 =====
+function setupCodeTabs() {
+  const tabBtns = document.querySelectorAll('.code-tab-btn');
+  const panels = document.querySelectorAll('.code-panel');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      
+      // 更新按钮状态
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // 更新面板显示
+      panels.forEach(p => p.classList.remove('active'));
+      const targetPanel = document.getElementById(`panel-${tab}`);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+        // 重新高亮代码
+        if (window.Prism) {
+          Prism.highlightAllUnder(targetPanel);
+        }
+      }
+    });
+  });
+}
+
 // ===== 导航栏当前章节高亮 =====
 function setupNavHighlight() {
-  const sections = ['team', 'overview', 'charts', 'conclusion'].map(id => document.getElementById(id));
+  const sections = ['team', 'overview', 'charts', 'code', 'conclusion'].map(id => document.getElementById(id));
   const links = document.querySelectorAll('.nav-links a');
   
   const navObserver = new IntersectionObserver((entries) => {
@@ -642,6 +669,14 @@ function renderAll(d) {
   
   // 启动导航高亮
   setupNavHighlight();
+  
+  // 初始化代码标签页
+  setupCodeTabs();
+  
+  // 触发代码语法高亮
+  if (window.Prism) {
+    Prism.highlightAll();
+  }
   
   hideLoader();
 }

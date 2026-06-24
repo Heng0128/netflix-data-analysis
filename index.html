@@ -44,6 +44,31 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
         onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'"></script>
 <link rel="stylesheet" href="css/style.css">
+<!-- Prism.js 代码语法高亮 -->
+<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+<style>
+  /* 覆盖 Prism 默认样式以匹配暗色主题 */
+  pre[class*="language-"] {
+    margin: 0;
+    border-radius: 0 0 16px 16px;
+    background: #0d0d0d !important;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  code[class*="language-"] {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+  .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6a9955; }
+  .token.punctuation { color: #d4d4d4; }
+  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #b5cea8; }
+  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #ce9178; }
+  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #d4d4d4; }
+  .token.atrule, .token.attr-value, .token.keyword { color: #569cd6; }
+  .token.function, .token.class-name { color: #dcdcaa; }
+  .token.regex, .token.important, .token.variable { color: #d16969; }
+</style>
 </head>
 <body>
 <div class="bg-layer"></div>
@@ -63,6 +88,7 @@
     <li><a href="#team">小组分工</a></li>
     <li><a href="#overview">数据概览</a></li>
     <li><a href="#charts">可视化图表</a></li>
+    <li><a href="#code">代码展示</a></li>
     <li><a href="#conclusion">分析结论</a></li>
   </ul>
 </nav>
@@ -127,6 +153,343 @@
       <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">📊</span>流派×类型对比</div><span class="badge">STACKED BAR</span></div><p class="desc">各流派中电影与电视节目构成</p><div class="chart-container" id="chart7" role="img" aria-label="流派×类型堆叠条形图：展示各流派中电影和电视节目的数量分布"></div></div>
       <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🌹</span>TV 剧集季数分布</div><span class="badge">ROSE CHART</span></div><p class="desc">电视节目的季数分布情况</p><div class="chart-container" id="chart8" role="img" aria-label="TV 剧集季数玫瑰图：1 季节目占比最大（52%）"></div></div>
       <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🔥</span>年份×评级热力图</div><span class="badge">HEATMAP</span></div><p class="desc">不同年份与各评级的内容密度</p><div class="chart-container tall" id="chart9" role="img" aria-label="年份×评级热力图：显示 2008-2024 年各评级内容密度的变化"></div></div>
+    </div>
+  </section>
+
+  <section class="code-section" id="code">
+    <div class="section-header">
+      <div class="line"></div>
+      <h2>数据分析代码</h2>
+      <span class="tag">SOURCE CODE</span>
+    </div>
+    
+    <div class="code-tabs">
+      <div class="code-tab-buttons">
+        <button class="code-tab-btn active" data-tab="preprocessing">
+          <span class="tab-icon">🧹</span>
+          <span class="tab-text">数据预处理</span>
+        </button>
+        <button class="code-tab-btn" data-tab="analysis">
+          <span class="tab-icon">📊</span>
+          <span class="tab-text">数据分析</span>
+        </button>
+        <button class="code-tab-btn" data-tab="ml">
+          <span class="tab-icon">🤖</span>
+          <span class="tab-text">机器学习</span>
+        </button>
+        <button class="code-tab-btn" data-tab="visualization">
+          <span class="tab-icon">📈</span>
+          <span class="tab-text">可视化</span>
+        </button>
+      </div>
+      
+      <div class="code-tab-content">
+        <div class="code-panel active" id="panel-preprocessing">
+          <div class="code-panel-header">
+            <h3>数据预处理代码</h3>
+            <div class="code-panel-desc">缺失值处理 · 特征工程 · 异常值检测</div>
+          </div>
+          <div class="code-block">
+            <pre><code class="language-python">import pandas as pd
+import numpy as np
+
+# 1. 数据加载
+df = pd.read_csv('netflix_titles.csv')
+print(f"原始数据形状: {df.shape}")
+
+# 2. 缺失值处理
+df['director'] = df['director'].fillna('Unknown')
+df['cast'] = df['cast'].fillna('Unknown')
+df['country'] = df['country'].fillna('Unknown')
+df['date_added'] = df['date_added'].fillna(df['date_added'].mode()[0])
+df['rating'] = df['rating'].fillna(df['rating'].mode()[0])
+df['duration'] = df['duration'].fillna(df['duration'].mode()[0])
+
+# 3. 特征工程
+df['year_added'] = df['date_added'].str.extract(r'(\d{4})').astype(int)
+
+def split_field(s):
+    if pd.isna(s) or s == 'Unknown':
+        return []
+    return [x.strip() for x in str(s).split(',') if x.strip()]
+
+df['genres_list'] = df['listed_in'].apply(split_field)
+df['countries_list'] = df['country'].apply(split_field)
+df['cast_list'] = df['cast'].apply(split_field)
+df['duration_num'] = df['duration'].str.extract(r'(\d+)').astype(float).astype(int)
+
+df['genre_count'] = df['genres_list'].apply(len)
+df['country_count'] = df['countries_list'].apply(len)
+df['cast_count'] = df['cast_list'].apply(len)
+df['has_director'] = (df['director'] != 'Unknown').astype(int)
+df['primary_genre'] = df['genres_list'].apply(lambda x: x[0] if x else 'Unknown')
+df['primary_country'] = df['countries_list'].apply(lambda x: x[0] if x else 'Unknown')
+
+# 4. 异常值检测（IQR法）
+movies = df[df['type'] == 'Movie'].copy()
+Q1 = movies['duration_num'].quantile(0.25)
+Q3 = movies['duration_num'].quantile(0.75)
+IQR = Q3 - Q1
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+iqr_outliers = movies[(movies['duration_num'] < lower_bound) | 
+                      (movies['duration_num'] > upper_bound)]
+print(f"IQR法异常值: {len(iqr_outliers)} 部")
+
+# Z-score法
+movies['duration_zscore'] = (movies['duration_num'] - movies['duration_num'].mean()) / movies['duration_num'].std()
+z_outliers = movies[abs(movies['duration_zscore']) > 3]
+print(f"Z-score法异常值: {len(z_outliers)} 部")
+
+# 标记异常值（保留不删除）
+df['is_outlier_duration'] = 0
+df.loc[iqr_outliers.index, 'is_outlier_duration'] = 1
+
+# 保存清洗后数据
+df.to_csv('netflix_titles_cleaned.csv', index=False)
+print(f"处理后数据形状: {df.shape}")</code></pre>
+          </div>
+        </div>
+        
+        <div class="code-panel" id="panel-analysis">
+          <div class="code-panel-header">
+            <h3>数据分析代码</h3>
+            <div class="code-panel-desc">描述性统计 · 分组统计 · 相关性分析</div>
+          </div>
+          <div class="code-block">
+            <pre><code class="language-python">import pandas as pd
+import numpy as np
+from collections import Counter
+
+# 1. 描述性统计
+numeric_cols = ['release_year', 'year_added', 'duration_num', 
+                'genre_count', 'country_count', 'cast_count']
+print("=== 数值型变量描述性统计 ===")
+print(df[numeric_cols].describe().round(2))
+
+# 2. 类型分布
+type_dist = df['type'].value_counts()
+print(f"\n电影: {type_dist['Movie']} 部 ({type_dist['Movie']/len(df)*100:.1f}%)")
+print(f"电视节目: {type_dist['TV Show']} 部 ({type_dist['TV Show']/len(df)*100:.1f}%)")
+
+# 3. 年度趋势
+year_trend = df.groupby('year_added').size()
+peak_year = year_trend.idxmax()
+print(f"\n峰值年份: {peak_year} 年 ({year_trend.max()} 部)")
+
+# 4. 制片国家 Top10
+all_countries = [c for cl in df['countries_list'] for c in cl]
+top_countries = Counter(all_countries).most_common(10)
+print("\n=== 制片国家 Top10 ===")
+for i, (c, n) in enumerate(top_countries, 1):
+    print(f"  {i:2d}. {c}: {n} 部")
+
+# 5. 热门流派 Top10
+all_genres = [g for gl in df['genres_list'] for g in gl]
+top_genres = Counter(all_genres).most_common(10)
+print("\n=== 热门流派 Top10 ===")
+for i, (g, n) in enumerate(top_genres, 1):
+    print(f"  {i:2d}. {g}: {n} 部")
+
+# 6. 分组统计：按类型
+type_group = df.groupby('type').agg({
+    'duration_num': ['mean', 'median', 'std'],
+    'release_year': ['mean', 'min', 'max'],
+    'cast_count': 'mean'
+}).round(2)
+print("\n=== 按类型分组统计 ===")
+print(type_group)
+
+# 7. 相关性分析
+corr_matrix = df[numeric_cols].corr()
+print("\n=== 相关系数矩阵 ===")
+print(corr_matrix.round(3))
+
+# 关键相关性解读
+print(f"\nrelease_year vs year_added: r = {corr_matrix.loc['release_year', 'year_added']:.3f}")
+print(f"  → 正相关：新发行的作品通常更快上线 Netflix")
+print(f"\ngenre_count vs cast_count: r = {corr_matrix.loc['genre_count', 'cast_count']:.3f}")
+print(f"  → 弱正相关：流派标签越多，演员阵容可能越庞大")</code></pre>
+          </div>
+        </div>
+        
+        <div class="code-panel" id="panel-ml">
+          <div class="code-panel-header">
+            <h3>机器学习代码</h3>
+            <div class="code-panel-desc">线性回归 · K-Means聚类 · 随机森林分类</div>
+          </div>
+          <div class="code-block">
+            <pre><code class="language-python">from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.cluster import KMeans
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (mean_squared_error, r2_score, 
+                             accuracy_score, silhouette_score)
+
+# ========== 1. 线性回归：预测电影时长 ==========
+movies_df = df[df['type'] == 'Movie'].copy()
+features = ['release_year', 'genre_count', 'country_count', 'cast_count']
+X = movies_df[features]
+y = movies_df['duration_num']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42)
+
+lr_model = LinearRegression()
+lr_model.fit(X_train, y_train)
+y_pred = lr_model.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)
+print(f"线性回归 R² = {r2:.4f}, RMSE = {rmse:.2f} min")
+
+# ========== 2. K-Means 聚类 ==========
+cluster_features = ['release_year', 'duration_num', 'genre_count', 
+                    'country_count', 'cast_count']
+X_km = movies_df[cluster_features].dropna()
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_km)
+
+kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
+X_km['cluster'] = kmeans.fit_predict(X_scaled)
+sil_score = silhouette_score(X_scaled, kmeans.labels_)
+print(f"\nK-Means 轮廓系数: {sil_score:.4f}")
+
+# 聚类画像
+cluster_profile = X_km.groupby('cluster')[cluster_features].mean().round(1)
+print("\n各簇特征画像:")
+print(cluster_profile)
+
+# ========== 3. 随机森林分类：预测内容类型 ==========
+ml_df = df.copy()
+ml_df['rating_enc'] = LabelEncoder().fit_transform(ml_df['rating'])
+ml_df['genre_enc'] = LabelEncoder().fit_transform(ml_df['primary_genre'])
+ml_df['country_enc'] = LabelEncoder().fit_transform(ml_df['primary_country'])
+
+X_rf = ml_df[['release_year', 'year_added', 'duration_num', 'genre_count',
+              'country_count', 'cast_count', 'has_director',
+              'rating_enc', 'genre_enc', 'country_enc']]
+y_rf = (ml_df['type'] == 'Movie').astype(int)
+
+X_train_rf, X_test_rf, y_train_rf, y_test_rf = train_test_split(
+    X_rf, y_rf, test_size=0.2, random_state=42, stratify=y_rf)
+
+rf_model = RandomForestClassifier(
+    n_estimators=100, max_depth=10,
+    min_samples_split=5, random_state=42, n_jobs=-1)
+rf_model.fit(X_train_rf, y_train_rf)
+
+y_pred_rf = rf_model.predict(X_test_rf)
+acc = accuracy_score(y_test_rf, y_pred_rf)
+print(f"\n随机森林准确率: {acc:.2%}")
+
+# 特征重要性
+importances = rf_model.feature_importances_
+indices = np.argsort(importances)[::-1]
+print("\n特征重要性 Top5:")
+for i in range(5):
+    print(f"  {i+1}. {X_rf.columns[indices[i]]}: {importances[indices[i]]:.4f}")</code></pre>
+          </div>
+        </div>
+        
+        <div class="code-panel" id="panel-visualization">
+          <div class="code-panel-header">
+            <h3>可视化代码</h3>
+            <div class="code-panel-desc">Matplotlib · pyecharts · 交互式图表</div>
+          </div>
+          <div class="code-block">
+            <pre><code class="language-python">import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.rcParams['font.sans-serif'] = ['DejaVu Sans']
+matplotlib.rcParams['axes.unicode_minus'] = False
+
+from pyecharts import options as opts
+from pyecharts.charts import Bar, Pie, Line, HeatMap, Funnel
+from pyecharts.globals import ThemeType
+
+# ========== 1. Matplotlib 饼状图 ==========
+fig, ax = plt.subplots(figsize=(8, 8))
+sizes = type_dist['数量'].values
+labels = type_dist['类型'].values
+colors = ['#E50914', '#4ECDC4']
+
+wedges, texts, autotexts = ax.pie(
+    sizes, labels=labels, colors=colors,
+    autopct='%1.1f%%', startangle=90,
+    textprops={'fontsize': 13, 'fontweight': 'bold'})
+ax.set_title('Netflix 内容类型分布', fontsize=16, fontweight='bold')
+ax.axis('equal')
+plt.tight_layout()
+plt.show()
+
+# ========== 2. Matplotlib 直方图 ==========
+fig, ax = plt.subplots(figsize=(12, 6))
+movie_durations = df[df['type'] == 'Movie']['duration_num']
+
+n, bins, patches = ax.hist(
+    movie_durations, bins=30, color='#E50914',
+    edgecolor='white', linewidth=0.5, alpha=0.8)
+ax.set_xlabel('时长（分钟）', fontsize=12)
+ax.set_ylabel('电影数量', fontsize=12)
+ax.set_title(f'电影时长分布直方图\n均值: {movie_durations.mean():.1f} min',
+             fontsize=14, fontweight='bold')
+ax.axvline(movie_durations.mean(), color='gold', 
+           linestyle='--', linewidth=2, label='均值')
+ax.legend(fontsize=11)
+plt.tight_layout()
+plt.show()
+
+# ========== 3. pyecharts 环形图 ==========
+def chart_type_pie():
+    data = [list(z) for z in zip(type_dist['类型'].tolist(), 
+                                  type_dist['数量'].tolist())]
+    c = (
+        Pie(init_opts=opts.InitOpts(theme=ThemeType.DARK, 
+                                    width="100%", height="500px"))
+        .add(series_name="数量分布", data_pair=data,
+             radius=["40%", "70%"], center=["50%", "50%"],
+             label_opts=opts.LabelOpts(
+                 formatter="{b}: {c} ({d}%)", font_size=14, color="#fff"))
+        .set_colors(["#E50914", "#831010"])
+        .set_global_opts(
+            title_opts=opts.TitleOpts(title="Netflix 内容类型分布"))
+    )
+    return c
+
+# ========== 4. pyecharts 折线图 ==========
+def chart_year_line():
+    c = (
+        Line(init_opts=opts.InitOpts(theme=ThemeType.DARK))
+        .add_xaxis(years)
+        .add_yaxis("电影", movies, is_smooth=True,
+                   linestyle_opts=opts.LineStyleOpts(width=4, color="#E50914"),
+                   areastyle_opts=opts.AreaStyleOpts(opacity=0.2))
+        .add_yaxis("电视节目", shows, is_smooth=True,
+                   linestyle_opts=opts.LineStyleOpts(width=4, color="#FFD700"))
+        .set_global_opts(title_opts=opts.TitleOpts(title="年度新增内容趋势"))
+    )
+    return c
+
+# ========== 5. pyecharts 热力图 ==========
+def chart_heatmap():
+    c = (
+        HeatMap(init_opts=opts.InitOpts(theme=ThemeType.DARK))
+        .add_xaxis(years)
+        .add_yaxis("作品数量", ratings, heatmap_data)
+        .set_global_opts(
+            title_opts=opts.TitleOpts(title="年份×评级热力图"),
+            visualmap_opts=opts.VisualMapOpts(
+                min_=0, max_=max_value,
+                range_color=["#0d0d0d", "#831010", "#E50914", "#FFD700"]))
+    )
+    return c</code></pre>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
