@@ -1,11 +1,11 @@
 /**
  * ============================================================
- * Netflix 数据分析看板 - 主脚本
+ * Netflix 数据分析看板 - 主脚本 (Netflix Official Style)
  * 数据链路：netflix_titles_cleaned.csv → PapaParse 解析 → 前端聚合计算 → ECharts 渲染
  * ============================================================
  */
 
-// ===== 配置常量 =====
+// ===== Netflix Style Configuration =====
 const VALID_RATINGS = new Set([
   'TV-MA', 'TV-14', 'TV-PG', 'TV-G', 'TV-Y', 'TV-Y7', 'TV-Y7-FV',
   'G', 'PG', 'PG-13', 'R', 'NC-17', 'NR', 'UR'
@@ -18,44 +18,82 @@ const CONFIG = Object.freeze({
   TOP_GENRES_COUNT: 10,
   RARE_DURATION_THRESHOLD: 5,
   SEASON_GROUP_THRESHOLD: 6,
-  SCROLL_NAV_THRESHOLD: 40,
-  NUMBER_ANIM_DURATION: 2000,
-  CHART_ENTRY_STAGGER: 80,
+  SCROLL_NAV_THRESHOLD: 50,
+  NUMBER_ANIM_DURATION: 2500,
+  CHART_ENTRY_STAGGER: 120,
   MAX_DPR: 2,
   COLORS: {
     red: '#E50914',
+    redLight: '#FF4444',
     gold: '#FFD700',
     teal: '#4ECDC4',
-    bg: '#080808'
+    bg: '#141414',
+    bgDark: '#000000'
   }
 });
 
-// ===== 导航栏滚动效果 =====
+// ===== Netflix Navigation Bar - Enhanced Scroll Effect =====
 const nav = document.getElementById('nav');
 let scrollTicking = false;
+let lastScrollY = 0;
+
 window.addEventListener('scroll', () => {
   if (!scrollTicking) {
     requestAnimationFrame(() => {
-      nav.classList.toggle('scrolled', window.scrollY > 40);
+      const currentScrollY = window.scrollY;
+      
+      // Netflix-style: Add scrolled class with smooth transition
+      if (currentScrollY > CONFIG.SCROLL_NAV_THRESHOLD) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+      
+      // Hide/show nav on scroll direction (Netflix-style)
+      if (currentScrollY > lastScrollY && currentScrollY > 200) {
+        nav.style.transform = 'translateY(-100%)';
+      } else {
+        nav.style.transform = 'translateY(0)';
+      }
+      
+      lastScrollY = currentScrollY;
       scrollTicking = false;
     });
     scrollTicking = true;
   }
 });
-// ===== 汉堡菜单交互 =====
+
+// ===== Netflix Hamburger Menu - Enhanced Animation =====
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.querySelector('.nav-links');
+
 if (hamburger) {
   hamburger.addEventListener('click', function() {
     this.classList.toggle('open');
     navLinks.classList.toggle('open');
+    
+    // Netflix-style: Add body scroll lock when menu is open
+    document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
   });
-  // 点击导航链接后自动关闭菜单
+  
+  // Close menu on link click
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       hamburger.classList.remove('open');
       navLinks.classList.remove('open');
+      document.body.style.overflow = '';
     });
+  });
+  
+  // Close menu on outside click
+  document.addEventListener('click', (e) => {
+    if (navLinks.classList.contains('open') && 
+        !navLinks.contains(e.target) && 
+        !hamburger.contains(e.target)) {
+      hamburger.classList.remove('open');
+      navLinks.classList.remove('open');
+      document.body.style.overflow = '';
+    }
   });
 }
 
@@ -113,41 +151,139 @@ function setupNavHighlight() {
   sections.forEach(s => s && navObserver.observe(s));
 }
 
-// ===== 滚动入场动画 =====
+// ===== Netflix-style Scroll Animation =====
+const observerOptions = {
+  threshold: 0.15,
+  rootMargin: '0px 0px -60px 0px'
+};
+
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
-      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      // Netflix-style: Staggered animation with delay
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+        
+        // Add Netflix-style glow effect on animation
+        entry.target.style.animation = 'netflixFadeIn 0.8s ease forwards';
+      }, i * CONFIG.CHART_ENTRY_STAGGER);
       observer.unobserve(entry.target);
     }
   });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+}, observerOptions);
 
-document.querySelectorAll('.chart-card').forEach(el => observer.observe(el));
+// Observe all cards and charts
+document.querySelectorAll('.chart-card, .nav-card, .req-card, .team-card, .stat-card, .ml-card').forEach(el => {
+  observer.observe(el);
+});
 
-// ===== 加载数据（带 Loading / Error 状态） =====
+// Netflix-style fade-in animation keyframes
+const netflixAnimationStyle = document.createElement('style');
+netflixAnimationStyle.textContent = `
+  @keyframes netflixFadeIn {
+    0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+    50% { opacity: 0.8; transform: translateY(20px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+`;
+document.head.appendChild(netflixAnimationStyle);
+
+// ===== Netflix Loading State - Optimized for Speed =====
 const loader = document.createElement('div');
 loader.id = 'data-loader';
-loader.innerHTML = '<div class="spinner"></div><p>正在加载 CSV 数据...</p>';
+loader.innerHTML = `
+  <div class="spinner"></div>
+  <p>正在加载...</p>
+`;
 Object.assign(loader.style, {
   position: 'fixed', inset: 0, zIndex: 9999,
-  background: 'rgba(8,8,8,0.92)', backdropFilter: 'blur(12px)',
+  background: 'rgba(8,8,8,0.98)',
   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-  gap: '16px', transition: 'opacity 0.5s'
+  gap: '16px', transition: 'opacity 0.3s ease'
 });
-const spinnerCSS = document.createElement('style');
-spinnerCSS.textContent = `
-#data-loader .spinner { width:40px;height:40px;border:3px solid rgba(229,9,20,0.2);border-top-color:#E50914;border-radius:50%;animation:spin 0.8s linear infinite; }
-#data-loader p { color:#999;font-size:14px;letter-spacing:1px; }
-@keyframes spin { to{transform:rotate(360deg)} }
-`;
-document.head.appendChild(spinnerCSS);
-document.body.appendChild(loader);
 
-function hideLoader() { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 500); }
+const loaderCSS = document.createElement('style');
+loaderCSS.textContent = `
+  #data-loader .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(229,9,20,0.2);
+    border-top-color: #E50914;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  #data-loader p {
+    color: #E5E5E5;
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+document.head.appendChild(loaderCSS);
+
+// 预加载数据，不等待DOM
+const dataPromise = fetch('data/analysis_data.json')
+  .then(r => r.json())
+  .then(jsonData => {
+    // 预处理数据格式转换
+    return {
+      overview: jsonData.overview,
+      type_dist: jsonData.type_dist.map(item => ({
+        type: item['类型'],
+        count: item['数量'],
+        percentage: item['占比(%)']
+      })),
+      year_trend: jsonData.year_trend,
+      countries: jsonData.countries.map(item => ({
+        country: item['国家'],
+        count: item['数量']
+      })),
+      genres: jsonData.genres.map(item => ({
+        genre: item['流派'],
+        count: item['数量']
+      })),
+      ratings: jsonData.ratings.map(item => ({
+        rating: item['评级'],
+        count: item['数量']
+      })),
+      duration_stats: jsonData.duration_stats,
+      duration_histogram: jsonData.duration_histogram,
+      genre_type_breakdown: jsonData.genre_type_breakdown.map(item => ({
+        genre: item['流派'],
+        movie: item['电影'],
+        tvshow: item['电视节目']
+      })),
+      season_distribution: jsonData.season_distribution.map(item => ({
+        seasonNum: item['季数'],
+        count: item['数量']
+      })),
+      heatmap_data: jsonData.heatmap_data,
+      heatmap_meta: jsonData.heatmap_meta,
+      desc_stats: {
+        release_year: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
+        year_added: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
+        duration_num: jsonData.duration_stats,
+        genre_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
+        country_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
+        cast_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 }
+      },
+      corr_matrix: {},
+      numVars: ['release_year', 'year_added', 'duration_num', 'genre_count', 'country_count', 'cast_count']
+    };
+  });
+
+function hideLoader() {
+  loader.style.opacity = '0';
+  setTimeout(() => loader.remove(), 300);
+}
 
 function showError(msg) {
-  loader.innerHTML = `<div style="color:#E50914;font-size:18px;font-weight:700;margin-bottom:8px;">数据加载失败</div><p style="color:#999;font-size:13px;max-width:400px;text-align:center;line-height:1.6">${msg}</p><button onclick="location.reload()" style="margin-top:20px;padding:10px 28px;background:#E50914;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;">重新加载</button>`;
+  loader.innerHTML = `
+    <div style="color:#E50914;font-size:20px;font-weight:700;">加载失败</div>
+    <p style="color:#999;font-size:13px;">${msg}</p>
+    <button onclick="location.reload()" style="margin-top:20px;padding:10px 24px;background:#E50914;color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;">重新加载</button>
+  `;
 }
 
 /**
@@ -472,73 +608,102 @@ function loadData() {
     });
 }
 
-// ===== 数字动画（支持 prefers-reduced-motion）=====
+// ===== Netflix Number Animation - Optimized =====
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function animateNumbers(overview) {
   const values = [overview.total, overview.movies, overview.tvshows, overview.countries, overview.genres, overview.directors];
-  document.querySelectorAll('#overviewGrid .value').forEach((el, i) => {
+  const elements = document.querySelectorAll('#overviewGrid .value');
+  
+  // 并行动画，同时开始
+  elements.forEach((el, i) => {
     const target = values[i];
+    
     if (prefersReducedMotion) {
       el.textContent = target.toLocaleString();
       return;
     }
-    const duration = 2000;
+    
+    const duration = 1200; // 减少到1.2秒
     const startTime = performance.now();
+    
     function step(now) {
-      const t = Math.min(1, (now - startTime) / duration);
-      const eased = 1 - Math.pow(1 - t, 4);
-      el.textContent = Math.floor(target * eased).toLocaleString();
-      if (t < 1) requestAnimationFrame(step);
-      else el.textContent = target.toLocaleString();
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // 更快的缓动
+      const currentValue = Math.floor(target * eased);
+      el.textContent = currentValue.toLocaleString();
+      
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = target.toLocaleString();
+      }
     }
+    
     requestAnimationFrame(step);
   });
 }
 
-// ===== ECharts 通用配置 =====
-const palette = ['#E50914','#FF6B6B','#FFD700','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD','#A29BFE','#81ECEC'];
+// ===== Netflix ECharts Configuration =====
+const palette = ['#E50914', '#FF4444', '#FF6B6B', '#FFD700', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#A29BFE'];
 
 const tooltipStyle = {
-  backgroundColor: 'rgba(10, 10, 10, 0.96)',
-  borderColor: 'rgba(229, 9, 20, 0.4)',
-  borderWidth: 1,
-  textStyle: { color: '#fff', fontSize: 13 },
-  extraCssText: 'box-shadow: 0 8px 32px rgba(229, 9, 20, 0.25); border-radius: 12px; backdrop-filter: blur(10px);'
+  backgroundColor: 'rgba(14, 14, 14, 0.98)',
+  borderColor: 'rgba(229, 9, 20, 0.5)',
+  borderWidth: 2,
+  textStyle: { color: '#fff', fontSize: 14, fontWeight: 500 },
+  extraCssText: 'box-shadow: 0 12px 40px rgba(229, 9, 20, 0.35); border-radius: 12px; backdrop-filter: blur(16px);',
+  confine: true
 };
 
 const axisStyle = {
-  axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-  axisLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 11 },
-  splitLine: { lineStyle: { color: 'rgba(255,255,255,0.04)', type: 'dashed' } }
+  axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
+  axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 500 },
+  splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)', type: 'dashed' } }
 };
 
-// ===== Canvas 渲染优化配置 =====
-const DPR = Math.min(window.devicePixelRatio || 1, 2);
+// ===== Netflix Canvas Rendering Optimization =====
+const DPR = Math.min(window.devicePixelRatio || 1, CONFIG.MAX_DPR);
 const chartInstances = [];
 
-/** 统一初始化图表（高清 + 脏矩形优化） */
 function initChart(elId) {
   const el = document.getElementById(elId);
   if (!el) return null;
+  
   const inst = echarts.init(el, null, {
     renderer: 'canvas',
     devicePixelRatio: DPR,
     useDirtyRect: true,
   });
+  
   chartInstances.push(inst);
+  
+  // Netflix-style: Add hover glow effect
+  el.addEventListener('mouseenter', () => {
+    el.style.filter = 'drop-shadow(0 0 20px rgba(229, 9, 20, 0.3))';
+  });
+  
+  el.addEventListener('mouseleave', () => {
+    el.style.filter = 'none';
+  });
+  
   return inst;
 }
 
-/** 统一防抖 ResizeObserver */
 function setupResizeObserver() {
   let rafId = null;
   const ro = new ResizeObserver(() => {
     cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(() => {
-      chartInstances.forEach(c => { try { c.resize(); } catch(e) {} });
+      chartInstances.forEach(c => {
+        try {
+          c.resize();
+        } catch(e) {}
+      });
     });
   });
+  
   chartInstances.forEach(c => {
     const dom = c.getDom();
     if (dom) ro.observe(dom.parentElement || dom);
@@ -862,7 +1027,181 @@ function renderAll(d) {
     Prism.highlightAll();
   }
   
+  // 隐藏loading
   hideLoader();
+}
+
+// ===== 优化的分批渲染函数 =====
+function renderChartsBatch(d, batchIndex) {
+  const batches = [
+    () => {
+      // 批次1：环形图、趋势折线、国家柱状图
+      const c1 = initChart('chart1');
+      if (c1) c1.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'item', ...tooltipStyle, formatter: '{b}: {c} ({d}%)' },
+        legend: { bottom: 0, textStyle: { color: 'rgba(255,255,255,0.6)', fontSize: 13 }, itemGap: 30, icon: 'roundRect' },
+        series: [{
+          name: '内容类型', type: 'pie',
+          radius: ['48%', '78%'], center: ['50%', '45%'],
+          avoidLabelOverlap: true,
+          itemStyle: { borderRadius: 10, borderColor: 'rgba(8,8,8,0.8)', borderWidth: 4 },
+          label: { color: '#fff', formatter: '{b}\n{d}%', fontSize: 14, fontWeight: 600, lineHeight: 22 },
+          emphasis: { scaleSize: 12, itemStyle: { shadowBlur: 30, shadowColor: 'rgba(229, 9, 20, 0.5)' } },
+          data: d.type_dist.map((x, i) => ({
+            name: x.type === 'Movie' ? '电影' : '电视节目',
+            value: x.count,
+            itemStyle: { color: i === 0 ? new echarts.graphic.LinearGradient(0, 0, 1, 1, [{ offset: 0, color: '#E50914' }, { offset: 1, color: '#FF4444' }]) : new echarts.graphic.LinearGradient(0, 0, 1, 1, [{ offset: 0, color: '#FFD700' }, { offset: 1, color: '#FFA500' }]) }
+          }))
+        }]
+      });
+    },
+    () => {
+      const c2 = initChart('chart2');
+      if (c2) c2.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', ...tooltipStyle, axisPointer: { type: 'cross', label: { backgroundColor: '#E50914' }, crossStyle: { color: '#999' } } },
+        legend: { data: ['电影', '电视节目'], top: 0, textStyle: { color: 'rgba(255,255,255,0.6)' }, icon: 'roundRect', itemGap: 24 },
+        grid: { left: '3%', right: '3%', top: 50, bottom: 30, containLabel: true },
+        xAxis: { type: 'category', data: d.year_trend.map(x => x.year), boundaryGap: false, ...axisStyle },
+        yAxis: { type: 'value', ...axisStyle },
+        series: [
+          { name: '电影', type: 'line', smooth: 0.4, symbol: 'circle', symbolSize: 6, showSymbol: false, data: d.year_trend.map(x => x.Movie), itemStyle: { color: '#E50914' }, lineStyle: { width: 3, color: '#E50914', shadowBlur: 8, shadowColor: 'rgba(229,9,20,0.3)' }, areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(229, 9, 20, 0.35)' }, { offset: 1, color: 'rgba(229, 9, 20, 0)' }]) }, emphasis: { focus: 'series' } },
+          { name: '电视节目', type: 'line', smooth: 0.4, symbol: 'circle', symbolSize: 6, showSymbol: false, data: d.year_trend.map(x => x['TV Show']), itemStyle: { color: '#FFD700' }, lineStyle: { width: 3, color: '#FFD700', shadowBlur: 8, shadowColor: 'rgba(255,215,0,0.2)' }, areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(255, 215, 0, 0.25)' }, { offset: 1, color: 'rgba(255, 215, 0, 0)' }]) }, emphasis: { focus: 'series' } }
+        ]
+      });
+    },
+    () => {
+      const c3 = initChart('chart3');
+      const countries = d.countries.slice().reverse();
+      if (c3) c3.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle },
+        grid: { left: '2%', right: '10%', top: 8, bottom: 8, containLabel: true },
+        xAxis: { type: 'value', ...axisStyle },
+        yAxis: { type: 'category', data: countries.map(x => x.country), axisLine: { show: false }, axisLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 12 } },
+        series: [{ type: 'bar', data: countries.map((x, i) => ({ value: x.count, itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: 'rgba(131, 16, 16, 0.6)' }, { offset: 1, color: '#E50914' }]), borderRadius: [0, 8, 8, 0] } })), barWidth: '52%', label: { show: true, position: 'right', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 11, fontFamily: 'Inter' }, emphasis: { itemStyle: { shadowBlur: 15, shadowColor: 'rgba(229,9,20,0.4)' } } }]
+      });
+    }
+  ];
+  
+  if (batchIndex < batches.length) {
+    batches[batchIndex]();
+    batchIndex++;
+    if (batchIndex < batches.length) {
+      requestAnimationFrame(() => renderChartsBatch(d, batchIndex));
+    }
+  }
+}
+
+// ===== 快速渲染所有图表（不分批）=====
+function renderAllFast(d) {
+  // 数字动画
+  if (document.getElementById('overviewGrid')) {
+    animateNumbers(d.overview);
+  }
+
+  // 分批渲染图表，每批之间让出主线程
+  renderChartsBatch(d, 0);
+
+  // 渲染后续图表
+  setTimeout(() => {
+    const c4 = initChart('chart4');
+    const genres = d.genres.slice().reverse();
+    if (c4) c4.setOption({
+      backgroundColor: 'transparent',
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle },
+      grid: { left: '2%', right: '12%', top: 8, bottom: 8, containLabel: true },
+      xAxis: { type: 'value', ...axisStyle },
+      yAxis: { type: 'category', data: genres.map(x => x.genre), axisLine: { show: false }, axisLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11 } },
+      series: [{ type: 'bar', data: genres.map((x, i) => ({ value: x.count, itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: 'rgba(78, 205, 196, 0.5)' }, { offset: 1, color: '#4ECDC4' }]), borderRadius: [0, 8, 8, 0] } })), barWidth: '52%', label: { show: true, position: 'right', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 11 }, emphasis: { itemStyle: { shadowBlur: 15, shadowColor: 'rgba(78,205,196,0.4)' } } }]
+    });
+  }, 50);
+
+  setTimeout(() => {
+    const c5 = initChart('chart5');
+    const ratingSorted = d.ratings.slice().reverse();
+    if (c5) c5.setOption({
+      backgroundColor: 'transparent',
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle, formatter: p => `${p[0].name}<br/>数量：<b>${p[0].value}</b> (${(p[0].value/d.overview.total*100).toFixed(1)}%)` },
+      grid: { left: '2%', right: '10%', top: 8, bottom: 8, containLabel: true },
+      xAxis: { type: 'value', ...axisStyle },
+      yAxis: { type: 'category', data: ratingSorted.map(x => x.rating), axisLine: { show: false }, axisLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11 } },
+      series: [{ type: 'bar', data: ratingSorted.map((x, i) => ({ value: x.count, itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ offset: 0, color: 'rgba(229, 9, 20, 0.4)' }, { offset: 1, color: '#E50914' }]), borderRadius: [0, 8, 8, 0] } })), barWidth: '55%', label: { show: true, position: 'right', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 11 } }]
+    });
+  }, 100);
+
+  setTimeout(() => {
+    const c6 = initChart('chart6');
+    const durStats = d.duration_stats;
+    const histData = d.duration_histogram || [];
+    const activeBins = histData.filter(b => b.count > 5);
+    const meanBinIdx = activeBins.findIndex(b => {
+      const mid = parseInt(b.range.split('-')[0]) + 7.5;
+      return mid >= durStats.mean && mid < durStats.mean + 15;
+    });
+    if (c6) c6.setOption({
+      backgroundColor: 'transparent',
+      tooltip: { trigger: 'axis', ...tooltipStyle, axisPointer: { type: 'shadow' }, formatter: p => `${p[0].name} min<br/>电影数：<b>${p[0].value}</b>` },
+      grid: { left: '3%', right: '3%', top: 35, bottom: 30, containLabel: true },
+      xAxis: { type: 'category', data: activeBins.map(b => b.range), ...axisStyle, axisLabel: { ...axisStyle.axisLabel, rotate: 45, fontSize: 10 } },
+      yAxis: { type: 'value', ...axisStyle },
+      series: [{ type: 'bar', data: activeBins.map((b, i) => ({ value: b.count, itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#FF6B6B' }, { offset: 1, color: '#E50914' }]), borderRadius: [5, 5, 0, 0] } })), barWidth: '72%', markLine: { silent: true, symbol: 'none', lineStyle: { color: '#FFD700', type: 'dashed', width: 2 }, label: { color: '#FFD700', fontFamily: 'Inter', fontWeight: 600, fontSize: 11, formatter: `Mean ${Math.round(durStats.mean)}min` }, data: [{ xAxis: meanBinIdx >= 0 ? meanBinIdx : 8 }] } }]
+    });
+  }, 150);
+
+  setTimeout(() => {
+    const c7 = initChart('chart7');
+    const gtData = d.genre_type_breakdown || [];
+    if (c7) c7.setOption({
+      backgroundColor: 'transparent',
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle },
+      legend: { top: 0, textStyle: { color: 'rgba(255,255,255,0.6)' }, icon: 'roundRect', itemGap: 24 },
+      grid: { left: '2%', right: '3%', top: 40, bottom: 50, containLabel: true },
+      xAxis: { type: 'category', data: gtData.map(x => x.genre), ...axisStyle, axisLabel: { ...axisStyle.axisLabel, rotate: 20, fontSize: 10, color: 'rgba(255,255,255,0.6)' } },
+      yAxis: { type: 'value', ...axisStyle },
+      series: [
+        { name: '电影', type: 'bar', stack: 'total', barWidth: '50%', itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#E50914' }, { offset: 1, color: '#831010' }]), borderRadius: [0, 0, 0, 0] }, emphasis: { focus: 'series' }, data: gtData.map(x => x.movie) },
+        { name: '电视节目', type: 'bar', stack: 'total', barWidth: '50%', itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#4ECDC4' }, { offset: 1, color: '#2E8B8B' }]), borderRadius: [6, 6, 0, 0] }, emphasis: { focus: 'series' }, data: gtData.map(x => x.tvshow) }
+      ]
+    });
+  }, 200);
+
+  setTimeout(() => {
+    const c8 = initChart('chart8');
+    const seasonData = (d.season_distribution || []).map(s => ({ name: typeof s.seasonNum === 'number' ? `${s.seasonNum} Season` : s.seasonNum, value: s.count }));
+    if (c8) c8.setOption({
+      backgroundColor: 'transparent',
+      tooltip: { trigger: 'item', ...tooltipStyle, formatter: '{b}: {c} ({d}%)' },
+      legend: { orient: 'vertical', right: 10, top: 'middle', textStyle: { color: 'rgba(255,255,255,0.6)', fontSize: 12 }, icon: 'circle', itemGap: 12 },
+      series: [{ name: '季数分布', type: 'pie', radius: ['22%', '78%'], center: ['38%', '50%'], roseType: 'radius', itemStyle: { borderRadius: 8, borderColor: 'rgba(8,8,8,0.8)', borderWidth: 3 }, label: { color: 'rgba(255,255,255,0.8)', fontSize: 12, formatter: '{b}: {c}', fontWeight: 500 }, emphasis: { scaleSize: 10, itemStyle: { shadowBlur: 20, shadowColor: 'rgba(255,215,0,0.4)' } }, data: seasonData.map((x, i) => ({ ...x, itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{ offset: 0, color: palette[i % palette.length] }, { offset: 1, color: '#fff' }]) } })) }]
+    });
+  }, 250);
+
+  setTimeout(() => {
+    const c9 = initChart('chart9');
+    const hmMeta = d.heatmap_meta || { years: [], ratings: [] };
+    const hmData = (d.heatmap_data || []).map(pt => [hmMeta.years.indexOf(pt.year), hmMeta.ratings.indexOf(pt.rating), pt.count]);
+    if (c9) c9.setOption({
+      backgroundColor: 'transparent',
+      tooltip: { ...tooltipStyle, position: 'top', formatter: p => { const yearIdx = p.data[0]; const ratingIdx = p.data[1]; const actualYear = hmMeta.years[yearIdx]; const actualRating = hmMeta.ratings[ratingIdx]; return `${actualYear} 年 / ${actualRating}<br/>数量：<b>${p.data[2]}</b>`; } },
+      grid: { left: '4%', right: '8%', top: 8, bottom: 30, containLabel: true },
+      xAxis: { type: 'category', data: hmMeta.years, splitArea: { show: false }, ...axisStyle, axisLabel: { ...axisStyle.axisLabel, rotate: 45, fontSize: 9 } },
+      yAxis: { type: 'category', data: hmMeta.ratings, splitArea: { show: false }, ...axisStyle },
+      visualMap: { min: 0, max: Math.max(...hmData.map(d => d[2]), 1), calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 10, itemHeight: 10, textStyle: { color: '#999', fontSize: 10 }, inRange: { color: ['#083344', '#4ECDC4', '#FFD700', '#E50914'] } },
+      series: [{ type: 'heatmap', data: hmData, label: { show: false }, emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } } }]
+    });
+  }, 300);
+
+  // 渲染表格和其他
+  setTimeout(() => {
+    renderTables(d);
+    setupResizeObserver();
+    setupNavHighlight();
+    setupCodeTabs();
+    if (window.Prism) Prism.highlightAll();
+    hideLoader();
+  }, 350);
 }
 
 // ===== 启动 =====
@@ -872,8 +1211,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
   const hasCharts = document.getElementById('chart1') || document.getElementById('overviewGrid');
   if (hasCharts) {
-    loadData().then(renderAll).catch(err => { console.error('Bootstrap error:', err); });
+    // 使用预加载的数据promise
+    dataPromise.then(renderAllFast).catch(err => { 
+      console.error('Data load error:', err); 
+      showError('数据加载失败，请刷新重试');
+    });
   } else {
+    hideLoader();
     if (window.Prism) {
       Prism.highlightAll();
     }
