@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netflix 数据分析 · 可视化结果</title>
+<meta name="description" content="Netflix 电影与电视节目数据分析可视化结果 - 9 张交互式图表与数据表格，深度展示内容库分布规律">
+<meta name="keywords" content="Netflix，数据分析，可视化，ECharts，数据表格">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"
+        onerror="this.onerror=null;this.src='https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
+        onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'"></script>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+<style>
+  pre[class*="language-"] {
+    margin: 0;
+    border-radius: 0 0 16px 16px;
+    background: #0d0d0d !important;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  code[class*="language-"] {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+  .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6a9955; }
+  .token.punctuation { color: #d4d4d4; }
+  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #b5cea8; }
+  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #ce9178; }
+  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #d4d4d4; }
+  .token.atrule, .token.attr-value, .token.keyword { color: #569cd6; }
+  .token.function, .token.class-name { color: #dcdcaa; }
+  .token.regex, .token.important, .token.variable { color: #d16969; }
+
+  .page-header {
+    padding: 120px 0 40px;
+    text-align: center;
+    position: relative;
+  }
+
+  .page-header .page-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(229, 9, 20, 0.1);
+    border: 1px solid rgba(229, 9, 20, 0.25);
+    border-radius: 100px;
+    padding: 6px 20px 6px 8px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--red);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    animation: fadeInUp 0.8s ease both;
+  }
+
+  .page-header .page-badge .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .page-header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 30%, rgba(255,107,107,0.9));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+
+  .page-header .page-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: fadeInUp 0.8s 0.2s ease both;
+  }
+
+  .page-divider {
+    margin: 28px auto 0;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    border-radius: 2px;
+    animation: fadeInUp 0.8s 0.3s ease both;
+  }
+
+  .ml-model-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .ml-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .ml-card:hover {
+    background: rgba(229, 9, 20, 0.04);
+    border-color: rgba(229, 9, 20, 0.15);
+  }
+
+  .ml-card .ml-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .ml-card .ml-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .ml-card .ml-metric {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .ml-card .ml-value {
+    font-size: 20px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, var(--gold), var(--red));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @media (max-width: 768px) {
+    .ml-model-grid {
+      grid-template-columns: 1fr;
+    }
+    .page-header h1 {
+      font-size: 28px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-brand">
+    <div class="logo-mark">N</div>
+    <span>NETFLIX</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-label="菜单">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="requirement.html">需求分析</a></li>
+    <li><a href="code.html">分析代码</a></li>
+    <li><a href="charts.html" class="active">可视化结果</a></li>
+    <li><a href="conclusion.html">分析结论</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+  <section class="page-header">
+    <div class="page-badge"><span class="dot"></span> DATA VISUALIZATION</div>
+    <h1>可视化结果</h1>
+    <p class="page-subtitle">9 Charts · 4 Tables · Interactive Dashboard</p>
+    <div class="page-divider"></div>
+  </section>
+
+  <section class="overview-section" id="overview">
+    <div class="section-header">
+      <div class="line"></div>
+      <h2>数据概览</h2>
+      <span class="tag">OVERVIEW</span>
+    </div>
+    <div class="overview-grid" id="overviewGrid">
+      <div class="stat-card">
+        <span class="icon">🎬</span>
+        <div class="label">总作品数</div>
+        <div class="value">0</div>
+      </div>
+      <div class="stat-card">
+        <span class="icon">🎥</span>
+        <div class="label">电影</div>
+        <div class="value">0</div>
+      </div>
+      <div class="stat-card">
+        <span class="icon">📺</span>
+        <div class="label">电视节目</div>
+        <div class="value">0</div>
+      </div>
+      <div class="stat-card">
+        <span class="icon">🌍</span>
+        <div class="label">制片国家</div>
+        <div class="value">0</div>
+      </div>
+      <div class="stat-card">
+        <span class="icon">🎭</span>
+        <div class="label">流派类型</div>
+        <div class="value">0</div>
+      </div>
+      <div class="stat-card">
+        <span class="icon">🎬</span>
+        <div class="label">导演数量</div>
+        <div class="value">0</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="charts-section" id="charts">
+    <div class="section-header">
+      <div class="line"></div>
+      <h2>可视化图表</h2>
+      <span class="tag">9 CHARTS</span>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🍩</span>内容类型分布</div>
+          <span class="badge">CHART 01</span>
+        </div>
+        <div class="desc">电影与电视节目的数量占比对比</div>
+        <div class="chart-container" id="chart1"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">📈</span>年度发布趋势</div>
+          <span class="badge">CHART 02</span>
+        </div>
+        <div class="desc">2008-2021 年每年新增内容数量变化</div>
+        <div class="chart-container" id="chart2"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🌍</span>制片国家 TOP15</div>
+          <span class="badge">CHART 03</span>
+        </div>
+        <div class="desc">按作品数量排名的前 15 个制片国家</div>
+        <div class="chart-container tall" id="chart3"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🎭</span>热门流派 TOP10</div>
+          <span class="badge">CHART 04</span>
+        </div>
+        <div class="desc">作品数量最多的十大内容流派</div>
+        <div class="chart-container tall" id="chart4"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🏷️</span>内容评级分布</div>
+          <span class="badge">CHART 05</span>
+        </div>
+        <div class="desc">各年龄评级的作品数量分布</div>
+        <div class="chart-container tall" id="chart5"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">⏱️</span>电影时长分布</div>
+          <span class="badge">CHART 06</span>
+        </div>
+        <div class="desc">电影时长直方图（单位：分钟）</div>
+        <div class="chart-container" id="chart6"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">📊</span>流派×类型对比</div>
+          <span class="badge">CHART 07</span>
+        </div>
+        <div class="desc">各流派中电影与电视节目的堆叠对比</div>
+        <div class="chart-container" id="chart7"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🌹</span>TV 剧集季数分布</div>
+          <span class="badge">CHART 08</span>
+        </div>
+        <div class="desc">电视节目季数的玫瑰图分布</div>
+        <div class="chart-container" id="chart8"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🔥</span>年份×评级热力图</div>
+          <span class="badge">CHART 09</span>
+        </div>
+        <div class="desc">各年份不同评级作品数量热力图</div>
+        <div class="chart-container" id="chart9"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tables-section">
+    <div class="section-header">
+      <div class="line"></div>
+      <h2>数据表格</h2>
+      <span class="tag">DATA TABLES</span>
+    </div>
+
+    <div class="tables-grid">
+      <div class="table-card">
+        <div class="table-card-header">
+          <span class="t-icon">📋</span>
+          <h4>数值型变量描述性统计</h4>
+          <span class="t-badge">DESC STATS</span>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table" id="descStatsTable">
+            <thead>
+              <tr>
+                <th>统计量</th>
+                <th class="num">发行年份</th>
+                <th class="num">上线年份</th>
+                <th class="num">时长</th>
+                <th class="num">流派数</th>
+                <th class="num">国家数</th>
+                <th class="num">演员数</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-card-header">
+          <span class="t-icon">🔗</span>
+          <h4>相关系数矩阵</h4>
+          <span class="t-badge">CORRELATION</span>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table" id="corrTable">
+            <thead>
+              <tr>
+                <th>变量</th>
+                <th class="num">发行年份</th>
+                <th class="num">上线年份</th>
+                <th class="num">时长</th>
+                <th class="num">流派数</th>
+                <th class="num">国家数</th>
+                <th class="num">演员数</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-card-header">
+          <span class="t-icon">🌍</span>
+          <h4>制片国家 Top 10</h4>
+          <span class="t-badge">COUNTRIES</span>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table" id="countryTable">
+            <thead>
+              <tr>
+                <th>排名</th>
+                <th>国家</th>
+                <th class="num">作品数</th>
+                <th class="num">占比</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-card-header">
+          <span class="t-icon">🤖</span>
+          <h4>机器学习模型结果</h4>
+          <span class="t-badge">ML MODELS</span>
+        </div>
+        <div class="table-wrapper" style="padding: 16px;">
+          <div class="ml-model-grid">
+            <div class="ml-card">
+              <div class="ml-icon">📉</div>
+              <div class="ml-name">线性回归</div>
+              <div class="ml-metric">R² Score</div>
+              <div class="ml-value" id="lrR2">—</div>
+            </div>
+            <div class="ml-card">
+              <div class="ml-icon">🔢</div>
+              <div class="ml-name">线性回归</div>
+              <div class="ml-metric">RMSE</div>
+              <div class="ml-value" id="lrRmse">—</div>
+            </div>
+            <div class="ml-card">
+              <div class="ml-icon">🎯</div>
+              <div class="ml-name">K-Means 聚类</div>
+              <div class="ml-metric">轮廓系数</div>
+              <div class="ml-value" id="kmSil">—</div>
+            </div>
+          </div>
+          <div class="ml-model-grid" style="grid-template-columns: 1fr; margin-top: 12px;">
+            <div class="ml-card">
+              <div class="ml-icon">🌲</div>
+              <div class="ml-name">随机森林分类</div>
+              <div class="ml-metric">准确率 (Accuracy)</div>
+              <div class="ml-value" id="rfAcc">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="brand">NETFLIX DATA ANALYSIS</div>
+    <div class="copy">Powered by ECharts 5.4 · 数据分析小组作业 · Netflix Titles Dataset</div>
+  </footer>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

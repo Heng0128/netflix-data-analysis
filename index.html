@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Netflix 数据分析 · 可视化看板</title>
+<title>Netflix 数据分析 · 首页</title>
 <meta name="description" content="Netflix 电影与电视节目数据分析可视化看板 — 8,807 部作品 × 10 张交互式图表">
 <meta name="keywords" content="Netflix，数据分析，可视化,ECharts,Python，数据科学">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
@@ -68,6 +68,141 @@
   .token.atrule, .token.attr-value, .token.keyword { color: #569cd6; }
   .token.function, .token.class-name { color: #dcdcaa; }
   .token.regex, .token.important, .token.variable { color: #d16969; }
+
+  /* 报告导航卡片 */
+  .nav-cards-section {
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+
+  .nav-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .nav-card {
+    display: block;
+    text-decoration: none;
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  .nav-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s ease, transform 0.7s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .nav-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .nav-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .nav-card:hover::before { opacity: 1; }
+
+  .nav-card .nav-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, rgba(229,9,20,0.15), rgba(229,9,20,0.05));
+  }
+
+  .nav-card:nth-child(2) .nav-icon { background: linear-gradient(135deg, rgba(78,205,196,0.15), rgba(78,205,196,0.05)); }
+  .nav-card:nth-child(3) .nav-icon { background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05)); }
+  .nav-card:nth-child(4) .nav-icon { background: linear-gradient(135deg, rgba(255,107,107,0.15), rgba(255,107,107,0.05)); }
+  .nav-card:nth-child(5) .nav-icon { background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.05)); }
+
+  .nav-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-card h3 .nav-badge {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(229, 9, 20, 0.15);
+    color: var(--red);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .nav-card p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .nav-card .nav-arrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--red);
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: all 0.3s ease;
+  }
+
+  .nav-card:hover .nav-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .nav-card .nav-arrow::after {
+    content: '→';
+    font-size: 14px;
+  }
+
+  @media (max-width: 1200px) {
+    .nav-cards-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .nav-cards-grid { grid-template-columns: 1fr 1fr; }
+    .nav-card { padding: 20px 16px; }
+    .nav-card .nav-icon { width: 48px; height: 48px; font-size: 24px; }
+  }
+
+  @media (max-width: 480px) {
+    .nav-cards-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -77,7 +212,7 @@
 <div class="orb orb-3"></div>
 
 <nav class="nav" id="nav">
-  <a href="#" class="nav-brand">
+  <a href="index.html" class="nav-brand">
     <div class="logo-mark">N</div>
     <span>NETFLIX</span>
   </a>
@@ -85,11 +220,11 @@
     <span></span><span></span><span></span>
   </button>
   <ul class="nav-links">
-    <li><a href="#team">小组分工</a></li>
-    <li><a href="#requirement">需求分析</a></li>
-    <li><a href="#code">分析代码</a></li>
-    <li><a href="#charts">可视化结果</a></li>
-    <li><a href="#conclusion">分析结论</a></li>
+    <li><a href="index.html" class="active">首页</a></li>
+    <li><a href="requirement.html">需求分析</a></li>
+    <li><a href="code.html">分析代码</a></li>
+    <li><a href="charts.html">可视化结果</a></li>
+    <li><a href="conclusion.html">分析结论</a></li>
   </ul>
 </nav>
 
@@ -121,552 +256,43 @@
     </div>
   </section>
 
-  <section class="req-section" id="requirement">
+  <section class="nav-cards-section">
     <div class="section-header">
       <div class="line"></div>
-      <h2>项目需求分析</h2>
-      <span class="tag">REQUIREMENT ANALYSIS</span>
+      <h2>报告导航</h2>
+      <span class="tag">REPORT NAVIGATION</span>
     </div>
-    <div class="req-cards">
-      <div class="req-card">
-        <div class="card-icon">📊</div>
-        <h3>数据集背景介绍 <span class="badge">DATASET</span></h3>
-        <p>本项目使用 <b>Netflix Titles Dataset</b>，该数据集来源于 Kaggle 公开数据集，全面收录了 Netflix 平台上的电影和电视节目信息。</p>
-        <table class="dataset-table">
-          <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
-          <tr><td>show_id</td><td>字符串</td><td>作品唯一标识 (s1~s8809)</td></tr>
-          <tr><td>type</td><td>分类</td><td>内容类型：Movie / TV Show</td></tr>
-          <tr><td>title</td><td>字符串</td><td>作品名称</td></tr>
-          <tr><td>director</td><td>字符串</td><td>导演姓名（部分缺失）</td></tr>
-          <tr><td>cast</td><td>字符串</td><td>主要演员阵容</td></tr>
-          <tr><td>country</td><td>字符串</td><td>制片国家/地区</td></tr>
-          <tr><td>date_added</td><td>日期</td><td>上线 Netflix 日期 (2008-2021)</td></tr>
-          <tr><td>release_year</td><td>整数</td><td>发行年份 (1925-2021)</td></tr>
-          <tr><td>rating</td><td>分类</td><td>年龄分级 (17 种评级)</td></tr>
-          <tr><td>duration</td><td>字符串</td><td>时长：电影(分钟) / 剧集(季数)</td></tr>
-          <tr><td>listed_in</td><td>字符串</td><td>流派分类 (36 个主要流派)</td></tr>
-          <tr><td>description</td><td>字符串</td><td>剧情简介</td></tr>
-        </table>
-      </div>
-      <div class="req-card">
-        <div class="card-icon">🎯</div>
-        <h3>分析目标与预期结果 <span class="badge">OBJECTIVES</span></h3>
-        <p>通过对 Netflix 内容库数据的多维度分析，探索内容分布规律，建立预测模型，为内容策略提供数据支持。</p>
-        <ul>
-          <li><b>描述性分析：</b>探索数据集整体分布特征，包括类型、年份、国家、流派、评级、时长等维度</li>
-          <li><b>相关性分析：</b>分析数值变量间的相关关系，挖掘变量间内在联系</li>
-          <li><b>回归预测：</b>建立线性回归模型，预测电影时长</li>
-          <li><b>聚类分析：</b>使用 K-Means 算法对内容进行聚类分群，识别典型内容模式</li>
-          <li><b>分类预测：</b>使用随机森林模型预测内容类型（Movie / TV Show）</li>
-          <li><b>可视化呈现：</b>通过 pyecharts + Matplotlib + ECharts 实现多维度交互式可视化</li>
-        </ul>
-        <p style="margin-top:12px;"><b>预期结果：</b>发现 Netflix 内容库的分布规律与增长趋势，建立有效的预测与分类模型，输出可视化看板与分析报告，为内容运营决策提供数据参考。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="code-section" id="code">
-    <div class="section-header">
-      <div class="line"></div>
-      <h2>数据分析处理代码</h2>
-      <span class="tag">SOURCE CODE</span>
-    </div>
-    
-    <div class="code-tabs">
-      <div class="code-tab-buttons">
-        <button class="code-tab-btn active" data-tab="preprocessing">
-          <span class="tab-icon">🧹</span>
-          <span class="tab-text">数据预处理</span>
-        </button>
-        <button class="code-tab-btn" data-tab="analysis">
-          <span class="tab-icon">📊</span>
-          <span class="tab-text">数据分析</span>
-        </button>
-        <button class="code-tab-btn" data-tab="ml">
-          <span class="tab-icon">🤖</span>
-          <span class="tab-text">机器学习</span>
-        </button>
-        <button class="code-tab-btn" data-tab="visualization">
-          <span class="tab-icon">📈</span>
-          <span class="tab-text">可视化</span>
-        </button>
-      </div>
-      
-      <div class="code-tab-content">
-        <div class="code-panel active" id="panel-preprocessing">
-          <div class="code-panel-header">
-            <h3>数据预处理代码</h3>
-            <div class="code-panel-desc">缺失值处理 · 特征工程 · 异常值检测</div>
-          </div>
-          <div class="code-block">
-            <pre><code class="language-python">import pandas as pd
-import numpy as np
-
-# 1. 数据加载
-df = pd.read_csv('netflix_titles.csv')
-print(f"原始数据形状: {df.shape}")
-
-# 2. 缺失值处理
-df['director'] = df['director'].fillna('Unknown')
-df['cast'] = df['cast'].fillna('Unknown')
-df['country'] = df['country'].fillna('Unknown')
-df['date_added'] = df['date_added'].fillna(df['date_added'].mode()[0])
-df['rating'] = df['rating'].fillna(df['rating'].mode()[0])
-df['duration'] = df['duration'].fillna(df['duration'].mode()[0])
-
-# 3. 特征工程
-df['year_added'] = df['date_added'].str.extract(r'(\d{4})').astype(int)
-
-def split_field(s):
-    if pd.isna(s) or s == 'Unknown':
-        return []
-    return [x.strip() for x in str(s).split(',') if x.strip()]
-
-df['genres_list'] = df['listed_in'].apply(split_field)
-df['countries_list'] = df['country'].apply(split_field)
-df['cast_list'] = df['cast'].apply(split_field)
-df['duration_num'] = df['duration'].str.extract(r'(\d+)').astype(float).astype(int)
-
-df['genre_count'] = df['genres_list'].apply(len)
-df['country_count'] = df['countries_list'].apply(len)
-df['cast_count'] = df['cast_list'].apply(len)
-df['has_director'] = (df['director'] != 'Unknown').astype(int)
-df['primary_genre'] = df['genres_list'].apply(lambda x: x[0] if x else 'Unknown')
-df['primary_country'] = df['countries_list'].apply(lambda x: x[0] if x else 'Unknown')
-
-# 4. 异常值检测（IQR法）
-movies = df[df['type'] == 'Movie'].copy()
-Q1 = movies['duration_num'].quantile(0.25)
-Q3 = movies['duration_num'].quantile(0.75)
-IQR = Q3 - Q1
-lower_bound = Q1 - 1.5 * IQR
-upper_bound = Q3 + 1.5 * IQR
-
-iqr_outliers = movies[(movies['duration_num'] < lower_bound) | 
-                      (movies['duration_num'] > upper_bound)]
-print(f"IQR法异常值: {len(iqr_outliers)} 部")
-
-# Z-score法
-movies['duration_zscore'] = (movies['duration_num'] - movies['duration_num'].mean()) / movies['duration_num'].std()
-z_outliers = movies[abs(movies['duration_zscore']) > 3]
-print(f"Z-score法异常值: {len(z_outliers)} 部")
-
-# 标记异常值（保留不删除）
-df['is_outlier_duration'] = 0
-df.loc[iqr_outliers.index, 'is_outlier_duration'] = 1
-
-# 保存清洗后数据
-df.to_csv('netflix_titles_cleaned.csv', index=False)
-print(f"处理后数据形状: {df.shape}")</code></pre>
-          </div>
-        </div>
-        
-        <div class="code-panel" id="panel-analysis">
-          <div class="code-panel-header">
-            <h3>数据分析代码</h3>
-            <div class="code-panel-desc">描述性统计 · 分组统计 · 相关性分析</div>
-          </div>
-          <div class="code-block">
-            <pre><code class="language-python">import pandas as pd
-import numpy as np
-from collections import Counter
-
-# 1. 描述性统计
-numeric_cols = ['release_year', 'year_added', 'duration_num', 
-                'genre_count', 'country_count', 'cast_count']
-print("=== 数值型变量描述性统计 ===")
-print(df[numeric_cols].describe().round(2))
-
-# 2. 类型分布
-type_dist = df['type'].value_counts()
-print(f"\n电影: {type_dist['Movie']} 部 ({type_dist['Movie']/len(df)*100:.1f}%)")
-print(f"电视节目: {type_dist['TV Show']} 部 ({type_dist['TV Show']/len(df)*100:.1f}%)")
-
-# 3. 年度趋势
-year_trend = df.groupby('year_added').size()
-peak_year = year_trend.idxmax()
-print(f"\n峰值年份: {peak_year} 年 ({year_trend.max()} 部)")
-
-# 4. 制片国家 Top10
-all_countries = [c for cl in df['countries_list'] for c in cl]
-top_countries = Counter(all_countries).most_common(10)
-print("\n=== 制片国家 Top10 ===")
-for i, (c, n) in enumerate(top_countries, 1):
-    print(f"  {i:2d}. {c}: {n} 部")
-
-# 5. 热门流派 Top10
-all_genres = [g for gl in df['genres_list'] for g in gl]
-top_genres = Counter(all_genres).most_common(10)
-print("\n=== 热门流派 Top10 ===")
-for i, (g, n) in enumerate(top_genres, 1):
-    print(f"  {i:2d}. {g}: {n} 部")
-
-# 6. 分组统计：按类型
-type_group = df.groupby('type').agg({
-    'duration_num': ['mean', 'median', 'std'],
-    'release_year': ['mean', 'min', 'max'],
-    'cast_count': 'mean'
-}).round(2)
-print("\n=== 按类型分组统计 ===")
-print(type_group)
-
-# 7. 相关性分析
-corr_matrix = df[numeric_cols].corr()
-print("\n=== 相关系数矩阵 ===")
-print(corr_matrix.round(3))
-
-# 关键相关性解读
-print(f"\nrelease_year vs year_added: r = {corr_matrix.loc['release_year', 'year_added']:.3f}")
-print(f"  → 正相关：新发行的作品通常更快上线 Netflix")
-print(f"\ngenre_count vs cast_count: r = {corr_matrix.loc['genre_count', 'cast_count']:.3f}")
-print(f"  → 弱正相关：流派标签越多，演员阵容可能越庞大")</code></pre>
-          </div>
-        </div>
-        
-        <div class="code-panel" id="panel-ml">
-          <div class="code-panel-header">
-            <h3>机器学习代码</h3>
-            <div class="code-panel-desc">线性回归 · K-Means聚类 · 随机森林分类</div>
-          </div>
-          <div class="code-block">
-            <pre><code class="language-python">from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.cluster import KMeans
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (mean_squared_error, r2_score, 
-                             accuracy_score, silhouette_score)
-
-# ========== 1. 线性回归：预测电影时长 ==========
-movies_df = df[df['type'] == 'Movie'].copy()
-features = ['release_year', 'genre_count', 'country_count', 'cast_count']
-X = movies_df[features]
-y = movies_df['duration_num']
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42)
-
-lr_model = LinearRegression()
-lr_model.fit(X_train, y_train)
-y_pred = lr_model.predict(X_test)
-
-mse = mean_squared_error(y_test, y_pred)
-rmse = np.sqrt(mse)
-r2 = r2_score(y_test, y_pred)
-print(f"线性回归 R² = {r2:.4f}, RMSE = {rmse:.2f} min")
-
-# ========== 2. K-Means 聚类 ==========
-cluster_features = ['release_year', 'duration_num', 'genre_count', 
-                    'country_count', 'cast_count']
-X_km = movies_df[cluster_features].dropna()
-
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X_km)
-
-kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
-X_km['cluster'] = kmeans.fit_predict(X_scaled)
-sil_score = silhouette_score(X_scaled, kmeans.labels_)
-print(f"\nK-Means 轮廓系数: {sil_score:.4f}")
-
-# 聚类画像
-cluster_profile = X_km.groupby('cluster')[cluster_features].mean().round(1)
-print("\n各簇特征画像:")
-print(cluster_profile)
-
-# ========== 3. 随机森林分类：预测内容类型 ==========
-ml_df = df.copy()
-ml_df['rating_enc'] = LabelEncoder().fit_transform(ml_df['rating'])
-ml_df['genre_enc'] = LabelEncoder().fit_transform(ml_df['primary_genre'])
-ml_df['country_enc'] = LabelEncoder().fit_transform(ml_df['primary_country'])
-
-X_rf = ml_df[['release_year', 'year_added', 'duration_num', 'genre_count',
-              'country_count', 'cast_count', 'has_director',
-              'rating_enc', 'genre_enc', 'country_enc']]
-y_rf = (ml_df['type'] == 'Movie').astype(int)
-
-X_train_rf, X_test_rf, y_train_rf, y_test_rf = train_test_split(
-    X_rf, y_rf, test_size=0.2, random_state=42, stratify=y_rf)
-
-rf_model = RandomForestClassifier(
-    n_estimators=100, max_depth=10,
-    min_samples_split=5, random_state=42, n_jobs=-1)
-rf_model.fit(X_train_rf, y_train_rf)
-
-y_pred_rf = rf_model.predict(X_test_rf)
-acc = accuracy_score(y_test_rf, y_pred_rf)
-print(f"\n随机森林准确率: {acc:.2%}")
-
-# 特征重要性
-importances = rf_model.feature_importances_
-indices = np.argsort(importances)[::-1]
-print("\n特征重要性 Top5:")
-for i in range(5):
-    print(f"  {i+1}. {X_rf.columns[indices[i]]}: {importances[indices[i]]:.4f}")</code></pre>
-          </div>
-        </div>
-        
-        <div class="code-panel" id="panel-visualization">
-          <div class="code-panel-header">
-            <h3>可视化代码</h3>
-            <div class="code-panel-desc">Matplotlib · pyecharts · 交互式图表</div>
-          </div>
-          <div class="code-block">
-            <pre><code class="language-python">import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.rcParams['font.sans-serif'] = ['DejaVu Sans']
-matplotlib.rcParams['axes.unicode_minus'] = False
-
-from pyecharts import options as opts
-from pyecharts.charts import Bar, Pie, Line, HeatMap, Funnel
-from pyecharts.globals import ThemeType
-
-# ========== 1. Matplotlib 饼状图 ==========
-fig, ax = plt.subplots(figsize=(8, 8))
-sizes = type_dist['数量'].values
-labels = type_dist['类型'].values
-colors = ['#E50914', '#4ECDC4']
-
-wedges, texts, autotexts = ax.pie(
-    sizes, labels=labels, colors=colors,
-    autopct='%1.1f%%', startangle=90,
-    textprops={'fontsize': 13, 'fontweight': 'bold'})
-ax.set_title('Netflix 内容类型分布', fontsize=16, fontweight='bold')
-ax.axis('equal')
-plt.tight_layout()
-plt.show()
-
-# ========== 2. Matplotlib 直方图 ==========
-fig, ax = plt.subplots(figsize=(12, 6))
-movie_durations = df[df['type'] == 'Movie']['duration_num']
-
-n, bins, patches = ax.hist(
-    movie_durations, bins=30, color='#E50914',
-    edgecolor='white', linewidth=0.5, alpha=0.8)
-ax.set_xlabel('时长（分钟）', fontsize=12)
-ax.set_ylabel('电影数量', fontsize=12)
-ax.set_title(f'电影时长分布直方图\n均值: {movie_durations.mean():.1f} min',
-             fontsize=14, fontweight='bold')
-ax.axvline(movie_durations.mean(), color='gold', 
-           linestyle='--', linewidth=2, label='均值')
-ax.legend(fontsize=11)
-plt.tight_layout()
-plt.show()
-
-# ========== 3. pyecharts 环形图 ==========
-def chart_type_pie():
-    data = [list(z) for z in zip(type_dist['类型'].tolist(), 
-                                  type_dist['数量'].tolist())]
-    c = (
-        Pie(init_opts=opts.InitOpts(theme=ThemeType.DARK, 
-                                    width="100%", height="500px"))
-        .add(series_name="数量分布", data_pair=data,
-             radius=["40%", "70%"], center=["50%", "50%"],
-             label_opts=opts.LabelOpts(
-                 formatter="{b}: {c} ({d}%)", font_size=14, color="#fff"))
-        .set_colors(["#E50914", "#831010"])
-        .set_global_opts(
-            title_opts=opts.TitleOpts(title="Netflix 内容类型分布"))
-    )
-    return c
-
-# ========== 4. pyecharts 折线图 ==========
-def chart_year_line():
-    c = (
-        Line(init_opts=opts.InitOpts(theme=ThemeType.DARK))
-        .add_xaxis(years)
-        .add_yaxis("电影", movies, is_smooth=True,
-                   linestyle_opts=opts.LineStyleOpts(width=4, color="#E50914"),
-                   areastyle_opts=opts.AreaStyleOpts(opacity=0.2))
-        .add_yaxis("电视节目", shows, is_smooth=True,
-                   linestyle_opts=opts.LineStyleOpts(width=4, color="#FFD700"))
-        .set_global_opts(title_opts=opts.TitleOpts(title="年度新增内容趋势"))
-    )
-    return c
-
-# ========== 5. pyecharts 热力图 ==========
-def chart_heatmap():
-    c = (
-        HeatMap(init_opts=opts.InitOpts(theme=ThemeType.DARK))
-        .add_xaxis(years)
-        .add_yaxis("作品数量", ratings, heatmap_data)
-        .set_global_opts(
-            title_opts=opts.TitleOpts(title="年份×评级热力图"),
-            visualmap_opts=opts.VisualMapOpts(
-                min_=0, max_=max_value,
-                range_color=["#0d0d0d", "#831010", "#E50914", "#FFD700"]))
-    )
-    return c</code></pre>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="overview-section" id="overview">
-    <div class="section-header">
-      <div class="line"></div>
-      <h2>数据概览</h2>
-      <span class="tag">OVERVIEW STATISTICS</span>
-    </div>
-    <div class="overview-grid" id="overviewGrid">
-      <div class="stat-card"><span class="icon">🎬</span><div class="label">总作品数</div><div class="value">0</div></div>
-      <div class="stat-card"><span class="icon">🎥</span><div class="label">电影</div><div class="value">0</div></div>
-      <div class="stat-card"><span class="icon">📺</span><div class="label">电视节目</div><div class="value">0</div></div>
-      <div class="stat-card"><span class="icon">🌍</span><div class="label">制片国家</div><div class="value">0</div></div>
-      <div class="stat-card"><span class="icon">🏷️</span><div class="label">流派类型</div><div class="value">0</div></div>
-      <div class="stat-card"><span class="icon">🎭</span><div class="label">导演数量</div><div class="value">0</div></div>
-    </div>
-  </section>
-
-  <section id="charts">
-    <div class="section-header">
-      <div class="line"></div>
-      <h2>可视化结果</h2>
-      <span class="tag">VISUALIZATION</span>
-    </div>
-    <div class="charts-grid">
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🍩</span>内容类型分布</div><span class="badge">PIE CHART</span></div><p class="desc">电影与电视节目的整体占比情况</p><div class="chart-container" id="chart1" role="img" aria-label="内容类型分布饼图：电影 69.6%，电视节目 30.4%"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">📈</span>年度发布趋势</div><span class="badge">LINE CHART</span></div><p class="desc">2000-2024 年内容发布数量变化</p><div class="chart-container tall" id="chart2" role="img" aria-label="年度发布趋势折线图：显示 2008-2024 年电影和电视节目发布数量的变化趋势"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🌏</span>制片国家 TOP15</div><span class="badge">BAR CHART</span></div><p class="desc">各国制作内容数量排名</p><div class="chart-container" id="chart3" role="img" aria-label="制片国家 TOP15 条形图：美国位居第一，共 3690 部作品"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🎭</span>热门流派 TOP10</div><span class="badge">BAR CHART</span></div><p class="desc">最受欢迎的内容流派排名</p><div class="chart-container" id="chart4" role="img" aria-label="热门流派 TOP10 条形图：International Movies 以 1689 部位居第一"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🔞</span>内容评级分布</div><span class="badge">BAR CHART</span></div><p class="desc">不同年龄分级内容占比</p><div class="chart-container" id="chart5" role="img" aria-label="内容评级分布条形图：TV-MA 占比最高 36.5%"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">⏱️</span>电影时长分布</div><span class="badge">HISTOGRAM</span></div><p class="desc">电影时长的频率分布直方图</p><div class="chart-container" id="chart6" role="img" aria-label="电影时长分布直方图：平均时长约 100 分钟"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">📊</span>流派×类型对比</div><span class="badge">STACKED BAR</span></div><p class="desc">各流派中电影与电视节目构成</p><div class="chart-container" id="chart7" role="img" aria-label="流派×类型堆叠条形图：展示各流派中电影和电视节目的数量分布"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🌹</span>TV 剧集季数分布</div><span class="badge">ROSE CHART</span></div><p class="desc">电视节目的季数分布情况</p><div class="chart-container" id="chart8" role="img" aria-label="TV 剧集季数玫瑰图：1 季节目占比最大（52%）"></div></div>
-      <div class="chart-card"><div class="card-head"><div class="title"><span class="emoji">🔥</span>年份×评级热力图</div><span class="badge">HEATMAP</span></div><p class="desc">不同年份与各评级的内容密度</p><div class="chart-container tall" id="chart9" role="img" aria-label="年份×评级热力图：显示 2008-2024 年各评级内容密度的变化"></div></div>
-    </div>
-
-    <div class="tables-section">
-      <div class="section-header">
-        <div class="line"></div>
-        <h2>数据表格</h2>
-        <span class="tag">DATA TABLES</span>
-      </div>
-      <div class="tables-grid">
-        <div class="table-card">
-          <div class="table-card-header">
-            <span class="t-icon">📋</span>
-            <h4>数值型变量描述性统计</h4>
-            <span class="t-badge">6 VARS</span>
-          </div>
-          <div class="table-wrapper">
-            <table class="data-table" id="descStatsTable">
-              <thead>
-                <tr><th>指标</th><th class="num">发行年份</th><th class="num">上线年份</th><th class="num">时长</th><th class="num">流派数</th><th class="num">国家数</th><th class="num">演员数</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>均值</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
-                <tr><td>标准差</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
-                <tr><td>最小值</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
-                <tr><td>中位数</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
-                <tr><td>最大值</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="table-card">
-          <div class="table-card-header">
-            <span class="t-icon">🔗</span>
-            <h4>相关系数矩阵</h4>
-            <span class="t-badge">6×6</span>
-          </div>
-          <div class="table-wrapper">
-            <table class="data-table" id="corrTable">
-              <thead>
-                <tr><th>变量</th><th class="num">发行年</th><th class="num">上线年</th><th class="num">时长</th><th class="num">流派数</th><th class="num">国家数</th><th class="num">演员数</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>发行年份</td><td class="num highlight">1.000</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
-                <tr><td>上线年份</td><td class="num">—</td><td class="num highlight">1.000</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
-                <tr><td>时长</td><td class="num">—</td><td class="num">—</td><td class="num highlight">1.000</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
-                <tr><td>流派数</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num highlight">1.000</td><td class="num">—</td><td class="num">—</td></tr>
-                <tr><td>国家数</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num highlight">1.000</td><td class="num">—</td></tr>
-                <tr><td>演员数</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num highlight">1.000</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="table-card">
-          <div class="table-card-header">
-            <span class="t-icon">🌍</span>
-            <h4>制片国家 Top 10</h4>
-            <span class="t-badge">RANKING</span>
-          </div>
-          <div class="table-wrapper">
-            <table class="data-table" id="countryTable">
-              <thead>
-                <tr><th>排名</th><th>国家</th><th class="num">作品数</th><th class="num">占比</th></tr>
-              </thead>
-              <tbody>
-                <tr><td colspan="4" style="text-align:center;color:#666;">加载中...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="table-card">
-          <div class="table-card-header">
-            <span class="t-icon">🤖</span>
-            <h4>机器学习模型结果</h4>
-            <span class="t-badge">3 MODELS</span>
-          </div>
-          <div class="table-wrapper">
-            <table class="data-table">
-              <thead>
-                <tr><th>模型</th><th>任务</th><th class="num">评估指标</th><th class="num">数值</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>线性回归</td><td>预测电影时长</td><td class="num">R²</td><td class="num" id="lrR2">—</td></tr>
-                <tr><td>线性回归</td><td>预测电影时长</td><td class="num">RMSE</td><td class="num" id="lrRmse">—</td></tr>
-                <tr><td>K-Means</td><td>内容聚类</td><td class="num">K值</td><td class="num">4</td></tr>
-                <tr><td>K-Means</td><td>内容聚类</td><td class="num">轮廓系数</td><td class="num" id="kmSil">—</td></tr>
-                <tr><td>随机森林</td><td>类型分类</td><td class="num">准确率</td><td class="num" id="rfAcc">—</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="conclusion" id="conclusion">
-    <h2><span class="icon">📋</span>案例分析结论</h2>
-
-    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:8px;">
-      <span style="color:var(--red);">▎</span>一、数据分析结果总结
-    </h3>
-    <div class="findings-grid">
-      <div class="finding"><span class="num">01</span><span class="text"><b>内容类型分布：</b>电影占比 69.6%，是 Netflix 内容库的主体，电视节目占 30.4% 且增长势头强劲。</span></div>
-      <div class="finding"><span class="num">02</span><span class="text"><b>年度增长趋势：</b>2019 年达到内容发布峰值（2,016 部），之后略有回落，呈现从"数量扩张"向"质量提升"转型的趋势。</span></div>
-      <div class="finding"><span class="num">03</span><span class="text"><b>地域分布特征：</b>美国以 3,690 部作品位居第一（占 42%），印度、英国、日本紧随其后，国际化战略成效显著。</span></div>
-      <div class="finding"><span class="num">04</span><span class="text"><b>热门流派排名：</b>International Movies 以 1,689 部位居榜首，Drama 和 Comedies 分列二三位，国际内容需求旺盛。</span></div>
-      <div class="finding"><span class="num">05</span><span class="text"><b>相关性发现：</b>发行年份与上线年份呈正相关（r≈0.45），新发行作品通常更快上线 Netflix；流派数与演员数呈弱正相关。</span></div>
-      <div class="finding"><span class="num">06</span><span class="text"><b>时长分布规律：</b>电影平均时长约 100 分钟，呈正态分布；52% 的电视节目仅有 1 季，试水特征明显。</span></div>
-      <div class="finding"><span class="num">07</span><span class="text"><b>线性回归模型：</b>R² 值较低，说明仅用元数据特征（发行年、流派数等）难以准确预测电影时长。</span></div>
-      <div class="finding"><span class="num">08</span><span class="text"><b>K-Means 聚类：</b>K=4 时聚类效果较好，可将电影分为"经典老片""主流电影""小众长片""新片短剧"四个典型群体。</span></div>
-      <div class="finding"><span class="num">09</span><span class="text"><b>随机森林分类：</b>准确率高，可有效区分电影与电视节目，时长是最重要的分类特征。</span></div>
-    </div>
-
-    <h3 style="font-size:16px;font-weight:700;margin:28px 0 16px;color:#fff;display:flex;align-items:center;gap:8px;">
-      <span style="color:var(--gold);">▎</span>二、结论与建议
-    </h3>
-    <div class="suggestions" style="margin-bottom:16px;">
-      <h3>📊 核心结论</h3>
-      <ul>
-        <li><b>内容结构：</b>电影仍是内容库主体，但电视节目增长迅速，内容结构正在向多元化方向发展。</li>
-        <li><b>增长阶段：</b>Netflix 已度过高速扩张期，正进入内容质量优化和精细化运营阶段。</li>
-        <li><b>地域格局：</b>美国内容一家独大，但亚洲市场（印度、日本、韩国）增长迅速，本土化内容是未来增长点。</li>
-        <li><b>数据质量：</b>部分字段存在缺失值和异常值，数据质量仍有提升空间。</li>
-      </ul>
-    </div>
-    <div class="suggestions">
-      <h3>💼 业务建议</h3>
-      <ul>
-        <li><b>内容策略优化：</b>继续加大 Drama 和 Comedy 类高需求内容投入，增加 International Movies 的多样性，特别是亚洲市场内容。</li>
-        <li><b>区域市场拓展：</b>美国市场已相对饱和，重点发展印度、韩国、日本等增长市场，推进本土化内容制作。</li>
-        <li><b>用户分级管理：</b>TV-MA 内容占比最高（约 36%），需完善家长控制功能，同时增加家庭友好型内容扩展受众。</li>
-        <li><b>续订决策优化：</b>建立数据驱动的剧集续订模型，对 1 季节目进行早期表现评估，优化资源分配效率。</li>
-        <li><b>数据驱动决策：</b>利用随机森林等模型辅助内容类型判断和资源分配，通过聚类分析指导采购策略。</li>
-      </ul>
+    <div class="nav-cards-grid">
+      <a href="requirement.html" class="nav-card">
+        <div class="nav-icon">🎯</div>
+        <h3>需求分析 <span class="nav-badge">01</span></h3>
+        <p>数据集背景介绍、分析目标与预期结果，了解项目整体规划与研究方向。</p>
+        <div class="nav-arrow">查看详情</div>
+      </a>
+      <a href="code.html" class="nav-card">
+        <div class="nav-icon">💻</div>
+        <h3>分析代码 <span class="nav-badge">02</span></h3>
+        <p>数据预处理、统计分析、机器学习模型、可视化代码的完整实现展示。</p>
+        <div class="nav-arrow">查看详情</div>
+      </a>
+      <a href="charts.html" class="nav-card">
+        <div class="nav-icon">📊</div>
+        <h3>可视化结果 <span class="nav-badge">03</span></h3>
+        <p>10 张交互式图表，多维度展示 Netflix 内容库的分布规律与趋势变化。</p>
+        <div class="nav-arrow">查看详情</div>
+      </a>
+      <a href="conclusion.html" class="nav-card">
+        <div class="nav-icon">📋</div>
+        <h3>分析结论 <span class="nav-badge">04</span></h3>
+        <p>数据分析结果总结、核心结论与业务建议，为内容策略提供数据支持。</p>
+        <div class="nav-arrow">查看详情</div>
+      </a>
+      <a href="index.html" class="nav-card">
+        <div class="nav-icon">🏠</div>
+        <h3>关于项目 <span class="nav-badge">05</span></h3>
+        <p>项目概述、技术栈介绍、团队分工与开发历程，了解项目全貌。</p>
+        <div class="nav-arrow">返回首页</div>
+      </a>
     </div>
   </section>
 
@@ -677,5 +303,22 @@ def chart_heatmap():
 </div>
 
 <script src="js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const navCards = document.querySelectorAll('.nav-card');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    navCards.forEach(card => observer.observe(card));
+  });
+</script>
 </body>
 </html>

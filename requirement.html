@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netflix 数据分析 · 需求分析</title>
+<meta name="description" content="Netflix 电影与电视节目数据分析 - 项目需求分析、数据集介绍与分析目标">
+<meta name="keywords" content="Netflix，数据分析，需求分析，数据集，可视化">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"
+        onerror="this.onerror=null;this.src='https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
+        onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'"></script>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+<style>
+  pre[class*="language-"] {
+    margin: 0;
+    border-radius: 0 0 16px 16px;
+    background: #0d0d0d !important;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  code[class*="language-"] {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+  .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6a9955; }
+  .token.punctuation { color: #d4d4d4; }
+  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #b5cea8; }
+  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #ce9178; }
+  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #d4d4d4; }
+  .token.atrule, .token.attr-value, .token.keyword { color: #569cd6; }
+  .token.function, .token.class-name { color: #dcdcaa; }
+  .token.regex, .token.important, .token.variable { color: #d16969; }
+
+  .page-header {
+    padding: 120px 0 40px;
+    text-align: center;
+    position: relative;
+  }
+
+  .page-header .page-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(229, 9, 20, 0.1);
+    border: 1px solid rgba(229, 9, 20, 0.25);
+    border-radius: 100px;
+    padding: 6px 20px 6px 8px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--red);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    animation: fadeInUp 0.8s ease both;
+  }
+
+  .page-header .page-badge .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .page-header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 30%, rgba(255,107,107,0.9));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+
+  .page-header .page-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: fadeInUp 0.8s 0.2s ease both;
+  }
+
+  .page-divider {
+    margin: 28px auto 0;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    border-radius: 2px;
+    animation: fadeInUp 0.8s 0.3s ease both;
+  }
+
+  .req-section {
+    margin-top: 20px;
+  }
+
+  .req-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .req-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .req-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s ease, transform 0.7s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .req-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-4px);
+  }
+
+  .req-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    opacity: 0.6;
+  }
+
+  .req-card .card-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+
+  .req-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .req-card h3 .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: rgba(229, 9, 20, 0.15);
+    color: var(--red);
+    letter-spacing: 0.5px;
+  }
+
+  .req-card p {
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+
+  .dataset-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-size: 12px;
+  }
+
+  .dataset-table th {
+    text-align: left;
+    padding: 10px 12px;
+    background: rgba(229, 9, 20, 0.1);
+    color: #fff;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(229, 9, 20, 0.2);
+    white-space: nowrap;
+  }
+
+  .dataset-table td {
+    padding: 9px 12px;
+    color: rgba(255,255,255,0.7);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .dataset-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+    color: #fff;
+  }
+
+  .dataset-table .field-name {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .goals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .goal-item {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .goal-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--red), var(--gold));
+  }
+
+  .goal-item:hover {
+    background: rgba(229, 9, 20, 0.04);
+    border-color: rgba(229, 9, 20, 0.15);
+    transform: translateX(4px);
+  }
+
+  .goal-item .goal-num {
+    color: var(--gold);
+    font-weight: 800;
+    font-size: 14px;
+    margin-right: 6px;
+  }
+
+  .goal-item .goal-title {
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .goal-item .goal-desc {
+    color: rgba(255,255,255,0.6);
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .stat-mini {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    text-align: center;
+  }
+
+  .stat-mini .stat-value {
+    font-size: 22px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 30%, rgba(255,107,107,0.9));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+
+  .stat-mini .stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .req-cards { grid-template-columns: 1fr; }
+    .goals-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .page-header h1 { font-size: 28px; }
+    .req-card { padding: 20px; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-brand">
+    <div class="logo-mark">N</div>
+    <span>NETFLIX</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-label="菜单">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="requirement.html" class="active">需求分析</a></li>
+    <li><a href="code.html">分析代码</a></li>
+    <li><a href="charts.html">可视化结果</a></li>
+    <li><a href="conclusion.html">分析结论</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+  <header class="page-header">
+    <div class="page-badge"><span class="dot"></span> PROJECT REQUIREMENT</div>
+    <h1>项目需求分析</h1>
+    <p class="page-subtitle">Dataset Overview · Analysis Goals · Expected Outcomes</p>
+    <div class="page-divider"></div>
+  </header>
+
+  <section class="req-section">
+    <div class="section-header">
+      <div class="line"></div>
+      <h2>项目需求分析</h2>
+      <span class="tag">REQUIREMENT ANALYSIS</span>
+    </div>
+
+    <div class="req-cards">
+      <div class="req-card" id="dataset-card">
+        <div class="card-icon">📊</div>
+        <h3>数据集背景介绍 <span class="badge">DATASET</span></h3>
+
+        <div class="stats-row">
+          <div class="stat-mini">
+            <div class="stat-value">8,807</div>
+            <div class="stat-label">总条目</div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-value">12</div>
+            <div class="stat-label">字段数</div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-value">2</div>
+            <div class="stat-label">内容类型</div>
+          </div>
+          <div class="stat-mini">
+            <div class="stat-value">200+</div>
+            <div class="stat-label">国家/地区</div>
+          </div>
+        </div>
+
+        <p>Netflix 作为媒体和视频流领域的主导力量，截至2021年中期，在其平台上可访问超过8,000部电影和电视节目，全球订阅用户数量超过2亿。此表格化数据集全面编录了Netflix的所有内容，包括演员、导演、评分、发行年份、时长等关键信息。</p>
+        <p>该数据集对于分析Netflix内容趋势、了解流派受欢迎程度以及研究不同地区和时间段的内容分布至关重要。</p>
+
+        <table class="dataset-table">
+          <thead>
+            <tr>
+              <th>字段名</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="field-name">show_id</td>
+              <td>每个标题的唯一标识符</td>
+            </tr>
+            <tr>
+              <td class="field-name">type</td>
+              <td>标题类别，为"电影"或"电视节目"</td>
+            </tr>
+            <tr>
+              <td class="field-name">title</td>
+              <td>电影或电视节目的名称</td>
+            </tr>
+            <tr>
+              <td class="field-name">director</td>
+              <td>电影或电视节目的导演（部分条目可能缺失）</td>
+            </tr>
+            <tr>
+              <td class="field-name">cast</td>
+              <td>标题中的主要演员/女演员列表</td>
+            </tr>
+            <tr>
+              <td class="field-name">country</td>
+              <td>电影或电视节目的制作国家</td>
+            </tr>
+            <tr>
+              <td class="field-name">date_added</td>
+              <td>标题添加到Netflix的日期</td>
+            </tr>
+            <tr>
+              <td class="field-name">release_year</td>
+              <td>电影或电视节目最初发布的年份</td>
+            </tr>
+            <tr>
+              <td class="field-name">rating</td>
+              <td>标题的年龄评级</td>
+            </tr>
+            <tr>
+              <td class="field-name">duration</td>
+              <td>标题的时长（电影以分钟计，电视节目以季计）</td>
+            </tr>
+            <tr>
+              <td class="field-name">listed_in</td>
+              <td>标题所属的流派分类</td>
+            </tr>
+            <tr>
+              <td class="field-name">description</td>
+              <td>标题的简短概述</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="req-card" id="goals-card">
+        <div class="card-icon">🎯</div>
+        <h3>分析目标与预期结果 <span class="badge">GOALS</span></h3>
+        <p>本项目旨在通过多维度数据分析，深入挖掘 Netflix 内容库的内在规律，为内容策略决策提供数据支持。以下是六大核心分析目标：</p>
+
+        <div class="goals-grid">
+          <div class="goal-item">
+            <div class="goal-title"><span class="goal-num">01</span>描述性分析</div>
+            <div class="goal-desc">对数据集进行全面的统计描述，包括内容类型分布、年份趋势、地区分布、评级分布等基础统计指标。</div>
+          </div>
+          <div class="goal-item">
+            <div class="goal-title"><span class="goal-num">02</span>相关性分析</div>
+            <div class="goal-desc">探索各字段之间的关联关系，如国家与类型的关系、发行年份与时长的关系、导演与流派的关联等。</div>
+          </div>
+          <div class="goal-item">
+            <div class="goal-title"><span class="goal-num">03</span>回归预测</div>
+            <div class="goal-desc">基于历史数据建立回归模型，预测未来内容发布趋势，包括电影/电视节目的数量增长预测。</div>
+          </div>
+          <div class="goal-item">
+            <div class="goal-title"><span class="goal-num">04</span>聚类分析</div>
+            <div class="goal-desc">通过聚类算法对内容进行分组，识别不同类型的内容集群，发现潜在的内容模式和细分市场。</div>
+          </div>
+          <div class="goal-item">
+            <div class="goal-title"><span class="goal-num">05</span>分类预测</div>
+            <div class="goal-desc">构建分类模型，根据内容特征预测其类型、评级或受欢迎程度，为内容推荐提供支持。</div>
+          </div>
+          <div class="goal-item">
+            <div class="goal-title"><span class="goal-num">06</span>可视化呈现</div>
+            <div class="goal-desc">通过交互式图表直观展示分析结果，包括词云、地图、桑基图等多种可视化形式，提升数据可读性。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="brand">NETFLIX DATA ANALYSIS</div>
+    <div class="copy">Powered by ECharts 5.4 · 数据分析小组作业 · Netflix Titles Dataset</div>
+  </footer>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const reqCards = document.querySelectorAll('.req-card');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 150);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    reqCards.forEach(card => observer.observe(card));
+  });
+</script>
+</body>
+</html>
