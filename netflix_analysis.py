@@ -129,6 +129,13 @@ df['date_added'] = df['date_added'].fillna(df['date_added'].mode()[0])
 df['rating'] = df['rating'].fillna(df['rating'].mode()[0])
 df['duration'] = df['duration'].fillna(df['duration'].mode()[0])
 
+# rating 异常值处理：检测到 3 条 rating 值为时长格式（如 '74 min'），用众数填充
+invalid_ratings = df['rating'].str.contains('min', na=False)
+invalid_rating_count = invalid_ratings.sum()
+if invalid_rating_count > 0:
+    print(f"发现 rating 异常值 {invalid_rating_count} 条（时长格式），已用众数填充")
+    df.loc[invalid_ratings, 'rating'] = df['rating'].mode()[0]
+
 print(f"缺失值处理后，总缺失数：{df.isnull().sum().sum()}")
 
 
@@ -1445,8 +1452,8 @@ movie_avg_dur = df[df['type'] == 'Movie']['duration_num'].mean()
 print(f"  6. 电影平均时长：{movie_avg_dur:.1f} 分钟")
 
 print(f"\n📈 二、相关性分析发现")
-print(f"  1. release_year 与 year_added 正相关 (r={corr_matrix.loc['release_year', 'year_added']:.3f})")
-print(f"     → 新发行的作品通常更快上线 Netflix")
+print(f"  1. release_year 与 year_added 弱正相关 (r={corr_matrix.loc['release_year', 'year_added']:.3f})")
+print(f"     → 整体变量间相关性不强")
 
 print(f"\n🤖 三、机器学习建模发现")
 print(f"  1. 线性回归预测电影时长：R²={r2:.4f}，解释能力有限")
@@ -1457,6 +1464,7 @@ print(f"     → 最重要特征：{sorted_features[0]}（{sorted_importances[0]
 print(f"\n⚠️  四、数据质量发现")
 print(f"  1. 异常值检测：电影时长异常 {df['is_outlier_duration'].sum()} 部（IQR 法）")
 print(f"  2. 缺失值处理：6 个字段存在缺失，已用众数/Unknown 填充")
+print(f"  3. rating 异常值：3 条时长格式数据，已用众数填充")
 print()
 print("=" * 60)
 

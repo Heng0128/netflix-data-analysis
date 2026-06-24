@@ -55,6 +55,14 @@ df['date_added'] = df['date_added'].fillna(df['date_added'].mode()[0])
 df['rating'] = df['rating'].fillna(df['rating'].mode()[0])
 df['duration'] = df['duration'].fillna(df['duration'].mode()[0])
 
+# rating 异常值处理：检测到 3 条 rating 值为时长格式（如 '74 min'），用众数填充
+invalid_ratings = df['rating'].str.contains('min', na=False)
+invalid_rating_count = invalid_ratings.sum()
+if invalid_rating_count > 0:
+    print(f"\n发现 rating 异常值 {invalid_rating_count} 条（时长格式），用众数填充:")
+    print(df.loc[invalid_ratings, ['show_id', 'title', 'rating', 'duration']].to_string(index=False))
+    df.loc[invalid_ratings, 'rating'] = df['rating'].mode()[0]
+
 print(f"\n处理后缺失值总数: {df.isnull().sum().sum()} (应为 0)")
 
 # ============================================================
