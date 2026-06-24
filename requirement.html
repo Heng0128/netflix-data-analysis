@@ -502,57 +502,83 @@
           <thead>
             <tr>
               <th>字段名</th>
+              <th>变量类型</th>
               <th>说明</th>
+              <th>取值范围 / 示例</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="field-name">show_id</td>
+              <td>字符串 (Categorical)</td>
               <td>每个标题的唯一标识符</td>
+              <td>s1 ~ s8807</td>
             </tr>
             <tr>
               <td class="field-name">type</td>
+              <td>分类变量 (Nominal)</td>
               <td>标题类别，为"电影"或"电视节目"</td>
+              <td>Movie / TV Show（2 类）</td>
             </tr>
             <tr>
               <td class="field-name">title</td>
+              <td>字符串 (Text)</td>
               <td>电影或电视节目的名称</td>
+              <td>如 "3 Idiots"、"Stranger Things"</td>
             </tr>
             <tr>
               <td class="field-name">director</td>
-              <td>电影或电视节目的导演（部分条目可能缺失）</td>
+              <td>字符串 (Text)</td>
+              <td>电影或电视节目的导演</td>
+              <td>4,528 位导演，缺失率约 30%</td>
             </tr>
             <tr>
               <td class="field-name">cast</td>
+              <td>字符串 (Text)</td>
               <td>标题中的主要演员/女演员列表</td>
+              <td>多人，逗号分隔，缺失率约 9%</td>
             </tr>
             <tr>
               <td class="field-name">country</td>
+              <td>分类变量 (Nominal)</td>
               <td>电影或电视节目的制作国家</td>
+              <td>85 个国家/地区，缺失率约 9%</td>
             </tr>
             <tr>
               <td class="field-name">date_added</td>
-              <td>标题添加到Netflix的日期</td>
+              <td>日期 (Date)</td>
+              <td>标题添加到 Netflix 的日期</td>
+              <td>2008-01 ~ 2021-09</td>
             </tr>
             <tr>
               <td class="field-name">release_year</td>
+              <td>数值 (Integer)</td>
               <td>电影或电视节目最初发布的年份</td>
+              <td>1942 ~ 2021（均值 2014.1）</td>
             </tr>
             <tr>
               <td class="field-name">rating</td>
+              <td>分类变量 (Ordinal)</td>
               <td>标题的年龄评级</td>
+              <td>TV-MA / TV-14 / TV-PG / R 等 14 种</td>
             </tr>
             <tr>
               <td class="field-name">duration</td>
-              <td>标题的时长（电影以分钟计，电视节目以季计）</td>
+              <td>数值 (Integer)</td>
+              <td>标题的时长（电影分钟，电视节目季数）</td>
+              <td>电影：1~312 分钟（均值 99.5 min）<br/>节目：1~17 季</td>
             </tr>
             <tr>
               <td class="field-name">listed_in</td>
+              <td>分类变量 (Multivalue)</td>
               <td>标题所属的流派分类</td>
+              <td>36 种流派，可多标签（均值 2.15 个）</td>
             </tr>
             <tr>
               <td class="field-name">description</td>
+              <td>字符串 (Text)</td>
               <td>标题的简短概述</td>
+              <td>约 50~250 字的文本描述</td>
             </tr>
           </tbody>
         </table>
@@ -561,32 +587,32 @@
       <div class="req-card" id="goals-card">
         <div class="card-icon">🎯</div>
         <h3>分析目标与预期结果 <span class="badge">GOALS</span></h3>
-        <p>本项目旨在通过多维度数据分析，深入挖掘 Netflix 内容库的内在规律，为内容策略决策提供数据支持。以下是六大核心分析目标：</p>
+        <p>本项目旨在通过多维度数据分析，深入挖掘 Netflix 内容库的内在规律，为内容策略决策提供数据支持。以下是六大核心分析目标及对应的预期结果：</p>
 
         <div class="goals-grid">
           <div class="goal-item">
             <div class="goal-title"><span class="goal-num">01</span>描述性分析</div>
-            <div class="goal-desc">对数据集进行全面的统计描述，包括内容类型分布、年份趋势、地区分布、评级分布等基础统计指标。</div>
+            <div class="goal-desc"><b>目标：</b>对数据集进行全面的统计描述，包括内容类型分布、年份趋势、地区分布、评级分布等基础统计指标。<br/><b>预期结果：</b>生成数据概览报告，发现内容库的基本结构特征，识别主要内容类型和关键指标。</div>
           </div>
           <div class="goal-item">
             <div class="goal-title"><span class="goal-num">02</span>相关性分析</div>
-            <div class="goal-desc">探索各字段之间的关联关系，如国家与类型的关系、发行年份与时长的关系、导演与流派的关联等。</div>
+            <div class="goal-desc"><b>目标：</b>探索各字段之间的关联关系，如国家与类型的关系、发行年份与时长的关系、导演与流派的关联等。<br/><b>预期结果：</b>输出相关系数矩阵，识别变量间的强相关与弱相关关系，为后续建模提供依据。</div>
           </div>
           <div class="goal-item">
-            <div class="goal-title"><span class="goal-num">03</span>回归预测</div>
-            <div class="goal-desc">基于历史数据建立回归模型，预测未来内容发布趋势，包括电影/电视节目的数量增长预测。</div>
+            <div class="goal-title"><span class="goal-num">03</span>回归分析</div>
+            <div class="goal-desc"><b>目标：</b>建立线性回归模型，探究内容元数据特征（发行年、流派数、演员数等）对电影时长的预测能力。<br/><b>预期结果：</b>评估模型拟合度（R²、RMSE），识别影响时长的关键因素，发现数据中的异常模式。</div>
           </div>
           <div class="goal-item">
             <div class="goal-title"><span class="goal-num">04</span>聚类分析</div>
-            <div class="goal-desc">通过聚类算法对内容进行分组，识别不同类型的内容集群，发现潜在的内容模式和细分市场。</div>
+            <div class="goal-desc"><b>目标：</b>通过 K-Means 聚类算法对内容进行分组，识别不同类型的内容集群，发现潜在的内容模式和细分市场。<br/><b>预期结果：</b>确定最佳聚类数（K值），生成各簇特征画像，发现内容群体的差异化规律。</div>
           </div>
           <div class="goal-item">
-            <div class="goal-title"><span class="goal-num">05</span>分类预测</div>
-            <div class="goal-desc">构建分类模型，根据内容特征预测其类型、评级或受欢迎程度，为内容推荐提供支持。</div>
+            <div class="goal-title"><span class="goal-num">05</span>随机森林分类</div>
+            <div class="goal-desc"><b>目标：</b>构建随机森林分类模型，根据内容特征预测其类型（电影 / 电视节目），评估分类准确率。<br/><b>预期结果：</b>输出模型准确率、混淆矩阵、特征重要性排序，识别区分内容类型的关键特征。</div>
           </div>
           <div class="goal-item">
             <div class="goal-title"><span class="goal-num">06</span>可视化呈现</div>
-            <div class="goal-desc">通过交互式图表直观展示分析结果，包括词云、地图、桑基图等多种可视化形式，提升数据可读性。</div>
+            <div class="goal-desc"><b>目标：</b>通过交互式图表直观展示分析结果，包括饼图、柱状图、折线图、直方图、热力图等多种可视化形式。<br/><b>预期结果：</b>构建可视化仪表盘，提升数据可读性，为业务决策提供直观的数据支撑。</div>
           </div>
         </div>
       </div>
