@@ -837,4 +837,16 @@ function renderAll(d) {
 }
 
 // ===== 启动 =====
-loadData().then(renderAll).catch(err => { console.error('Bootstrap error:', err); });
+document.addEventListener('DOMContentLoaded', function() {
+  setupCodeTabs();
+  setupNavHighlight();
+  
+  const hasCharts = document.getElementById('chart1') || document.getElementById('overviewGrid');
+  if (hasCharts) {
+    loadData().then(renderAll).catch(err => { console.error('Bootstrap error:', err); });
+  } else {
+    if (window.Prism) {
+      Prism.highlightAll();
+    }
+  }
+});

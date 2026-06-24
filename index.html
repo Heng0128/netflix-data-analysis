@@ -3,15 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Netflix 数据分析 · 首页</title>
-<meta name="description" content="Netflix 电影与电视节目数据分析可视化看板 — 8,807 部作品 × 10 张交互式图表">
+<title>Netflix 内容数据分析</title>
+<meta name="description" content="Netflix 电影与电视节目数据分析可视化 — 8,807 部作品的深度洞察">
 <meta name="keywords" content="Netflix，数据分析，可视化,ECharts,Python，数据科学">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
 
-<!-- SEO & Social Sharing -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Netflix 数据分析 · 可视化看板">
-<meta property="og:description" content="8,807部作品 × 10个交互式图表，深度分析Netflix内容库。">
+<meta property="og:description" content="8,807部作品 × 9个交互式图表，深度分析Netflix内容库。">
 <meta property="og:url" content="https://heng0128.github.io/netflix-data-analysis/">
 <meta property="og:image" content="https://heng0128.github.io/netflix-data-analysis/preview.png">
 <meta property="og:locale" content="zh_CN">
@@ -19,77 +18,220 @@
 <meta name="twitter:title" content="Netflix 数据分析 · 可视化看板">
 <meta name="theme-color" content="#E50914">
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Dataset",
-  "name": "Netflix Titles Dataset Analysis",
-  "description": "Netflix 电影与电视节目数据分析可视化看板，包含8807部作品的多维度分析",
-  "creator": {
-    "@type": "Organization",
-    "name": "数据分析小组"
-  },
-  "temporalCoverage": "2000-2024",
-  "measurementTechnique": "数据可视化",
-  "variableMeasured": [
-    "内容类型", "发布年份", "制片国家", "流派", "评级", "时长", "季数"
-  ]
-}
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"
-        onerror="this.onerror=null;this.src='https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
-        onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'"></script>
 <link rel="stylesheet" href="css/style.css">
-<!-- Prism.js 代码语法高亮 -->
-<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
 <style>
-  /* 覆盖 Prism 默认样式以匹配暗色主题 */
-  pre[class*="language-"] {
-    margin: 0;
-    border-radius: 0 0 16px 16px;
-    background: #0d0d0d !important;
-    font-size: 13px;
-    line-height: 1.6;
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 100px 24px 60px;
+    position: relative;
+    text-align: center;
   }
-  code[class*="language-"] {
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-  }
-  .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6a9955; }
-  .token.punctuation { color: #d4d4d4; }
-  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #b5cea8; }
-  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #ce9178; }
-  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #d4d4d4; }
-  .token.atrule, .token.attr-value, .token.keyword { color: #569cd6; }
-  .token.function, .token.class-name { color: #dcdcaa; }
-  .token.regex, .token.important, .token.variable { color: #d16969; }
 
-  /* 报告导航卡片 */
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(229, 9, 20, 0.1);
+    border: 1px solid rgba(229, 9, 20, 0.3);
+    border-radius: 100px;
+    padding: 8px 24px 8px 12px;
+    margin-bottom: 32px;
+    font-size: 12px;
+    color: var(--red);
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: fadeInUp 0.8s ease both;
+  }
+
+  .hero-badge .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .hero-netflix {
+    font-size: clamp(80px, 18vw, 200px);
+    font-weight: 900;
+    letter-spacing: -6px;
+    line-height: 0.9;
+    background: linear-gradient(180deg, #fff 0%, #e50914 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.8s 0.15s ease both;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .hero-title {
+    font-size: clamp(24px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    color: #fff;
+    animation: fadeInUp 0.8s 0.3s ease both;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(13px, 2vw, 16px);
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: fadeInUp 0.8s 0.4s ease both;
+    margin-bottom: 48px;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 800px;
+    width: 100%;
+    animation: fadeInUp 0.8s 0.5s ease both;
+    margin-bottom: 56px;
+  }
+
+  .hero-stat {
+    text-align: center;
+    padding: 20px 12px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .hero-stat:hover {
+    border-color: rgba(229, 9, 20, 0.3);
+    transform: translateY(-4px);
+    background: rgba(229, 9, 20, 0.05);
+  }
+
+  .hero-stat .num {
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff, #e50914);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-stat .label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    animation: fadeInUp 0.8s 0.6s ease both;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: var(--red);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-primary:hover {
+    background: #f40612;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(229, 9, 20, 0.4);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: transparent;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  .scroll-indicator .arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: rotate(45deg);
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
+    50% { transform: translateX(-50%) translateY(10px); opacity: 1; }
+  }
+
   .nav-cards-section {
-    margin-top: 20px;
-    margin-bottom: 40px;
+    padding: 80px 0;
   }
 
   .nav-cards-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 14px;
-    margin-top: 16px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 24px;
   }
 
   .nav-card {
     display: block;
     text-decoration: none;
-    background: var(--bg-card);
+    background: rgba(18, 18, 18, 0.6);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 32px 24px;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     position: relative;
     overflow: hidden;
@@ -110,106 +252,195 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--red), var(--gold));
-    opacity: 0;
-    transition: opacity 0.4s ease;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
   }
 
   .nav-card:hover {
-    border-color: var(--border-hover);
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-hover);
+    border-color: rgba(229, 9, 20, 0.4);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(229,9,20,0.2);
   }
 
-  .nav-card:hover::before { opacity: 1; }
+  .nav-card:hover::before { transform: scaleX(1); }
+
+  .nav-card .nav-step {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--red);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
 
   .nav-card .nav-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    margin-bottom: 16px;
-    background: linear-gradient(135deg, rgba(229,9,20,0.15), rgba(229,9,20,0.05));
+    font-size: 40px;
+    margin-bottom: 20px;
+    display: block;
   }
-
-  .nav-card:nth-child(2) .nav-icon { background: linear-gradient(135deg, rgba(78,205,196,0.15), rgba(78,205,196,0.05)); }
-  .nav-card:nth-child(3) .nav-icon { background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05)); }
-  .nav-card:nth-child(4) .nav-icon { background: linear-gradient(135deg, rgba(255,107,107,0.15), rgba(255,107,107,0.05)); }
-  .nav-card:nth-child(5) .nav-icon { background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.05)); }
 
   .nav-card h3 {
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 10px;
     color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .nav-card h3 .nav-badge {
-    font-size: 9px;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 6px;
-    background: rgba(229, 9, 20, 0.15);
-    color: var(--red);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
   }
 
   .nav-card p {
-    font-size: 12px;
-    color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 20px;
   }
 
-  .nav-card .nav-arrow {
-    display: flex;
+  .nav-card .nav-link {
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
     color: var(--red);
-    opacity: 0;
-    transform: translateX(-8px);
-    transition: all 0.3s ease;
+    transition: gap 0.3s ease;
   }
 
-  .nav-card:hover .nav-arrow {
-    opacity: 1;
-    transform: translateX(0);
+  .nav-card:hover .nav-link { gap: 12px; }
+
+  .feature-section {
+    padding: 80px 0;
   }
 
-  .nav-card .nav-arrow::after {
-    content: '→';
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    margin-top: 32px;
+  }
+
+  .feature-content h3 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .feature-content p {
+    color: var(--text-dim);
+    line-height: 1.8;
+    margin-bottom: 20px;
     font-size: 14px;
   }
 
-  @media (max-width: 1200px) {
-    .nav-cards-grid { grid-template-columns: repeat(3, 1fr); }
+  .feature-list {
+    list-style: none;
+    padding: 0;
   }
 
-  @media (max-width: 768px) {
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+  }
+
+  .feature-list li::before {
+    content: '✓';
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    background: rgba(229, 9, 20, 0.15);
+    color: var(--red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+    margin-top: 1px;
+  }
+
+  .feature-visual {
+    background: linear-gradient(135deg, rgba(229,9,20,0.1), rgba(255,215,0,0.05));
+    border: 1px solid rgba(229, 9, 20, 0.2);
+    border-radius: 16px;
+    padding: 32px;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-visual::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(229,9,20,0.15) 0%, transparent 60%);
+    animation: rotate 20s linear infinite;
+  }
+
+  @keyframes rotate {
+    to { transform: rotate(360deg); }
+  }
+
+  .feature-visual-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .feature-visual-content .big-num {
+    font-size: 72px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff, #e50914);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .feature-visual-content .big-label {
+    font-size: 14px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .nav-cards-grid { grid-template-columns: 1fr 1fr; }
-    .nav-card { padding: 20px 16px; }
-    .nav-card .nav-icon { width: 48px; height: 48px; font-size: 24px; }
+    .feature-grid { grid-template-columns: 1fr; gap: 24px; }
+    .hero-netflix { letter-spacing: -3px; }
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 600px) {
     .nav-cards-grid { grid-template-columns: 1fr; }
+    .hero-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
   }
 </style>
 </head>
 <body>
 <div class="bg-layer"></div>
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
 
 <nav class="nav" id="nav">
   <a href="index.html" class="nav-brand">
@@ -228,77 +459,115 @@
   </ul>
 </nav>
 
-<div class="container">
-  <section class="hero">
-    <div class="hero-badge"><span class="dot"></span> DATA VISUALIZATION DASHBOARD</div>
-    <div class="logo">NETFLIX</div>
-    <h1>CONTENT ANALYSIS 2025</h1>
-    <p class="subtitle">8,807 Titles · 10 Interactive Charts · Deep Insights</p>
-    <div class="hero-divider"></div>
-  </section>
+<section class="hero">
+  <div class="hero-badge"><span class="dot"></span> DATA ANALYSIS REPORT</div>
+  <div class="hero-netflix">NETFLIX</div>
+  <h1 class="hero-title">内容数据分析报告</h1>
+  <p class="hero-subtitle">8,807 Titles · Deep Insights · Data Visualization</p>
 
-  <section class="team-section" id="team">
-    <div class="team-grid">
-      <div class="team-card">
-        <div class="avatar">👨‍💻</div>
-        <div class="info">
-          <div class="role">数据科学家 / 后端开发</div>
-          <div class="task">数据清洗、CSV 解析、聚合分析、统计建模、API 设计</div>
-        </div>
-      </div>
-      <div class="team-card">
-        <div class="avatar">🎨</div>
-        <div class="info">
-          <div class="role">前端工程师 / 可视化设计师</div>
-          <div class="task">ECharts 图表、交互设计、响应式布局、性能优化</div>
-        </div>
-      </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="num">8,807</div>
+      <div class="label">总作品数</div>
     </div>
-  </section>
+    <div class="hero-stat">
+      <div class="num">12</div>
+      <div class="label">数据字段</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">9</div>
+      <div class="label">分析图表</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">120+</div>
+      <div class="label">制片国家</div>
+    </div>
+  </div>
 
+  <div class="hero-cta">
+    <a href="charts.html" class="btn-primary">
+      查看可视化 <span>→</span>
+    </a>
+    <a href="conclusion.html" class="btn-secondary">
+      阅读分析结论
+    </a>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>探索更多</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<div class="container">
   <section class="nav-cards-section">
     <div class="section-header">
       <div class="line"></div>
-      <h2>报告导航</h2>
-      <span class="tag">REPORT NAVIGATION</span>
+      <h2>报告章节</h2>
+      <span class="tag">REPORT SECTIONS</span>
     </div>
     <div class="nav-cards-grid">
       <a href="requirement.html" class="nav-card">
-        <div class="nav-icon">🎯</div>
-        <h3>需求分析 <span class="nav-badge">01</span></h3>
+        <div class="nav-step">STEP 01</div>
+        <span class="nav-icon">🎯</span>
+        <h3>需求分析</h3>
         <p>数据集背景介绍、分析目标与预期结果，了解项目整体规划与研究方向。</p>
-        <div class="nav-arrow">查看详情</div>
+        <span class="nav-link">查看详情 →</span>
       </a>
       <a href="code.html" class="nav-card">
-        <div class="nav-icon">💻</div>
-        <h3>分析代码 <span class="nav-badge">02</span></h3>
+        <div class="nav-step">STEP 02</div>
+        <span class="nav-icon">💻</span>
+        <h3>分析代码</h3>
         <p>数据预处理、统计分析、机器学习模型、可视化代码的完整实现展示。</p>
-        <div class="nav-arrow">查看详情</div>
+        <span class="nav-link">查看详情 →</span>
       </a>
       <a href="charts.html" class="nav-card">
-        <div class="nav-icon">📊</div>
-        <h3>可视化结果 <span class="nav-badge">03</span></h3>
-        <p>10 张交互式图表，多维度展示 Netflix 内容库的分布规律与趋势变化。</p>
-        <div class="nav-arrow">查看详情</div>
+        <div class="nav-step">STEP 03</div>
+        <span class="nav-icon">📊</span>
+        <h3>可视化结果</h3>
+        <p>9 张交互式图表，多维度展示 Netflix 内容库的分布规律与趋势变化。</p>
+        <span class="nav-link">查看详情 →</span>
       </a>
       <a href="conclusion.html" class="nav-card">
-        <div class="nav-icon">📋</div>
-        <h3>分析结论 <span class="nav-badge">04</span></h3>
+        <div class="nav-step">STEP 04</div>
+        <span class="nav-icon">📋</span>
+        <h3>分析结论</h3>
         <p>数据分析结果总结、核心结论与业务建议，为内容策略提供数据支持。</p>
-        <div class="nav-arrow">查看详情</div>
+        <span class="nav-link">查看详情 →</span>
       </a>
-      <a href="index.html" class="nav-card">
-        <div class="nav-icon">🏠</div>
-        <h3>关于项目 <span class="nav-badge">05</span></h3>
-        <p>项目概述、技术栈介绍、团队分工与开发历程，了解项目全貌。</p>
-        <div class="nav-arrow">返回首页</div>
-      </a>
+    </div>
+  </section>
+
+  <section class="feature-section">
+    <div class="section-header">
+      <div class="line"></div>
+      <h2>关于数据集</h2>
+      <span class="tag">ABOUT DATASET</span>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-content">
+        <h3>Netflix 全球内容库的深度洞察</h3>
+        <p>Netflix 作为全球领先的流媒体平台，其内容库涵盖了来自全球各国的电影和电视节目。本数据集收录了截至 2021 年中期平台上的所有可访问内容，为分析流媒体内容趋势提供了宝贵的数据基础。</p>
+        <ul class="feature-list">
+          <li>包含 8,807 部电影和电视节目的完整元数据</li>
+          <li>覆盖 120+ 国家和地区的内容制作分布</li>
+          <li>涵盖导演、演员、流派、评级等 12 个维度字段</li>
+          <li>时间跨度长达数十年的内容发布历史</li>
+          <li>支持内容分析、推荐系统、市场研究等多种应用</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="feature-visual-content">
+          <div class="big-num">8,807</div>
+          <div class="big-label">TOTAL TITLES</div>
+        </div>
+      </div>
     </div>
   </section>
 
   <footer class="footer">
     <div class="brand">NETFLIX DATA ANALYSIS</div>
-    <div class="copy">Powered by ECharts 5.4 · 数据分析小组作业 · Netflix Titles Dataset</div>
+    <div class="copy">基于 Netflix Titles Dataset · 数据分析案例报告</div>
   </footer>
 </div>
 
@@ -311,7 +580,7 @@
         if (entry.isIntersecting) {
           setTimeout(() => {
             entry.target.classList.add('visible');
-          }, index * 100);
+          }, index * 120);
           observer.unobserve(entry.target);
         }
       });
