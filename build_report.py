@@ -1,9 +1,24 @@
-{
- "cells": [
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+import json
+
+def md_cell(source):
+    return {
+        "cell_type": "markdown",
+        "metadata": {},
+        "source": source if isinstance(source, list) else [source + "\n"]
+    }
+
+def code_cell(source):
+    return {
+        "cell_type": "code",
+        "execution_count": None,
+        "metadata": {},
+        "outputs": [],
+        "source": source if isinstance(source, list) else [source + "\n"]
+    }
+
+cells = []
+
+cells.append(md_cell([
     "# Netflix 电影与电视节目数据分析报告\n",
     "\n",
     "> **课程**：Python数据分析 期末案例报告  \n",
@@ -33,19 +48,11 @@
     "6. [结论与建议](#6-结论与建议)\n",
     "\n",
     "---"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "## 1. 项目需求分析\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+]))
+
+cells.append(md_cell("## 1. 项目需求分析"))
+
+cells.append(md_cell([
     "### 1.1 数据集背景\n",
     "\n",
     "| 项目 | 详情 |\n",
@@ -75,21 +82,11 @@
     "6. **可视化呈现**：交互式网页看板 + 静态图表\n",
     "\n",
     "---"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "## 2. 数据预处理\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(md_cell("## 2. 数据预处理"))
+
+cells.append(code_cell([
     "import pandas as pd\n",
     "import numpy as np\n",
     "import warnings\n",
@@ -97,34 +94,19 @@
     "\n",
     "df_raw = pd.read_csv('netflix_titles.csv')\n",
     "print(f\"原始数据: {df_raw.shape[0]} 条 × {df_raw.shape[1]} 列\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "### 2.1 缺失值处理\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(md_cell("### 2.1 缺失值处理"))
+
+cells.append(code_cell([
     "# 缺失值统计\n",
     "missing = df_raw.isnull().sum().sort_values(ascending=False)\n",
     "missing_pct = (missing / len(df_raw) * 100).round(2)\n",
     "missing_df = pd.DataFrame({'缺失数量': missing, '缺失比例(%)': missing_pct})\n",
     "missing_df[missing_df['缺失数量'] > 0]"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(code_cell([
     "# 处理策略\n",
     "df = df_raw.copy()\n",
     "df['director'] = df['director'].fillna('Unknown')      # 分类变量：Unknown\n",
@@ -135,21 +117,11 @@
     "df['duration'] = df['duration'].fillna(df['duration'].mode()[0])        # 众数填充\n",
     "\n",
     "print(f\"处理后缺失值: {df.isnull().sum().sum()} (应为 0)\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "### 2.2 特征工程\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(md_cell("### 2.2 特征工程"))
+
+cells.append(code_cell([
     "# 提取上线年份\n",
     "df['year_added'] = df['date_added'].str.extract(r'(\\d{4})').astype(int)\n",
     "\n",
@@ -171,21 +143,11 @@
     "df['primary_country'] = df['countries_list'].apply(lambda x: x[0] if x else 'Unknown')\n",
     "\n",
     "print(f\"预处理完成: {df.shape[0]} 条 × {df.shape[1]} 列\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "### 2.3 异常值检测（IQR 法 + Z-score 法）\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(md_cell("### 2.3 异常值检测（IQR 法 + Z-score 法）"))
+
+cells.append(code_cell([
     "# 方法一：IQR 四分位距法\n",
     "movies = df[df['type'] == 'Movie']\n",
     "Q1 = movies['duration_num'].quantile(0.25)\n",
@@ -205,33 +167,20 @@
     "df['is_outlier'] = 0\n",
     "df.loc[iqr_outliers.index, 'is_outlier'] = 1\n",
     "print(f\"\\n已标记异常值: {df['is_outlier'].sum()} 部\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+]))
+
+cells.append(md_cell([
     "**异常值处理策略**：标记但不删除。\n",
     "- 短时长电影可能是短片/纪录片，有分析价值\n",
     "- 长时长电影可能是导演剪辑版/合集，不应直接剔除\n",
     "- 分析时可根据需要选择是否排除\n",
     "\n",
     "---"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "## 3. 描述性统计分析\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(md_cell("## 3. 描述性统计分析"))
+
+cells.append(code_cell([
     "from collections import Counter\n",
     "\n",
     "# 1) 类型分布\n",
@@ -264,54 +213,33 @@
     "movie_dur = df[df['type'] == 'Movie']['duration_num']\n",
     "print(f\"\\n=== 电影时长 ===\")\n",
     "print(f\"均值: {movie_dur.mean():.1f} 分钟 | 中位数: {movie_dur.median():.1f} 分钟\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+]))
+
+cells.append(md_cell([
     "---\n",
     "\n",
     "## 4. 高级分析（建模）"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "### 4.1 相关性分析\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(md_cell("### 4.1 相关性分析"))
+
+cells.append(code_cell([
     "numeric_cols = ['release_year', 'year_added', 'duration_num', 'genre_count', 'country_count', 'cast_count']\n",
     "corr = df[numeric_cols].corr()\n",
     "print(\"=== 相关系数矩阵 ===\")\n",
     "corr.round(3)"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+]))
+
+cells.append(md_cell([
     "**关键发现**：\n",
     "- `release_year` 与 `year_added` 正相关（r ≈ 0.65）：新片更快上线\n",
     "- `genre_count` 与 `cast_count` 弱相关：标签多的作品演员稍多\n",
     "- 时长与其他变量相关性弱：电影时长受多因素影响\n",
     "\n",
     "### 4.2 线性回归：预测电影时长"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(code_cell([
     "from sklearn.linear_model import LinearRegression\n",
     "from sklearn.model_selection import train_test_split\n",
     "from sklearn.metrics import mean_squared_error, r2_score\n",
@@ -333,26 +261,18 @@
     "for feat, coef in zip(X.columns, lr.coef_):\n",
     "    print(f\"  {feat}: {coef:+.3f}\")\n",
     "print(f\"  截距: {lr.intercept_:.1f}\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+]))
+
+cells.append(md_cell([
     "**解读**：\n",
     "- R² 较低（~5%），说明仅用发行年份、流派数等元数据难以准确预测电影时长\n",
     "- 合理：电影时长受剧情、导演风格、市场定位等深层因素影响\n",
     "- 如果加入流派、导演等分类特征，模型效果可能提升\n",
     "\n",
     "### 4.3 K-Means 聚类分析"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(code_cell([
     "from sklearn.cluster import KMeans\n",
     "from sklearn.preprocessing import StandardScaler\n",
     "from sklearn.metrics import silhouette_score\n",
@@ -375,37 +295,24 @@
     "for i in range(4):\n",
     "    n = (X_km['cluster'] == i).sum()\n",
     "    print(f\"  簇 {i}: {n} 部 ({n/len(X_km)*100:.1f}%)\")"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(code_cell([
     "# 聚类画像\n",
     "profile = X_km.groupby('cluster')[features].mean().round(1)\n",
     "print(\"=== 各簇特征均值 ===\")\n",
     "profile"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+]))
+
+cells.append(md_cell([
     "**聚类画像解读**：\n",
     "- 可识别出\"经典老片\"、\"现代主流片\"、\"大制作群星片\"、\"小众独立片\"等典型群体\n",
     "- 为内容采购和用户分群提供数据支持\n",
     "\n",
     "### 4.4 随机森林分类：预测内容类型"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(code_cell([
     "from sklearn.ensemble import RandomForestClassifier\n",
     "from sklearn.preprocessing import LabelEncoder\n",
     "from sklearn.metrics import accuracy_score, classification_report\n",
@@ -434,45 +341,29 @@
     "print(f\"准确率: {acc:.2%}\")\n",
     "print(f\"\\n分类报告:\")\n",
     "print(classification_report(y_test_rf, y_pred_rf, target_names=['TV Show', 'Movie']))"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+]))
+
+cells.append(code_cell([
     "# 特征重要性\n",
     "importances = rf.feature_importances_\n",
     "indices = np.argsort(importances)[::-1]\n",
     "print(\"=== 特征重要性 Top 5 ===\")\n",
     "for i in range(5):\n",
     "    print(f\"  {i+1}. {X_rf.columns[indices[i]]}: {importances[indices[i]]:.3f}\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+]))
+
+cells.append(md_cell([
     "**随机森林结论**：\n",
     "- 准确率很高（~95%+），说明用元数据可准确区分电影和电视节目\n",
     "- `duration_num` 是最重要特征（合理：电影是分钟，TV是季数）\n",
     "- 模型可用于自动化内容分类与质量检查\n",
     "\n",
     "---"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "## 5. 可视化展示\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+]))
+
+cells.append(md_cell("## 5. 可视化展示"))
+
+cells.append(md_cell([
     "### 5.1 交互式网页看板（推荐）\n",
     "\n",
     "🌐 **在线地址**：https://heng0128.github.io/netflix-data-analysis/\n",
@@ -499,19 +390,11 @@
     "- 热力图（相关性矩阵、混淆矩阵）\n",
     "\n",
     "---"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "## 6. 结论与建议\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
+]))
+
+cells.append(md_cell("## 6. 结论与建议"))
+
+cells.append(md_cell([
     "### 6.1 核心发现\n",
     "\n",
     "| # | 发现 | 数据支撑 |\n",
@@ -566,28 +449,35 @@
     "---\n",
     "\n",
     "**汇报结束，感谢聆听！** 🎬"
-   ]
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.8.0"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 4
+]))
+
+notebook = {
+    "cells": cells,
+    "metadata": {
+        "kernelspec": {
+            "display_name": "Python 3",
+            "language": "python",
+            "name": "python3"
+        },
+        "language_info": {
+            "codemirror_mode": {
+                "name": "ipython",
+                "version": 3
+            },
+            "file_extension": ".py",
+            "mimetype": "text/x-python",
+            "name": "python",
+            "nbconvert_exporter": "python",
+            "pygments_lexer": "ipython3",
+            "version": "3.8.0"
+        }
+    },
+    "nbformat": 4,
+    "nbformat_minor": 4
 }
+
+with open('/workspace/netflix_report.ipynb', 'w', encoding='utf-8') as f:
+    json.dump(notebook, f, ensure_ascii=False, indent=1)
+
+print(f"✅ netflix_report.ipynb 生成完成！")
+print(f"   共 {len(cells)} 个单元格")
