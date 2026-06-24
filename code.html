@@ -177,7 +177,7 @@
       </div>
 
       <div class="code-tab-content">
-        <div class="code-panel active" data-panel="preprocessing">
+        <div class="code-panel active" id="panel-preprocessing" data-panel="preprocessing">
           <div class="code-panel-header">
             <h3>数据预处理</h3>
             <div class="code-panel-desc">数据加载、缺失值处理、特征工程、异常值检测（IQR + Z-score）</div>
@@ -291,7 +291,7 @@ print("处理策略：标记保留，分析时可选择排除或单独研究")</
           </div>
         </div>
 
-        <div class="code-panel" data-panel="analysis">
+        <div class="code-panel" id="panel-analysis" data-panel="analysis">
           <div class="code-panel-header">
             <h3>数据分析</h3>
             <div class="code-panel-desc">描述性统计、类型分布、年度趋势、国家Top10、流派Top10、分组统计、相关性分析</div>
@@ -376,7 +376,7 @@ print("   → 弱相关：发行年份与时长没有强线性关系")</code></p
           </div>
         </div>
 
-        <div class="code-panel" data-panel="ml">
+        <div class="code-panel" id="panel-ml" data-panel="ml">
           <div class="code-panel-header">
             <h3>机器学习</h3>
             <div class="code-panel-desc">线性回归、K-Means 聚类、随机森林分类</div>
@@ -544,7 +544,7 @@ importance_df.round(4)</code></pre>
           </div>
         </div>
 
-        <div class="code-panel" data-panel="visualization">
+        <div class="code-panel" id="panel-visualization" data-panel="visualization">
           <div class="code-panel-header">
             <h3>可视化</h3>
             <div class="code-panel-desc">Matplotlib 饼图直方图、pyecharts 环形图折线图热力图</div>
@@ -756,30 +756,5 @@ c_heatmap.render('charts/heatmap.html')</code></pre>
 </div>
 
 <script src="js/main.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const tabBtns = document.querySelectorAll('.code-tab-btn');
-    const panels = document.querySelectorAll('.code-panel');
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const tab = this.getAttribute('data-tab');
-
-        tabBtns.forEach(b => b.classList.remove('active'));
-        panels.forEach(p => p.classList.remove('active'));
-
-        this.classList.add('active');
-        const activePanel = document.querySelector(`.code-panel[data-panel="${tab}"]`);
-        if (activePanel) {
-          activePanel.classList.add('active');
-        }
-
-        if (typeof Prism !== 'undefined') {
-          Prism.highlightAll();
-        }
-      });
-    });
-  });
-</script>
 </body>
 </html>
