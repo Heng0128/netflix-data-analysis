@@ -816,6 +816,62 @@ function renderAll(d) {
     series: [{ type: 'heatmap', data: hmData, label: { show: false }, emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } } }]
   });
 
+  // ==== 图 10：散点图 - 发行年份 vs 时长 ====
+  const c10 = initChart('chart10');
+  if (c10) {
+    const movieData = d.raw.filter(item => item.type === 'Movie' && item.duration_num > 0 && item.release_year >= 1980);
+    const scatterData = movieData.map(item => [item.release_year, item.duration_num]);
+    const sampledData = scatterData.length > 500 
+      ? scatterData.filter((_, i) => i % Math.ceil(scatterData.length / 500) === 0)
+      : scatterData;
+    
+    c10.setOption({
+      tooltip: {
+        trigger: 'item',
+        formatter: p => `发行年份：${p.data[0]}<br/>时长：<b>${p.data[1]} 分钟</b>`
+      },
+      grid: { left: '8%', right: '5%', top: 30, bottom: 40, containLabel: true },
+      xAxis: {
+        type: 'value',
+        name: '发行年份',
+        min: 1980,
+        max: 2021,
+        nameTextStyle: { color: '#999', fontSize: 11 },
+        axisLine: { lineStyle: { color: '#333' } },
+        axisLabel: { color: '#999', fontSize: 10 },
+        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }
+      },
+      yAxis: {
+        type: 'value',
+        name: '时长（分钟）',
+        nameTextStyle: { color: '#999', fontSize: 11 },
+        axisLine: { lineStyle: { color: '#333' } },
+        axisLabel: { color: '#999', fontSize: 10 },
+        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }
+      },
+      series: [{
+        type: 'scatter',
+        data: sampledData,
+        symbolSize: 8,
+        itemStyle: {
+          color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [
+            { offset: 0, color: 'rgba(229, 9, 20, 0.8)' },
+            { offset: 1, color: 'rgba(229, 9, 20, 0.3)' }
+          ]),
+          shadowBlur: 10,
+          shadowColor: 'rgba(229, 9, 20, 0.3)'
+        },
+        emphasis: {
+          itemStyle: {
+            color: '#FFD700',
+            shadowBlur: 20,
+            shadowColor: 'rgba(255, 215, 0, 0.5)'
+          }
+        }
+      }]
+    });
+  }
+
   // 渲染数据表格
   renderTables(d);
 
