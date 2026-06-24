@@ -88,8 +88,16 @@ function setupCodeTabs() {
 
 // ===== 导航栏当前章节高亮 =====
 function setupNavHighlight() {
-  const sections = ['team', 'requirement', 'code', 'charts', 'conclusion'].map(id => document.getElementById(id));
   const links = document.querySelectorAll('.nav-links a');
+  const firstLink = links[0];
+  
+  // 多页面模式：导航链接是 .html 页面跳转，直接保留 HTML 中的 active 类
+  if (firstLink && firstLink.getAttribute('href').endsWith('.html')) {
+    return;
+  }
+  
+  // 单页模式：基于锚点的滚动高亮
+  const sections = ['team', 'requirement', 'code', 'charts', 'conclusion'].map(id => document.getElementById(id));
   
   const navObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -583,11 +591,14 @@ function renderTables(d) {
 }
 
 function renderAll(d) {
-  animateNumbers(d.overview);
+  // 如果没有概览数据元素，跳过数字动画
+  if (document.getElementById('overviewGrid')) {
+    animateNumbers(d.overview);
+  }
 
   // ==== 图 1：环形图 ====
   const c1 = initChart('chart1');
-  c1.setOption({
+  if (c1) c1.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...tooltipStyle, formatter: '{b}: {c} ({d}%)' },
     legend: { bottom: 0, textStyle: { color: 'rgba(255,255,255,0.6)', fontSize: 13 }, itemGap: 30, icon: 'roundRect' },
@@ -608,7 +619,7 @@ function renderAll(d) {
 
   // ==== 图 2：趋势折线 ====
   const c2 = initChart('chart2');
-  c2.setOption({
+  if (c2) c2.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', ...tooltipStyle, axisPointer: { type: 'cross', label: { backgroundColor: '#E50914' }, crossStyle: { color: '#999' } } },
     legend: { data: ['电影', '电视节目'], top: 0, textStyle: { color: 'rgba(255,255,255,0.6)' }, icon: 'roundRect', itemGap: 24 },
@@ -638,7 +649,7 @@ function renderAll(d) {
   // ==== 图 3：国家 Top15 ====
   const c3 = initChart('chart3');
   const countries = d.countries.slice().reverse();
-  c3.setOption({
+  if (c3) c3.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle },
     grid: { left: '2%', right: '10%', top: 8, bottom: 8, containLabel: true },
@@ -659,7 +670,7 @@ function renderAll(d) {
   // ==== 图 4：流派 Top10 ====
   const c4 = initChart('chart4');
   const genres = d.genres.slice().reverse();
-  c4.setOption({
+  if (c4) c4.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle },
     grid: { left: '2%', right: '12%', top: 8, bottom: 8, containLabel: true },
@@ -680,7 +691,7 @@ function renderAll(d) {
   // ==== 图 5：评级分布（水平条形图）====
   const c5 = initChart('chart5');
   const ratingSorted = d.ratings.slice().reverse();
-  c5.setOption({
+  if (c5) c5.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle,
       formatter: p => `${p[0].name}<br/>数量：<b>${p[0].value}</b> (${(p[0].value/d.overview.total*100).toFixed(1)}%)`
@@ -719,7 +730,7 @@ function renderAll(d) {
     const mid = parseInt(b.range.split('-')[0]) + 7.5;
     return mid >= durStats.mean && mid < durStats.mean + 15;
   });
-  c6.setOption({
+  if (c6) c6.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', ...tooltipStyle, axisPointer: { type: 'shadow' }, formatter: p => `${p[0].name} min<br/>电影数：<b>${p[0].value}</b>` },
     grid: { left: '3%', right: '3%', top: 35, bottom: 30, containLabel: true },
@@ -744,7 +755,7 @@ function renderAll(d) {
   // ==== 图 7：流派 × 类型 堆叠 ====
   const c7 = initChart('chart7');
   const gtData = d.genre_type_breakdown || [];
-  c7.setOption({
+  if (c7) c7.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...tooltipStyle },
     legend: { top: 0, textStyle: { color: 'rgba(255,255,255,0.6)' }, icon: 'roundRect', itemGap: 24 },
@@ -773,7 +784,7 @@ function renderAll(d) {
     name: typeof s.seasonNum === 'number' ? `${s.seasonNum} Season` : s.seasonNum,
     value: s.count
   }));
-  c8.setOption({
+  if (c8) c8.setOption({
     backgroundColor: 'transparent',
     tooltip: { trigger: 'item', ...tooltipStyle, formatter: '{b}: {c} ({d}%)' },
     legend: { orient: 'vertical', right: 10, top: 'middle', textStyle: { color: 'rgba(255,255,255,0.6)', fontSize: 12 }, icon: 'circle', itemGap: 12 },
@@ -795,7 +806,7 @@ function renderAll(d) {
   const c9 = initChart('chart9');
   const hmMeta = d.heatmap_meta || { years: [], ratings: [] };
   const hmData = (d.heatmap_data || []).map(pt => [hmMeta.years.indexOf(pt.year), hmMeta.ratings.indexOf(pt.rating), pt.count]);
-  c9.setOption({
+  if (c9) c9.setOption({
     backgroundColor: 'transparent',
     tooltip: { ...tooltipStyle, position: 'top', formatter: p => { const yearIdx = p.data[0]; const ratingIdx = p.data[1]; const actualYear = hmMeta.years[yearIdx]; const actualRating = hmMeta.ratings[ratingIdx]; return `${actualYear} 年 / ${actualRating}<br/>数量：<b>${p.data[2]}</b>`; } },
     grid: { left: '4%', right: '8%', top: 8, bottom: 30, containLabel: true },
