@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netflix 数据分析 · 分析代码</title>
+<meta name="description" content="Netflix 电影与电视节目数据分析 - 数据预处理、统计分析、机器学习、可视化的完整代码实现">
+<meta name="keywords" content="Netflix，数据分析，Python代码，机器学习，可视化">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"
+        onerror="this.onerror=null;this.src='https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
+        onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'"></script>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+<style>
+  pre[class*="language-"] {
+    margin: 0;
+    border-radius: 0 0 16px 16px;
+    background: #0d0d0d !important;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  code[class*="language-"] {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+  .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6a9955; }
+  .token.punctuation { color: #d4d4d4; }
+  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #b5cea8; }
+  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #ce9178; }
+  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #d4d4d4; }
+  .token.atrule, .token.attr-value, .token.keyword { color: #569cd6; }
+  .token.function, .token.class-name { color: #dcdcaa; }
+  .token.regex, .token.important, .token.variable { color: #d16969; }
+
+  .page-header {
+    padding: 120px 0 40px;
+    text-align: center;
+    position: relative;
+  }
+
+  .page-header .page-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(229, 9, 20, 0.1);
+    border: 1px solid rgba(229, 9, 20, 0.25);
+    border-radius: 100px;
+    padding: 6px 20px 6px 8px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--red);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    animation: fadeInUp 0.8s ease both;
+  }
+
+  .page-header .page-badge .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .page-header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 30%, rgba(255,107,107,0.9));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.8s 0.1s ease both;
+  }
+
+  .page-header .page-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: fadeInUp 0.8s 0.2s ease both;
+  }
+
+  .page-divider {
+    margin: 28px auto 0;
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    border-radius: 2px;
+    animation: fadeInUp 0.8s 0.3s ease both;
+  }
+
+  .code-section {
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 900px) {
+    .page-header h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-brand">
+    <div class="logo-mark">N</div>
+    <span>NETFLIX</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-label="菜单">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="requirement.html">需求分析</a></li>
+    <li><a href="code.html" class="active">分析代码</a></li>
+    <li><a href="charts.html">可视化结果</a></li>
+    <li><a href="conclusion.html">分析结论</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+  <header class="page-header">
+    <div class="page-badge"><span class="dot"></span> SOURCE CODE</div>
+    <h1>数据分析处理代码</h1>
+    <p class="page-subtitle">Data Preprocessing · Analysis · ML · Visualization</p>
+    <div class="page-divider"></div>
+  </header>
+
+  <section class="code-section" id="code">
+    <div class="section-header">
+      <div class="line"></div>
+      <h2>代码实现</h2>
+      <span class="tag">CODE IMPLEMENTATION</span>
+    </div>
+
+    <div class="code-tabs" id="code-tabs">
+      <div class="code-tab-buttons">
+        <button class="code-tab-btn active" data-tab="preprocessing">
+          <span class="tab-icon">🧹</span>
+          <span class="tab-text">数据预处理</span>
+        </button>
+        <button class="code-tab-btn" data-tab="analysis">
+          <span class="tab-icon">📊</span>
+          <span class="tab-text">数据分析</span>
+        </button>
+        <button class="code-tab-btn" data-tab="ml">
+          <span class="tab-icon">🤖</span>
+          <span class="tab-text">机器学习</span>
+        </button>
+        <button class="code-tab-btn" data-tab="visualization">
+          <span class="tab-icon">📈</span>
+          <span class="tab-text">可视化</span>
+        </button>
+      </div>
+
+      <div class="code-tab-content">
+        <div class="code-panel active" data-panel="preprocessing">
+          <div class="code-panel-header">
+            <h3>数据预处理</h3>
+            <div class="code-panel-desc">数据加载、缺失值处理、特征工程、异常值检测（IQR + Z-score）</div>
+          </div>
+          <div class="code-block">
+<pre><code class="language-python">import pandas as pd
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
+
+# ========== 1. 数据加载 ==========
+df = pd.read_csv('netflix_titles.csv')
+print(f"原始数据形状：{df.shape}")
+print(f"各列数据类型：\n{df.dtypes}")
+df.head()
+
+# ========== 2. 缺失值处理 ==========
+# 缺失值统计
+missing = df.isnull().sum().sort_values(ascending=False)
+missing_pct = (missing / len(df) * 100).round(2)
+missing_df = pd.DataFrame({'缺失数量': missing, '缺失比例(%)': missing_pct})
+print("=== 缺失值统计 ===")
+missing_df[missing_df['缺失数量'] > 0]
+
+# 缺失值处理策略
+# director, cast, country: 用 'Unknown' 填充
+# date_added, rating, duration: 用众数填充
+df['director'] = df['director'].fillna('Unknown')
+df['cast'] = df['cast'].fillna('Unknown')
+df['country'] = df['country'].fillna('Unknown')
+df['date_added'] = df['date_added'].fillna(df['date_added'].mode()[0])
+df['rating'] = df['rating'].fillna(df['rating'].mode()[0])
+df['duration'] = df['duration'].fillna(df['duration'].mode()[0])
+
+print(f"缺失值处理后，总缺失数：{df.isnull().sum().sum()}")
+
+# ========== 3. 特征工程 ==========
+# 提取添加年份、月份
+df['year_added'] = df['date_added'].str.extract(r'(\d{4})').astype(int)
+
+# 拆分多值字段（流派、国家、演员）
+def split_field(s):
+    if pd.isna(s) or s == 'Unknown':
+        return []
+    return [x.strip() for x in str(s).split(',') if x.strip()]
+
+df['genres_list'] = df['listed_in'].apply(split_field)
+df['countries_list'] = df['country'].apply(split_field)
+df['cast_list'] = df['cast'].apply(split_field)
+
+# 数值化时长：电影=分钟数，电视节目=季数
+df['duration_num'] = df['duration'].str.extract(r'(\d+)').astype(float).astype(int)
+
+# 衍生字段
+df['genre_count'] = df['genres_list'].apply(len)
+df['country_count'] = df['countries_list'].apply(len)
+df['cast_count'] = df['cast_list'].apply(len)
+df['has_director'] = (df['director'] != 'Unknown').astype(int)
+
+# 第一流派、第一制片国
+df['primary_genre'] = df['genres_list'].apply(lambda x: x[0] if x else 'Unknown')
+df['primary_country'] = df['countries_list'].apply(lambda x: x[0] if x else 'Unknown')
+
+print(f"处理后数据形状：{df.shape}")
+df.head(3)
+
+# ========== 4. 异常值检测 ==========
+# ---- 方法一：IQR（四分位距）法 ----
+movies_df = df[df['type'] == 'Movie'].copy()
+
+Q1 = movies_df['duration_num'].quantile(0.25)
+Q3 = movies_df['duration_num'].quantile(0.75)
+IQR = Q3 - Q1
+
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+print(f"=== IQR 法检测电影时长异常值 ===")
+print(f"Q1 (25%分位数): {Q1:.1f} 分钟")
+print(f"Q3 (75%分位数): {Q3:.1f} 分钟")
+print(f"IQR: {IQR:.1f} 分钟")
+print(f"正常范围: [{lower_bound:.1f}, {upper_bound:.1f}] 分钟")
+
+iqr_outliers = movies_df[
+    (movies_df['duration_num'] < lower_bound) | 
+    (movies_df['duration_num'] > upper_bound)
+]
+print(f"异常值数量: {len(iqr_outliers)} 部 ({len(iqr_outliers)/len(movies_df)*100:.2f}%)")
+
+# ---- 方法二：Z-score 法 ----
+movies_df['duration_zscore'] = (
+    (movies_df['duration_num'] - movies_df['duration_num'].mean()) 
+    / movies_df['duration_num'].std()
+)
+
+z_outliers = movies_df[abs(movies_df['duration_zscore']) > 3]
+print(f"\n=== Z-score 法检测电影时长异常值（|Z|>3） ===")
+print(f"电影时长均值: {movies_df['duration_num'].mean():.1f} 分钟")
+print(f"电影时长标准差: {movies_df['duration_num'].std():.1f} 分钟")
+print(f"异常值数量: {len(z_outliers)} 部 ({len(z_outliers)/len(movies_df)*100:.2f}%)")
+
+# 异常值处理：标记但不删除，保留分析价值
+df['is_outlier_duration'] = 0
+df.loc[movies_df[
+    (movies_df['duration_num'] < lower_bound) | 
+    (movies_df['duration_num'] > upper_bound)
+].index, 'is_outlier_duration'] = 1
+
+print(f"\n已标记异常值: {df['is_outlier_duration'].sum()} 部")
+print("处理策略：标记保留，分析时可选择排除或单独研究")</code></pre>
+          </div>
+        </div>
+
+        <div class="code-panel" data-panel="analysis">
+          <div class="code-panel-header">
+            <h3>数据分析</h3>
+            <div class="code-panel-desc">描述性统计、类型分布、年度趋势、国家Top10、流派Top10、分组统计、相关性分析</div>
+          </div>
+          <div class="code-block">
+<pre><code class="language-python">from collections import Counter
+
+# ========== 1. 描述性统计 ==========
+numeric_cols = [
+    'release_year', 'year_added', 'duration_num', 
+    'genre_count', 'country_count', 'cast_count'
+]
+print("=== 数值型变量描述性统计 ===")
+df[numeric_cols].describe().round(2)
+
+# ========== 2. 内容类型分布 ==========
+type_dist = df['type'].value_counts().reset_index()
+type_dist.columns = ['类型', '数量']
+type_dist['占比(%)'] = (type_dist['数量'] / type_dist['数量'].sum() * 100).round(2)
+print("=== 内容类型分布 ===")
+type_dist
+
+# ========== 3. 年度新增内容趋势 ==========
+year_added = df.groupby(['year_added', 'type']).size().unstack().fillna(0).astype(int)
+year_added = year_added.sort_index()
+year_added['总计'] = year_added.sum(axis=1)
+print("=== 年度新增内容趋势 ===")
+year_added.tail(10)
+
+# ========== 4. 制片国家 Top10 ==========
+all_countries = []
+for c in df['countries_list']:
+    all_countries.extend(c)
+country_count = pd.DataFrame(
+    Counter(all_countries).most_common(10), 
+    columns=['国家', '数量']
+)
+print("=== 制片国家 Top10 ===")
+country_count
+
+# ========== 5. 热门流派 Top10 ==========
+all_genres = []
+for g in df['genres_list']:
+    all_genres.extend(g)
+genre_count = pd.DataFrame(
+    Counter(all_genres).most_common(10), 
+    columns=['流派', '数量']
+)
+print("=== 热门流派 Top10 ===")
+genre_count
+
+# ========== 6. 年龄评级分布 ==========
+rating_dist = df['rating'].value_counts().head(10).reset_index()
+rating_dist.columns = ['评级', '数量']
+print("=== 年龄评级 Top10 ===")
+rating_dist
+
+# ========== 7. 分组统计：按类型分组 ==========
+type_group = df.groupby('type').agg({
+    'title': 'count',
+    'duration_num': ['mean', 'median', 'std'],
+    'release_year': ['mean', 'min', 'max'],
+    'cast_count': 'mean'
+}).round(2)
+print("=== 按类型分组统计 ===")
+type_group
+
+# ========== 8. 相关性分析 ==========
+# 计算相关系数矩阵
+corr_matrix = df[numeric_cols].corr()
+print("=== 相关系数矩阵 ===")
+corr_matrix.round(3)
+
+# 关键相关性解读
+print("=== 关键相关性解读 ===")
+print(f"1. release_year 与 year_added: r = {corr_matrix.loc['release_year', 'year_added']:.3f}")
+print("   → 正相关：越新发行的电影，通常越晚上线到 Netflix")
+print(f"\n2. genre_count 与 cast_count: r = {corr_matrix.loc['genre_count', 'cast_count']:.3f}")
+print("   → 弱正相关：流派标签越多的作品，演员阵容可能越庞大")
+print(f"\n3. duration_num 与 release_year: r = {corr_matrix.loc['duration_num', 'release_year']:.3f}")
+print("   → 弱相关：发行年份与时长没有强线性关系")</code></pre>
+          </div>
+        </div>
+
+        <div class="code-panel" data-panel="ml">
+          <div class="code-panel-header">
+            <h3>机器学习</h3>
+            <div class="code-panel-desc">线性回归、K-Means 聚类、随机森林分类</div>
+          </div>
+          <div class="code-block">
+<pre><code class="language-python">from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.cluster import KMeans
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (
+    mean_squared_error, r2_score, accuracy_score,
+    classification_report, confusion_matrix, silhouette_score
+)
+
+# ========== 1. 线性回归：预测电影时长 ==========
+# 准备数据
+movies = df[df['type'] == 'Movie'].copy()
+features = ['release_year', 'genre_count', 'country_count', 'cast_count']
+X = movies[features]
+y = movies['duration_num']
+
+# 划分训练集和测试集
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+print(f"训练集大小: {X_train.shape[0]}")
+print(f"测试集大小: {X_test.shape[0]}")
+
+# 训练线性回归模型
+lr_model = LinearRegression()
+lr_model.fit(X_train, y_train)
+
+# 预测与评估
+y_pred = lr_model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)
+
+print("=== 线性回归模型评估 ===")
+print(f"均方误差 (MSE): {mse:.2f}")
+print(f"均方根误差 (RMSE): {rmse:.2f} 分钟")
+print(f"决定系数 (R²): {r2:.4f}")
+print(f"模型解释了 {r2*100:.2f}% 的电影时长变异")
+
+# 回归系数分析
+coef_df = pd.DataFrame({
+    '特征': features,
+    '系数': lr_model.coef_,
+    '标准化系数': lr_model.coef_ * X_train.std().values
+})
+coef_df = coef_df.sort_values('标准化系数', key=abs, ascending=False)
+print("\n=== 回归系数分析 ===")
+print(f"截距: {lr_model.intercept_:.2f}")
+coef_df.round(3)
+
+# ========== 2. K-Means 聚类 ==========
+# 数据准备与标准化
+cluster_features = [
+    'release_year', 'duration_num', 
+    'genre_count', 'country_count', 'cast_count'
+]
+movie_cluster_data = df[df['type'] == 'Movie'][cluster_features].copy()
+movie_cluster_data = movie_cluster_data.dropna()
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(movie_cluster_data)
+print(f"聚类数据形状: {X_scaled.shape}")
+
+# 肘部法则：确定最佳 K 值
+inertias = []
+k_range = range(2, 11)
+for k in k_range:
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    kmeans.fit(X_scaled)
+    inertias.append(kmeans.inertia_)
+
+# 使用 K=4 进行聚类
+kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
+movie_cluster_data['cluster'] = kmeans.fit_predict(X_scaled)
+
+# 计算轮廓系数
+sil_score = silhouette_score(X_scaled, kmeans.labels_)
+print(f"=== K-Means 聚类结果 ===")
+print(f"聚类数: 4")
+print(f"轮廓系数: {sil_score:.4f}")
+print(f"\n各簇样本数:")
+movie_cluster_data['cluster'].value_counts().sort_index()
+
+# 聚类画像
+cluster_profile = movie_cluster_data.groupby('cluster')[cluster_features].mean().round(2)
+cluster_profile['样本数'] = movie_cluster_data['cluster'].value_counts().sort_index()
+cluster_profile['占比(%)'] = (cluster_profile['样本数'] / len(movie_cluster_data) * 100).round(2)
+print("\n=== 各簇特征画像 ===")
+cluster_profile
+
+# ========== 3. 随机森林分类：预测内容类型 ==========
+# 特征工程
+ml_df = df.copy()
+le_rating = LabelEncoder()
+le_genre = LabelEncoder()
+le_country = LabelEncoder()
+
+ml_df['rating_enc'] = le_rating.fit_transform(ml_df['rating'])
+ml_df['primary_genre_enc'] = le_genre.fit_transform(ml_df['primary_genre'])
+ml_df['primary_country_enc'] = le_country.fit_transform(ml_df['primary_country'])
+
+X_rf = ml_df[[
+    'release_year', 'year_added', 'duration_num', 'genre_count',
+    'country_count', 'cast_count', 'has_director',
+    'rating_enc', 'primary_genre_enc', 'primary_country_enc'
+]]
+y_rf = (ml_df['type'] == 'Movie').astype(int)
+
+# 划分数据集
+X_train_rf, X_test_rf, y_train_rf, y_test_rf = train_test_split(
+    X_rf, y_rf, test_size=0.2, random_state=42, stratify=y_rf
+)
+print(f"\n训练集: {X_train_rf.shape[0]} 条")
+print(f"测试集: {X_test_rf.shape[0]} 条")
+
+# 训练随机森林分类器
+rf_model = RandomForestClassifier(
+    n_estimators=100,
+    max_depth=10,
+    min_samples_split=5,
+    random_state=42,
+    n_jobs=-1
+)
+rf_model.fit(X_train_rf, y_train_rf)
+
+# 预测与评估
+y_pred_rf = rf_model.predict(X_test_rf)
+print("\n=== 随机森林模型评估 ===")
+print(f"测试集准确率: {accuracy_score(y_test_rf, y_pred_rf):.4f}")
+
+# 分类报告
+print("\n=== 分类报告 ===")
+print(classification_report(
+    y_test_rf, y_pred_rf, target_names=['TV Show', 'Movie']
+))
+
+# 混淆矩阵
+cm = confusion_matrix(y_test_rf, y_pred_rf)
+print("=== 混淆矩阵 ===")
+print(f"              预测 TV Show  预测 Movie")
+print(f"实际 TV Show    {cm[0][0]:>6}        {cm[0][1]:>6}")
+print(f"实际 Movie      {cm[1][0]:>6}        {cm[1][1]:>6}")
+
+# 特征重要性
+feature_names = [
+    'release_year', 'year_added', 'duration_num', 'genre_count',
+    'country_count', 'cast_count', 'has_director',
+    'rating', 'primary_genre', 'primary_country'
+]
+importances = rf_model.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+importance_df = pd.DataFrame({
+    '特征': [feature_names[i] for i in indices],
+    '重要性': importances[indices]
+})
+print("\n=== 特征重要性排序 ===")
+importance_df.round(4)</code></pre>
+          </div>
+        </div>
+
+        <div class="code-panel" data-panel="visualization">
+          <div class="code-panel-header">
+            <h3>可视化</h3>
+            <div class="code-panel-desc">Matplotlib 饼图直方图、pyecharts 环形图折线图热力图</div>
+          </div>
+          <div class="code-block">
+<pre><code class="language-python">import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.rcParams['font.sans-serif'] = ['DejaVu Sans']
+matplotlib.rcParams['axes.unicode_minus'] = False
+plt.switch_backend('Agg')
+
+from pyecharts import options as opts
+from pyecharts.charts import Bar, Pie, Line, HeatMap, WordCloud, Funnel
+from pyecharts.globals import ThemeType
+
+# ========== 1. Matplotlib 可视化 ==========
+
+# ---- 1.1 饼状图：内容类型分布 ----
+fig, ax = plt.subplots(figsize=(8, 8))
+sizes = type_dist['数量'].values
+labels = type_dist['类型'].values
+colors = ['#E50914', '#4ECDC4']
+explode = (0.05, 0)
+
+wedges, texts, autotexts = ax.pie(
+    sizes, explode=explode, labels=labels, colors=colors,
+    autopct='%1.1f%%', shadow=True, startangle=90,
+    textprops={'fontsize': 13, 'fontweight': 'bold'}
+)
+for autotext in autotexts:
+    autotext.set_color('white')
+ax.set_title('Netflix 内容类型分布', fontsize=16, fontweight='bold', pad=20)
+ax.axis('equal')
+plt.tight_layout()
+plt.show()
+
+# ---- 1.2 直方图：电影时长分布 ----
+fig, ax = plt.subplots(figsize=(12, 6))
+movie_durations = df[df['type'] == 'Movie']['duration_num']
+
+n, bins, patches = ax.hist(
+    movie_durations, bins=30, color='#E50914',
+    edgecolor='white', linewidth=0.5, alpha=0.8
+)
+ax.set_xlabel('时长（分钟）', fontsize=12)
+ax.set_ylabel('电影数量', fontsize=12)
+ax.set_title(
+    f'电影时长分布直方图\n均值: {movie_durations.mean():.1f} min | 中位数: {movie_durations.median():.1f} min',
+    fontsize=14, fontweight='bold'
+)
+ax.axvline(
+    movie_durations.mean(), color='gold', linestyle='--', 
+    linewidth=2, label=f'均值 = {movie_durations.mean():.1f} min'
+)
+ax.axvline(
+    movie_durations.median(), color='green', linestyle='--', 
+    linewidth=2, label=f'中位数 = {movie_durations.median():.1f} min'
+)
+ax.legend(fontsize=11)
+ax.grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()
+
+# ========== 2. pyecharts 交互式可视化 ==========
+
+# ---- 2.1 内容类型分布环形图 ----
+def chart_type_pie():
+    data = [list(z) for z in zip(type_dist['类型'].tolist(), type_dist['数量'].tolist())]
+    c = (
+        Pie(init_opts=opts.InitOpts(theme=ThemeType.DARK, width="100%", height="500px"))
+        .add(
+            series_name="数量分布",
+            data_pair=data,
+            radius=["40%", "70%"],
+            center=["50%", "50%"],
+            label_opts=opts.LabelOpts(
+                formatter="{b}: {c} ({d}%)", font_size=14, color="#fff"
+            ),
+            itemstyle_opts=opts.ItemStyleOpts(border_color="#0e0e0e", border_width=2),
+        )
+        .set_colors(["#E50914", "#831010"])
+        .set_global_opts(
+            title_opts=opts.TitleOpts(
+                title="Netflix 内容类型分布",
+                subtitle=f"共 {df.shape[0]} 部作品",
+                title_textstyle_opts=opts.TextStyleOpts(
+                    color="#fff", font_size=22, font_weight="bold"
+                ),
+                subtitle_textstyle_opts=opts.TextStyleOpts(color="#ccc", font_size=14),
+                pos_left="center",
+            ),
+            legend_opts=opts.LegendOpts(
+                orient="vertical", pos_top="middle", pos_right="10px",
+                textstyle_opts=opts.TextStyleOpts(color="#fff")
+            ),
+        )
+    )
+    return c
+
+c1 = chart_type_pie()
+c1.render('charts/chart1.html')
+
+# ---- 2.2 年度发布趋势折线图 ----
+def chart_year_line():
+    years = [int(y) for y in year_added.index.tolist()]
+    movies = year_added.get('Movie', pd.Series(0, index=year_added.index)).tolist()
+    shows = year_added.get('TV Show', pd.Series(0, index=year_added.index)).tolist()
+
+    c = (
+        Line(init_opts=opts.InitOpts(theme=ThemeType.DARK, width="100%", height="550px"))
+        .add_xaxis(years)
+        .add_yaxis(
+            "电影", movies, is_smooth=True, symbol_size=8,
+            linestyle_opts=opts.LineStyleOpts(width=4, color="#E50914"),
+            itemstyle_opts=opts.ItemStyleOpts(color="#E50914"),
+            areastyle_opts=opts.AreaStyleOpts(opacity=0.2, color="#E50914"),
+            label_opts=opts.LabelOpts(is_show=False),
+        )
+        .add_yaxis(
+            "电视节目", shows, is_smooth=True, symbol_size=8,
+            linestyle_opts=opts.LineStyleOpts(width=4, color="#FFD700"),
+            itemstyle_opts=opts.ItemStyleOpts(color="#FFD700"),
+            areastyle_opts=opts.AreaStyleOpts(opacity=0.2, color="#FFD700"),
+            label_opts=opts.LabelOpts(is_show=False),
+        )
+        .set_global_opts(
+            title_opts=opts.TitleOpts(
+                title="Netflix 每年新增内容趋势",
+                title_textstyle_opts=opts.TextStyleOpts(
+                    color="#fff", font_size=22, font_weight="bold"
+                ),
+                pos_left="center",
+            ),
+            xaxis_opts=opts.AxisOpts(
+                axisline_opts=opts.AxisLineOpts(
+                    linestyle_opts=opts.LineStyleOpts(color="#666")
+                ),
+                axislabel_opts=opts.LabelOpts(color="#ccc"),
+            ),
+            yaxis_opts=opts.AxisOpts(
+                name="数量",
+                axisline_opts=opts.AxisLineOpts(
+                    linestyle_opts=opts.LineStyleOpts(color="#666")
+                ),
+                axislabel_opts=opts.LabelOpts(color="#ccc"),
+                splitline_opts=opts.SplitLineOpts(
+                    is_show=True, 
+                    linestyle_opts=opts.LineStyleOpts(opacity=0.15)
+                ),
+            ),
+            legend_opts=opts.LegendOpts(
+                textstyle_opts=opts.TextStyleOpts(color="#fff"), pos_top="50px"
+            ),
+            tooltip_opts=opts.TooltipOpts(trigger="axis", axis_pointer_type="cross"),
+        )
+    )
+    return c
+
+c2 = chart_year_line()
+c2.render('charts/chart2.html')
+
+# ---- 2.3 相关性热力图 ----
+def chart_corr_heatmap():
+    corr_data = []
+    for i in range(len(numeric_cols)):
+        for j in range(len(numeric_cols)):
+            corr_data.append([j, i, round(corr_matrix.iloc[i, j], 3)])
+    
+    c = (
+        HeatMap(init_opts=opts.InitOpts(theme=ThemeType.DARK, width="100%", height="550px"))
+        .add_xaxis(numeric_cols)
+        .add_yaxis(
+            "相关系数", numeric_cols, corr_data,
+            label_opts=opts.LabelOpts(is_show=True, color="#fff", font_size=12),
+        )
+        .set_global_opts(
+            title_opts=opts.TitleOpts(
+                title="数值变量相关性热力图",
+                title_textstyle_opts=opts.TextStyleOpts(
+                    color="#fff", font_size=22, font_weight="bold"
+                ),
+                pos_left="center",
+            ),
+            visualmap_opts=opts.VisualMapOpts(
+                min_=-1, max_=1,
+                range_color=["#4ECDC4", "#1a1a1a", "#E50914"],
+                textstyle_opts=opts.TextStyleOpts(color="#fff"),
+            ),
+            xaxis_opts=opts.AxisOpts(
+                axislabel_opts=opts.LabelOpts(color="#fff", rotate=30)
+            ),
+            yaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(color="#fff")),
+        )
+    )
+    return c
+
+c_heatmap = chart_corr_heatmap()
+c_heatmap.render('charts/heatmap.html')</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="brand">NETFLIX DATA ANALYSIS</div>
+    <div class="copy">Powered by ECharts 5.4 · 数据分析小组作业 · Netflix Titles Dataset</div>
+  </footer>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabBtns = document.querySelectorAll('.code-tab-btn');
+    const panels = document.querySelectorAll('.code-panel');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const tab = this.getAttribute('data-tab');
+
+        tabBtns.forEach(b => b.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+
+        this.classList.add('active');
+        const activePanel = document.querySelector(`.code-panel[data-panel="${tab}"]`);
+        if (activePanel) {
+          activePanel.classList.add('active');
+        }
+
+        if (typeof Prism !== 'undefined') {
+          Prism.highlightAll();
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
