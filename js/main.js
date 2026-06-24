@@ -128,18 +128,40 @@ document.querySelectorAll('.chart-card').forEach(el => observer.observe(el));
 // ===== 加载数据（带 Loading / Error 状态） =====
 const loader = document.createElement('div');
 loader.id = 'data-loader';
-loader.innerHTML = '<div class="spinner"></div><p>正在加载 CSV 数据...</p>';
+loader.innerHTML = `
+  <div class="loader-brand">N</div>
+  <div class="loader-spinner"></div>
+  <p class="loader-text">正在加载分析数据<span class="dots"></span></p>
+`;
 Object.assign(loader.style, {
   position: 'fixed', inset: 0, zIndex: 9999,
-  background: 'rgba(8,8,8,0.92)', backdropFilter: 'blur(12px)',
+  background: 'rgba(8,8,8,0.95)', backdropFilter: 'blur(16px)',
   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-  gap: '16px', transition: 'opacity 0.5s'
+  gap: '24px', transition: 'opacity 0.4s ease-out'
 });
 const spinnerCSS = document.createElement('style');
 spinnerCSS.textContent = `
-#data-loader .spinner { width:40px;height:40px;border:3px solid rgba(229,9,20,0.2);border-top-color:#E50914;border-radius:50%;animation:spin 0.8s linear infinite; }
-#data-loader p { color:#999;font-size:14px;letter-spacing:1px; }
-@keyframes spin { to{transform:rotate(360deg)} }
+  #data-loader .loader-brand {
+    font-size: 48px; font-weight: 900; color: #E50914;
+    background: linear-gradient(180deg, #fff, #E50914);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  #data-loader .loader-spinner {
+    width: 48px; height: 48px;
+    border: 3px solid rgba(229,9,20,0.15);
+    border-top-color: #E50914;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  #data-loader .loader-text {
+    color: #999; font-size: 14px; letter-spacing: 1px; margin: 0;
+  }
+  #data-loader .dots::after {
+    content: ''; animation: dots 1.5s steps(4, end) infinite;
+  }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  @keyframes dots { 0%,20%{content:''} 40%{content:'.'} 60%{content:'..'} 80%,100%{content:'...'} }
 `;
 document.head.appendChild(spinnerCSS);
 document.body.appendChild(loader);
