@@ -6,6 +6,11 @@
  */
 
 // ===== 配置常量 =====
+const VALID_RATINGS = new Set([
+  'TV-MA', 'TV-14', 'TV-PG', 'TV-G', 'TV-Y', 'TV-Y7', 'TV-Y7-FV',
+  'G', 'PG', 'PG-13', 'R', 'NC-17', 'NR', 'UR'
+]);
+
 const CONFIG = Object.freeze({
   CHART_YEAR_START: 2008,
   DURATION_BIN_SIZE: 15,
@@ -171,12 +176,12 @@ function computeAnalysisData(rows) {
     }
     
     // 评级
-    if (r.rating) {
+    if (r.rating && VALID_RATINGS.has(r.rating)) {
       ratingMap[r.rating] = (ratingMap[r.rating] || 0) + 1;
     }
     
     // 热力图
-    if (year >= 2008 && r.rating) {
+    if (year >= 2008 && r.rating && VALID_RATINGS.has(r.rating)) {
       const key = `${year}-${r.rating}`;
       heatmapData[key] = (heatmapData[key] || 0) + 1;
     }
@@ -265,8 +270,8 @@ function computeAnalysisData(rows) {
   
 
   
-  const hmYears = [...new Set(Object.keys(heatmapData).map(k => parseInt(k.split('-')[0])))].sort((a, b) => a - b);
-  const hmRatings = [...new Set(Object.keys(heatmapData).map(k => k.split('-')[1]))].sort();
+  const hmYears = [...new Set(Object.keys(heatmapData).map(k => parseInt(k.slice(0, k.indexOf('-')))))].sort((a, b) => a - b);
+  const hmRatings = [...new Set(Object.keys(heatmapData).map(k => k.slice(k.indexOf('-') + 1)))].sort();
   
   const heatmap_data = [];
   const heatmap_meta = { years: hmYears, ratings: hmRatings };
@@ -423,7 +428,7 @@ function renderAll(d) {
       radius: ['48%', '78%'], center: ['50%', '45%'],
       avoidLabelOverlap: true,
       itemStyle: { borderRadius: 10, borderColor: 'rgba(8,8,8,0.8)', borderWidth: 4 },
-      label: { color: '#fff', formatter: '{b}\\n{d}%', fontSize: 14, fontWeight: 600, lineHeight: 22 },
+      label: { color: '#fff', formatter: '{b}\n{d}%', fontSize: 14, fontWeight: 600, lineHeight: 22 },
       emphasis: { scaleSize: 12, itemStyle: { shadowBlur: 30, shadowColor: 'rgba(229, 9, 20, 0.5)' } },
       data: d.type_dist.map((x, i) => ({
         name: x.type === 'Movie' ? '电影' : '电视节目',
