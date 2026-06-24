@@ -25,7 +25,7 @@
 │   ├── analysis_data.json      # 结构化分析数据
 │   ├── complete_analysis.json  # 完整分析结果
 │   └── raw_data_sample.csv     # 原始数据样本
-├── netflix_titles_cleaned.csv  # 清洗后的数据集（8,807 条×23 字段）
+├── netflix_titles_cleaned.csv  # 清洗后的数据集（8,807 条×24 字段）
 ├── netflix_analysis.ipynb      # Jupyter 分析代码（必备）
 ├── netflix_report.ipynb        # Jupyter 案例报告（必备）
 ├── data_preprocessing.py       # 数据预处理代码文档
@@ -63,15 +63,16 @@ python3 -m http.server 8080
 | 序号 | 图表名称 | 类型 | 说明 |
 |------|----------|------|------|
 | 1 | 内容类型分布 | 环形图 | 电影 vs 电视节目占比 |
-| 2 | 年度发布趋势 | 折线图 | 2015-2021 年内容增长趋势 |
+| 2 | 年度发布趋势 | 折线图 | 2008-2021 年内容增长趋势 |
 | 3 | 制片国家 Top15 | 柱状图 | 各国内容产出排行 |
 | 4 | 热门流派 Top10 | 柱状图 | 流派分布统计 |
-| 5 | 年龄评级分布 | 漏斗图 | TV-MA、TV-14 等评级占比 |
+| 5 | 年龄评级分布 | 水平条形图 | TV-MA、TV-14 等评级占比 |
 | 6 | 电影时长分布 | 直方图 | 电影时长区间统计 |
-| 7 | 电视节目季数 | 柱状图 | 剧集季数分布 |
-| 8 | 年份×类型热力图 | 热力图 | 时间维度交叉分析 |
-| 9 | **流派词云** | 力导向图 | 流派关键词视觉化（支持点击下钻） |
-| 10 | 相关性矩阵 | 热力图 | 数值变量相关性分析 |
+| 7 | 流派×类型对比 | 堆叠柱状图 | 各流派中电影与剧集对比 |
+| 8 | 电视节目季数分布 | 玫瑰图 | 剧集季数分布 |
+| 9 | 年份×评级热力图 | 热力图 | 时间维度交叉分析 |
+
+**配套数据表格**：描述性统计表、相关系数矩阵表、制片国家 Top10 表、机器学习模型结果表
 
 ---
 
@@ -112,7 +113,7 @@ python3 -m http.server 8080
 | title | string | 作品标题 | - |
 | director | string | 导演 | - |
 | cast | string | 演员阵容 | - |
-| country | string | 制片国家 | 86 个国家 |
+| country | string | 制片国家 | 122 个国家/地区 |
 | date_added | date | 上线日期 | 1967-2021 |
 | release_year | int | 发行年份 | 1925-2021 |
 | rating | string | 年龄分级 | TV-MA, TV-14, PG-13 等 17 种 |
@@ -122,16 +123,17 @@ python3 -m http.server 8080
 
 ### 衍生字段
 - `year_added`: 提取自 date_added 的年份
-- `month_added`: 提取自 date_added 的月份
+- `genres_list`: 流派列表（拆分自 listed_in）
+- `countries_list`: 制片国家列表（拆分自 country）
+- `cast_list`: 演员列表（拆分自 cast）
 - `duration_num`: 时长的数值部分
-- `duration_unit`: 时长单位 (Minutes/Seasons)
-- `primary_genre`: 第一流派
-- `primary_country`: 第一制片国
 - `genre_count`: 流派数量
 - `country_count`: 国家数量
 - `cast_count`: 演员数量
-- `is_anomaly_duration`: 时长异常标记
-- `no_director`: 无导演标记
+- `has_director`: 是否有导演标记
+- `primary_genre`: 第一流派
+- `primary_country`: 第一制片国
+- `is_outlier_duration`: 时长异常标记（IQR 法）
 
 ---
 

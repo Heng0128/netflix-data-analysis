@@ -20,7 +20,7 @@
 # 
 # ### 1.1 数据集背景
 # - **来源**：Kaggle 公开数据集 Netflix Titles Dataset
-# - **规模**：8,809 条记录，12 列原始字段
+# - **规模**：8,807 条记录，12 列原始字段
 # - **字段说明**：
 # 
 # | 字段名 | 类型 | 说明 | 取值范围 |
@@ -30,7 +30,7 @@
 # | title | string | 作品标题 | - |
 # | director | string | 导演姓名 | - |
 # | cast | string | 演员阵容 | - |
-# | country | string | 制片国家 | 86 个国家 |
+# | country | string | 制片国家 | 122 个国家/地区 |
 # | date_added | date | 上线日期 | 2008-2021 |
 # | release_year | int | 发行年份 | 1925-2021 |
 # | rating | string | 年龄分级 | TV-MA, TV-14, PG-13 等 17 种 |

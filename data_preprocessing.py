@@ -99,9 +99,9 @@ df['primary_genre'] = df['genres_list'].apply(lambda x: x[0] if x else 'Unknown'
 df['primary_country'] = df['countries_list'].apply(lambda x: x[0] if x else 'Unknown')
 
 print(f"处理后数据形状: {df.shape}")
-print(f"新增 10 个衍生字段: year_added, genres_list, countries_list, cast_list,")
+print(f"新增 11 个衍生字段: year_added, genres_list, countries_list, cast_list,")
 print(f"                    duration_num, genre_count, country_count, cast_count,")
-print(f"                    primary_genre, primary_country")
+print(f"                    has_director, primary_genre, primary_country")
 
 # ============================================================
 # 4. 异常值检测（IQR 法 + Z-score 法）
