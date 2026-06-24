@@ -966,6 +966,231 @@ pre[class*="language-"] code {
   counter-increment: line;
 }
 
+/* ===== 需求分析板块 ===== */
+.req-section {
+  margin-top: 60px;
+}
+
+.req-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.req-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.req-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.req-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--gold));
+  opacity: 0.6;
+}
+
+.req-card .card-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.req-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.req-card h3 .badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(229, 9, 20, 0.15);
+  color: var(--red);
+  letter-spacing: 0.5px;
+}
+
+.req-card p {
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.req-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.req-card ul li {
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  line-height: 1.8;
+  padding-left: 18px;
+  position: relative;
+}
+
+.req-card ul li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--red);
+  font-weight: bold;
+}
+
+.dataset-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+.dataset-table th {
+  text-align: left;
+  padding: 8px 10px;
+  background: rgba(229, 9, 20, 0.1);
+  color: #fff;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(229, 9, 20, 0.2);
+  white-space: nowrap;
+}
+
+.dataset-table td {
+  padding: 7px 10px;
+  color: rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.dataset-table tr:hover td {
+  background: rgba(255,255,255,0.02);
+  color: #fff;
+}
+
+/* ===== 数据表格 ===== */
+.tables-section {
+  margin-top: 24px;
+}
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.table-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.table-card:hover {
+  border-color: rgba(229, 9, 20, 0.2);
+}
+
+.table-card-header {
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(229,9,20,0.08), transparent);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-card-header .t-icon { font-size: 16px; }
+
+.table-card-header h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.table-card-header .t-badge {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.table-wrapper::-webkit-scrollbar { width: 6px; height: 6px; }
+.table-wrapper::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+.table-wrapper::-webkit-scrollbar-thumb { background: rgba(229,9,20,0.25); border-radius: 3px; }
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.data-table th {
+  position: sticky;
+  top: 0;
+  text-align: left;
+  padding: 8px 12px;
+  background: #121212;
+  color: #fff;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(229, 9, 20, 0.2);
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 7px 12px;
+  color: rgba(255,255,255,0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.data-table tr:hover td {
+  background: rgba(229, 9, 20, 0.04);
+  color: #fff;
+}
+
+.data-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table .highlight {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.data-table .pos { color: #4ECDC4; }
+.data-table .neg { color: #FF6B6B; }
+
 /* 响应式 */
 @media (max-width: 768px) {
   .code-tab-btn {
@@ -984,4 +1209,7 @@ pre[class*="language-"] code {
   pre[class*="language-"] {
     font-size: 11px !important;
   }
+  .req-cards { grid-template-columns: 1fr; }
+  .tables-grid { grid-template-columns: 1fr; }
+  .req-card { padding: 18px; }
 }
