@@ -4,15 +4,31 @@
     <meta charset="UTF-8">
     <title>Netflix 数据分析看板</title>
                 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts-wordcloud.min.js"></script>
-            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/jquery.min.js"></script>
-            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/jquery-ui.min.js"></script>
-            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/ResizeSensor.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-wordcloud@2.1.0/dist/echarts-wordcloud.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery-ui@1.13.2/dist/jquery-ui.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/css-element-queries@1.2.3/src/ResizeSensor.js"></script>
 
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/jquery-ui.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.13.2/themes/base/jquery-ui.css">
 
 </head>
 <body >
+<style>
+body {
+    margin: 0;
+    padding: 20px;
+    background: #080808;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+.chart-container {
+    background: rgba(18, 18, 18, 0.75);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 16px;
+    box-sizing: border-box;
+}
+</style>
     <style>.box {  } </style>
         <button onclick="downloadCfg()">Save Config</button>
     <div class="box">
@@ -216,7 +232,7 @@
     "series": [
         {
             "type": "line",
-            "name": "\u7535\u5f71",
+            "name": "电影",
             "connectNulls": false,
             "xAxisIndex": 0,
             "symbolSize": 8,
@@ -226,62 +242,20 @@
             "step": false,
             "stackStrategy": "samesign",
             "data": [
-                [
-                    2008,
-                    1
-                ],
-                [
-                    2009,
-                    2
-                ],
-                [
-                    2010,
-                    1
-                ],
-                [
-                    2011,
-                    13
-                ],
-                [
-                    2012,
-                    3
-                ],
-                [
-                    2013,
-                    6
-                ],
-                [
-                    2014,
-                    19
-                ],
-                [
-                    2015,
-                    56
-                ],
-                [
-                    2016,
-                    253
-                ],
-                [
-                    2017,
-                    839
-                ],
-                [
-                    2018,
-                    1237
-                ],
-                [
-                    2019,
-                    1424
-                ],
-                [
-                    2020,
-                    1284
-                ],
-                [
-                    2021,
-                    993
-                ]
+                1,
+                2,
+                1,
+                13,
+                3,
+                6,
+                19,
+                56,
+                253,
+                839,
+                1237,
+                1424,
+                1284,
+                993
             ],
             "hoverAnimation": true,
             "label": {
@@ -293,7 +267,7 @@
             "logBase": 10,
             "seriesLayoutBy": "column",
             "lineStyle": {
-                "show": false,
+                "show": true,
                 "width": 4,
                 "color": "#E50914"
             },
@@ -309,7 +283,7 @@
         },
         {
             "type": "line",
-            "name": "\u7535\u89c6\u8282\u76ee",
+            "name": "电视节目",
             "connectNulls": false,
             "xAxisIndex": 0,
             "symbolSize": 8,
@@ -319,62 +293,20 @@
             "step": false,
             "stackStrategy": "samesign",
             "data": [
-                [
-                    2008,
-                    1
-                ],
-                [
-                    2009,
-                    0
-                ],
-                [
-                    2010,
-                    0
-                ],
-                [
-                    2011,
-                    0
-                ],
-                [
-                    2012,
-                    0
-                ],
-                [
-                    2013,
-                    5
-                ],
-                [
-                    2014,
-                    5
-                ],
-                [
-                    2015,
-                    26
-                ],
-                [
-                    2016,
-                    176
-                ],
-                [
-                    2017,
-                    349
-                ],
-                [
-                    2018,
-                    412
-                ],
-                [
-                    2019,
-                    592
-                ],
-                [
-                    2020,
-                    605
-                ],
-                [
-                    2021,
-                    505
-                ]
+                1,
+                0,
+                0,
+                0,
+                0,
+                5,
+                5,
+                26,
+                176,
+                349,
+                412,
+                592,
+                605,
+                505
             ],
             "hoverAnimation": true,
             "label": {
@@ -386,7 +318,7 @@
             "logBase": 10,
             "seriesLayoutBy": "column",
             "lineStyle": {
-                "show": false,
+                "show": true,
                 "width": 4,
                 "color": "#FFD700"
             },
@@ -404,8 +336,8 @@
     "legend": [
         {
             "data": [
-                "\u7535\u5f71",
-                "\u7535\u89c6\u8282\u76ee"
+                "电影",
+                "电视节目"
             ],
             "selected": {},
             "show": true,
@@ -523,7 +455,7 @@
     ],
     "yAxis": [
         {
-            "name": "\u6570\u91cf",
+            "name": "数量",
             "show": true,
             "scale": false,
             "nameLocation": "end",
@@ -572,7 +504,7 @@
     "title": [
         {
             "show": true,
-            "text": "\ud83d\udcc8 Netflix \u6bcf\u5e74\u65b0\u589e\u5185\u5bb9\u8d8b\u52bf",
+            "text": "📈 Netflix 每年新增内容趋势",
             "target": "blank",
             "subtarget": "blank",
             "left": "center",
