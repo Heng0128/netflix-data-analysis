@@ -39,112 +39,195 @@
   .token.function, .token.class-name { color: #dcdcaa; }
   .token.regex, .token.important, .token.variable { color: #d16969; }
 
+  /* Netflix Page Header Style */
   .page-header {
-    padding: 120px 0 40px;
+    padding: 140px 0 60px;
     text-align: center;
     position: relative;
+    background: linear-gradient(180deg, 
+      rgba(0,0,0,0) 0%, 
+      rgba(0,0,0,0.2) 40%, 
+      rgba(0,0,0,0.5) 70%, 
+      rgba(20,20,20,0.9) 100%
+    );
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 100% 70% at 50% -20%, rgba(229, 9, 20, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 80% 0%, rgba(229, 9, 20, 0.08) 0%, transparent 40%);
+    animation: headerGlow 6s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  @keyframes headerGlow {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
   }
 
   .page-header .page-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(229, 9, 20, 0.1);
-    border: 1px solid rgba(229, 9, 20, 0.25);
+    gap: 10px;
+    background: rgba(229, 9, 20, 0.15);
+    border: 1px solid rgba(229, 9, 20, 0.4);
     border-radius: 100px;
-    padding: 6px 20px 6px 8px;
-    margin-bottom: 20px;
-    font-size: 12px;
+    padding: 10px 28px 10px 14px;
+    margin-bottom: 28px;
+    font-size: 13px;
     color: var(--red);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    animation: fadeInUp 0.8s ease both;
+    font-weight: 700;
+    letter-spacing: 1px;
+    animation: fadeInUp 1s ease both;
+    box-shadow: 0 8px 32px rgba(229, 9, 20, 0.25);
+    position: relative;
+    z-index: 1;
   }
 
   .page-header .page-badge .dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     background: var(--red);
     border-radius: 50%;
     animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 15px var(--red);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 15px var(--red); }
+    50% { opacity: 0.5; transform: scale(0.8); box-shadow: 0 0 25px var(--red); }
   }
 
   .page-header h1 {
-    font-size: 42px;
+    font-size: clamp(36px, 6vw, 56px);
     font-weight: 800;
     letter-spacing: -1px;
-    margin-bottom: 12px;
-    background: linear-gradient(135deg, #fff 30%, rgba(255,107,107,0.9));
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 50%, rgba(229,9,20,0.9) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: fadeInUp 0.8s 0.1s ease both;
+    animation: fadeInUp 1s 0.2s ease both;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 4px 20px rgba(229, 9, 20, 0.3));
   }
 
   .page-header .page-subtitle {
-    font-size: 14px;
+    font-size: clamp(12px, 2vw, 16px);
     color: var(--text-muted);
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    animation: fadeInUp 0.8s 0.2s ease both;
+    animation: fadeInUp 1s 0.3s ease both;
+    position: relative;
+    z-index: 1;
   }
 
   .page-divider {
-    margin: 28px auto 0;
-    width: 80px;
-    height: 2px;
+    margin: 36px auto 0;
+    width: 120px;
+    height: 3px;
     background: linear-gradient(90deg, transparent, var(--red), transparent);
-    border-radius: 2px;
-    animation: fadeInUp 0.8s 0.3s ease both;
+    border-radius: 3px;
+    animation: fadeInUp 1s 0.4s ease both;
+    position: relative;
+    z-index: 1;
   }
 
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ML Model Cards - Netflix Style */
   .ml-model-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 12px;
+    gap: 16px;
+    margin-top: 16px;
   }
 
   .ml-card {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.04);
-    border-radius: var(--radius-sm);
-    padding: 16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 20px;
     text-align: center;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ml-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .ml-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
   }
 
   .ml-card:hover {
-    background: rgba(229, 9, 20, 0.04);
-    border-color: rgba(229, 9, 20, 0.15);
+    background: linear-gradient(180deg, rgba(229,9,20,0.12), rgba(229,9,20,0.04));
+    border-color: rgba(229, 9, 20, 0.4);
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 16px 48px rgba(229,9,20,0.25);
+  }
+
+  .ml-card:hover::before,
+  .ml-card:hover::after {
+    opacity: 1;
   }
 
   .ml-card .ml-icon {
-    font-size: 24px;
-    margin-bottom: 8px;
+    font-size: 28px;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+    transition: transform 0.4s ease;
+  }
+
+  .ml-card:hover .ml-icon {
+    transform: scale(1.2) translateY(-5px);
   }
 
   .ml-card .ml-name {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     color: #fff;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   .ml-card .ml-metric {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-muted);
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
   }
 
   .ml-card .ml-value {
-    font-size: 20px;
-    font-weight: 800;
+    font-size: 24px;
+    font-weight: 900;
     font-variant-numeric: tabular-nums;
-    background: linear-gradient(135deg, var(--gold), var(--red));
+    background: linear-gradient(135deg, #fff 0%, #E50914 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    filter: drop-shadow(0 2px 8px rgba(229, 9, 20, 0.3));
   }
 
   @media (max-width: 768px) {
@@ -152,7 +235,7 @@
       grid-template-columns: 1fr;
     }
     .page-header h1 {
-      font-size: 28px;
+      font-size: 32px;
     }
   }
 </style>

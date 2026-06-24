@@ -1,11 +1,11 @@
 /**
  * ============================================================
- * Netflix 数据分析看板 - 主脚本
+ * Netflix 数据分析看板 - 主脚本 (Netflix Official Style)
  * 数据链路：netflix_titles_cleaned.csv → PapaParse 解析 → 前端聚合计算 → ECharts 渲染
  * ============================================================
  */
 
-// ===== 配置常量 =====
+// ===== Netflix Style Configuration =====
 const VALID_RATINGS = new Set([
   'TV-MA', 'TV-14', 'TV-PG', 'TV-G', 'TV-Y', 'TV-Y7', 'TV-Y7-FV',
   'G', 'PG', 'PG-13', 'R', 'NC-17', 'NR', 'UR'
@@ -18,44 +18,82 @@ const CONFIG = Object.freeze({
   TOP_GENRES_COUNT: 10,
   RARE_DURATION_THRESHOLD: 5,
   SEASON_GROUP_THRESHOLD: 6,
-  SCROLL_NAV_THRESHOLD: 40,
-  NUMBER_ANIM_DURATION: 2000,
-  CHART_ENTRY_STAGGER: 80,
+  SCROLL_NAV_THRESHOLD: 50,
+  NUMBER_ANIM_DURATION: 2500,
+  CHART_ENTRY_STAGGER: 120,
   MAX_DPR: 2,
   COLORS: {
     red: '#E50914',
+    redLight: '#FF4444',
     gold: '#FFD700',
     teal: '#4ECDC4',
-    bg: '#080808'
+    bg: '#141414',
+    bgDark: '#000000'
   }
 });
 
-// ===== 导航栏滚动效果 =====
+// ===== Netflix Navigation Bar - Enhanced Scroll Effect =====
 const nav = document.getElementById('nav');
 let scrollTicking = false;
+let lastScrollY = 0;
+
 window.addEventListener('scroll', () => {
   if (!scrollTicking) {
     requestAnimationFrame(() => {
-      nav.classList.toggle('scrolled', window.scrollY > 40);
+      const currentScrollY = window.scrollY;
+      
+      // Netflix-style: Add scrolled class with smooth transition
+      if (currentScrollY > CONFIG.SCROLL_NAV_THRESHOLD) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+      
+      // Hide/show nav on scroll direction (Netflix-style)
+      if (currentScrollY > lastScrollY && currentScrollY > 200) {
+        nav.style.transform = 'translateY(-100%)';
+      } else {
+        nav.style.transform = 'translateY(0)';
+      }
+      
+      lastScrollY = currentScrollY;
       scrollTicking = false;
     });
     scrollTicking = true;
   }
 });
-// ===== 汉堡菜单交互 =====
+
+// ===== Netflix Hamburger Menu - Enhanced Animation =====
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.querySelector('.nav-links');
+
 if (hamburger) {
   hamburger.addEventListener('click', function() {
     this.classList.toggle('open');
     navLinks.classList.toggle('open');
+    
+    // Netflix-style: Add body scroll lock when menu is open
+    document.body.style.overflow = navLinks.classList.contains('open') ? 'hidden' : '';
   });
-  // 点击导航链接后自动关闭菜单
+  
+  // Close menu on link click
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       hamburger.classList.remove('open');
       navLinks.classList.remove('open');
+      document.body.style.overflow = '';
     });
+  });
+  
+  // Close menu on outside click
+  document.addEventListener('click', (e) => {
+    if (navLinks.classList.contains('open') && 
+        !navLinks.contains(e.target) && 
+        !hamburger.contains(e.target)) {
+      hamburger.classList.remove('open');
+      navLinks.classList.remove('open');
+      document.body.style.overflow = '';
+    }
   });
 }
 
@@ -113,41 +151,135 @@ function setupNavHighlight() {
   sections.forEach(s => s && navObserver.observe(s));
 }
 
-// ===== 滚动入场动画 =====
+// ===== Netflix-style Scroll Animation =====
+const observerOptions = {
+  threshold: 0.15,
+  rootMargin: '0px 0px -60px 0px'
+};
+
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
-      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      // Netflix-style: Staggered animation with delay
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+        
+        // Add Netflix-style glow effect on animation
+        entry.target.style.animation = 'netflixFadeIn 0.8s ease forwards';
+      }, i * CONFIG.CHART_ENTRY_STAGGER);
       observer.unobserve(entry.target);
     }
   });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+}, observerOptions);
 
-document.querySelectorAll('.chart-card').forEach(el => observer.observe(el));
+// Observe all cards and charts
+document.querySelectorAll('.chart-card, .nav-card, .req-card, .team-card, .stat-card, .ml-card').forEach(el => {
+  observer.observe(el);
+});
 
-// ===== 加载数据（带 Loading / Error 状态） =====
+// Netflix-style fade-in animation keyframes
+const netflixAnimationStyle = document.createElement('style');
+netflixAnimationStyle.textContent = `
+  @keyframes netflixFadeIn {
+    0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+    50% { opacity: 0.8; transform: translateY(20px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+`;
+document.head.appendChild(netflixAnimationStyle);
+
+// ===== Netflix Loading State =====
 const loader = document.createElement('div');
 loader.id = 'data-loader';
-loader.innerHTML = '<div class="spinner"></div><p>正在加载 CSV 数据...</p>';
+loader.innerHTML = `
+  <div class="spinner"></div>
+  <p>正在加载 Netflix 数据...</p>
+  <div class="loading-progress">
+    <div class="progress-bar"></div>
+  </div>
+`;
 Object.assign(loader.style, {
   position: 'fixed', inset: 0, zIndex: 9999,
-  background: 'rgba(8,8,8,0.92)', backdropFilter: 'blur(12px)',
+  background: 'rgba(8,8,8,0.95)', backdropFilter: 'blur(20px)',
   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-  gap: '16px', transition: 'opacity 0.5s'
+  gap: '24px', transition: 'opacity 0.6s ease'
 });
-const spinnerCSS = document.createElement('style');
-spinnerCSS.textContent = `
-#data-loader .spinner { width:40px;height:40px;border:3px solid rgba(229,9,20,0.2);border-top-color:#E50914;border-radius:50%;animation:spin 0.8s linear infinite; }
-#data-loader p { color:#999;font-size:14px;letter-spacing:1px; }
-@keyframes spin { to{transform:rotate(360deg)} }
+
+const loaderCSS = document.createElement('style');
+loaderCSS.textContent = `
+  #data-loader .spinner {
+    width: 56px; height: 56px;
+    border: 4px solid rgba(229,9,20,0.2);
+    border-top-color: #E50914;
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    filter: drop-shadow(0 0 30px rgba(229, 9, 20, 0.6));
+  }
+  #data-loader p {
+    color: #E5E5E5;
+    font-size: 16px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  #data-loader .loading-progress {
+    width: 200px;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  #data-loader .progress-bar {
+    width: 30%;
+    height: 100%;
+    background: linear-gradient(90deg, #E50914, #FF4444);
+    animation: progressPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes progressPulse {
+    0%, 100% { width: 30%; opacity: 0.8; }
+    50% { width: 70%; opacity: 1; }
+  }
 `;
-document.head.appendChild(spinnerCSS);
+document.head.appendChild(loaderCSS);
 document.body.appendChild(loader);
 
-function hideLoader() { loader.style.opacity = '0'; setTimeout(() => loader.remove(), 500); }
+function hideLoader() {
+  loader.style.opacity = '0';
+  setTimeout(() => {
+    loader.remove();
+    // Netflix-style: Add entrance animation to page content
+    document.body.classList.add('loaded');
+  }, 600);
+}
 
 function showError(msg) {
-  loader.innerHTML = `<div style="color:#E50914;font-size:18px;font-weight:700;margin-bottom:8px;">数据加载失败</div><p style="color:#999;font-size:13px;max-width:400px;text-align:center;line-height:1.6">${msg}</p><button onclick="location.reload()" style="margin-top:20px;padding:10px 28px;background:#E50914;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;">重新加载</button>`;
+  loader.innerHTML = `
+    <div style="color:#E50914;font-size:24px;font-weight:900;margin-bottom:16px;text-shadow:0 0 20px rgba(229,9,20,0.5);">
+      加载失败
+    </div>
+    <p style="color:#E5E5E5;font-size:14px;max-width:400px;text-align:center;line-height:1.8;letter-spacing:1px;">
+      ${msg}
+    </p>
+    <button onclick="location.reload()" style="
+      margin-top:32px;
+      padding:16px 40px;
+      background:#E50914;
+      color:#fff;
+      border:none;
+      border-radius:8px;
+      font-weight:700;
+      cursor:pointer;
+      font-size:16px;
+      letter-spacing:1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(229,9,20,0.4);
+    " onmouseover="this.style.background='#F40612';this.style.transform='translateY(-4px)'" onmouseout="this.style.background='#E50914';this.style.transform='translateY(0)'">
+      重新加载
+    </button>
+  `;
 }
 
 /**
@@ -472,73 +604,107 @@ function loadData() {
     });
 }
 
-// ===== 数字动画（支持 prefers-reduced-motion）=====
+// ===== Netflix Number Animation =====
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function animateNumbers(overview) {
   const values = [overview.total, overview.movies, overview.tvshows, overview.countries, overview.genres, overview.directors];
   document.querySelectorAll('#overviewGrid .value').forEach((el, i) => {
     const target = values[i];
+    
     if (prefersReducedMotion) {
       el.textContent = target.toLocaleString();
       return;
     }
-    const duration = 2000;
+    
+    // Netflix-style: Smooth counting animation with easing
+    const duration = CONFIG.NUMBER_ANIM_DURATION;
     const startTime = performance.now();
+    
     function step(now) {
-      const t = Math.min(1, (now - startTime) / duration);
-      const eased = 1 - Math.pow(1 - t, 4);
-      el.textContent = Math.floor(target * eased).toLocaleString();
-      if (t < 1) requestAnimationFrame(step);
-      else el.textContent = target.toLocaleString();
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Netflix-style easing: cubic-bezier for smooth effect
+      const eased = 1 - Math.pow(1 - progress, 4);
+      
+      // Add slight random variation for more dynamic feel
+      const currentValue = Math.floor(target * eased);
+      el.textContent = currentValue.toLocaleString();
+      
+      // Add glow effect during animation
+      if (progress < 1) {
+        el.style.textShadow = `0 0 ${20 * eased}px rgba(229, 9, 20, ${0.5 * eased})`;
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = target.toLocaleString();
+        el.style.textShadow = '0 2px 10px rgba(229, 9, 20, 0.3)';
+      }
     }
+    
     requestAnimationFrame(step);
   });
 }
 
-// ===== ECharts 通用配置 =====
-const palette = ['#E50914','#FF6B6B','#FFD700','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD','#A29BFE','#81ECEC'];
+// ===== Netflix ECharts Configuration =====
+const palette = ['#E50914', '#FF4444', '#FF6B6B', '#FFD700', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#A29BFE'];
 
 const tooltipStyle = {
-  backgroundColor: 'rgba(10, 10, 10, 0.96)',
-  borderColor: 'rgba(229, 9, 20, 0.4)',
-  borderWidth: 1,
-  textStyle: { color: '#fff', fontSize: 13 },
-  extraCssText: 'box-shadow: 0 8px 32px rgba(229, 9, 20, 0.25); border-radius: 12px; backdrop-filter: blur(10px);'
+  backgroundColor: 'rgba(14, 14, 14, 0.98)',
+  borderColor: 'rgba(229, 9, 20, 0.5)',
+  borderWidth: 2,
+  textStyle: { color: '#fff', fontSize: 14, fontWeight: 500 },
+  extraCssText: 'box-shadow: 0 12px 40px rgba(229, 9, 20, 0.35); border-radius: 12px; backdrop-filter: blur(16px);',
+  confine: true
 };
 
 const axisStyle = {
-  axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-  axisLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 11 },
-  splitLine: { lineStyle: { color: 'rgba(255,255,255,0.04)', type: 'dashed' } }
+  axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
+  axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 500 },
+  splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)', type: 'dashed' } }
 };
 
-// ===== Canvas 渲染优化配置 =====
-const DPR = Math.min(window.devicePixelRatio || 1, 2);
+// ===== Netflix Canvas Rendering Optimization =====
+const DPR = Math.min(window.devicePixelRatio || 1, CONFIG.MAX_DPR);
 const chartInstances = [];
 
-/** 统一初始化图表（高清 + 脏矩形优化） */
 function initChart(elId) {
   const el = document.getElementById(elId);
   if (!el) return null;
+  
   const inst = echarts.init(el, null, {
     renderer: 'canvas',
     devicePixelRatio: DPR,
     useDirtyRect: true,
   });
+  
   chartInstances.push(inst);
+  
+  // Netflix-style: Add hover glow effect
+  el.addEventListener('mouseenter', () => {
+    el.style.filter = 'drop-shadow(0 0 20px rgba(229, 9, 20, 0.3))';
+  });
+  
+  el.addEventListener('mouseleave', () => {
+    el.style.filter = 'none';
+  });
+  
   return inst;
 }
 
-/** 统一防抖 ResizeObserver */
 function setupResizeObserver() {
   let rafId = null;
   const ro = new ResizeObserver(() => {
     cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(() => {
-      chartInstances.forEach(c => { try { c.resize(); } catch(e) {} });
+      chartInstances.forEach(c => {
+        try {
+          c.resize();
+        } catch(e) {}
+      });
     });
   });
+  
   chartInstances.forEach(c => {
     const dom = c.getDom();
     if (dom) ro.observe(dom.parentElement || dom);
