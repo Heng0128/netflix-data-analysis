@@ -1,560 +1,392 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Netflix 数据分析 · 分析结论</title>
-<meta name="description" content="Netflix 电影与电视节目数据分析 - 案例分析结论、核心发现与业务建议">
-<meta name="keywords" content="Netflix，数据分析，分析结论，业务建议，数据洞察">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"
-        onerror="this.onerror=null;this.src='https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
-        onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js'"></script>
-<link rel="stylesheet" href="css/style.css">
-<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
-<style>
-  pre[class*="language-"] {
-    margin: 0;
-    border-radius: 0 0 16px 16px;
-    background: #0d0d0d !important;
-    font-size: 13px;
-    line-height: 1.6;
-  }
-  code[class*="language-"] {
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-  }
-  .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6a9955; }
-  .token.punctuation { color: #d4d4d4; }
-  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #b5cea8; }
-  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #ce9178; }
-  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #d4d4d4; }
-  .token.atrule, .token.attr-value, .token.keyword { color: #569cd6; }
-  .token.function, .token.class-name { color: #dcdcaa; }
-  .token.regex, .token.important, .token.variable { color: #d16969; }
-
-  .page-header {
-    padding: 120px 0 40px;
-    text-align: center;
-    position: relative;
-  }
-
-  .page-header .page-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(229, 9, 20, 0.1);
-    border: 1px solid rgba(229, 9, 20, 0.25);
-    border-radius: 100px;
-    padding: 6px 20px 6px 8px;
-    margin-bottom: 20px;
-    font-size: 12px;
-    color: var(--red);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    animation: fadeInUp 0.8s ease both;
-  }
-
-  .page-header .page-badge .dot {
-    width: 8px;
-    height: 8px;
-    background: var(--red);
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  .page-header h1 {
-    font-size: 42px;
-    font-weight: 800;
-    letter-spacing: -1px;
-    margin-bottom: 12px;
-    background: linear-gradient(135deg, #fff 30%, rgba(255,107,107,0.9));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: fadeInUp 0.8s 0.1s ease both;
-  }
-
-  .page-header .page-subtitle {
-    font-size: 14px;
-    color: var(--text-muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    animation: fadeInUp 0.8s 0.2s ease both;
-  }
-
-  .page-divider {
-    margin: 28px auto 0;
-    width: 80px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-    border-radius: 2px;
-    animation: fadeInUp 0.8s 0.3s ease both;
-  }
-
-  .conclusion-section {
-    margin-top: 20px;
-  }
-
-  .conclusion-main {
-    background: var(--bg-card);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 40px;
-    position: relative;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(30px);
-  }
-
-  .conclusion-main.visible {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.7s ease, transform 0.7s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-  }
-
-  .conclusion-main::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--red), var(--gold), var(--teal));
-  }
-
-  .conclusion-main:hover {
-    border-color: var(--border-hover);
-    box-shadow: var(--shadow-hover);
-  }
-
-  .conclusion-main h2 {
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .conclusion-main h2 .icon { font-size: 26px; }
-
-  .findings-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 28px;
-  }
-
-  .finding-card {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 16px 18px;
-    border-radius: var(--radius-sm);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .finding-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 12px;
-    bottom: 12px;
-    width: 3px;
-    border-radius: 3px;
-    background: linear-gradient(180deg, var(--red), var(--gold));
-  }
-
-  .finding-card:hover {
-    background: rgba(229, 9, 20, 0.04);
-    border-color: rgba(229, 9, 20, 0.15);
-    transform: translateX(4px);
-  }
-
-  .finding-card .finding-num {
-    color: var(--gold);
-    font-weight: 800;
-    font-size: 14px;
-    margin-bottom: 6px;
-    letter-spacing: 0.5px;
-  }
-
-  .finding-card .finding-title {
-    color: #fff;
-    font-weight: 700;
-    font-size: 13px;
-    margin-bottom: 4px;
-  }
-
-  .finding-card .finding-desc {
-    color: rgba(255,255,255,0.7);
-    font-size: 12px;
-    line-height: 1.6;
-  }
-
-  .finding-card .finding-desc b {
-    color: #fff;
-    font-weight: 600;
-  }
-
-  .sub-section {
-    margin-top: 28px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(255,255,255,0.05);
-  }
-
-  .sub-section h3 {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #fff;
-  }
-
-  .sub-section h3 .sub-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    background: linear-gradient(135deg, rgba(229,9,20,0.2), rgba(229,9,20,0.05));
-  }
-
-  .conclusions-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-
-  .conclusion-item {
-    background: linear-gradient(135deg, rgba(229,9,20,0.06), rgba(255,215,0,0.03));
-    border: 1px solid rgba(229,9,20,0.12);
-    padding: 14px 16px;
-    border-radius: var(--radius-sm);
-    position: relative;
-    transition: all 0.3s ease;
-  }
-
-  .conclusion-item:hover {
-    background: linear-gradient(135deg, rgba(229,9,20,0.1), rgba(255,215,0,0.05));
-    border-color: rgba(229,9,20,0.2);
-    transform: translateY(-2px);
-  }
-
-  .conclusion-item .c-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    background: rgba(229, 9, 20, 0.2);
-    color: var(--red);
-    font-weight: 800;
-    font-size: 11px;
-    margin-right: 8px;
-  }
-
-  .conclusion-item .c-title {
-    color: var(--gold);
-    font-weight: 700;
-    font-size: 13px;
-    margin-bottom: 4px;
-  }
-
-  .conclusion-item .c-desc {
-    color: rgba(255,255,255,0.75);
-    font-size: 12px;
-    line-height: 1.6;
-    padding-left: 30px;
-  }
-
-  .suggestions-list {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .suggestion-item {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 12px 16px;
-    border-radius: var(--radius-sm);
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    transition: all 0.3s ease;
-  }
-
-  .suggestion-item:hover {
-    background: rgba(78, 205, 196, 0.04);
-    border-color: rgba(78, 205, 196, 0.15);
-    transform: translateX(4px);
-  }
-
-  .suggestion-item .s-num {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--teal), rgba(78,205,196,0.3));
-    color: #fff;
-    font-weight: 700;
-    font-size: 11px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .suggestion-item .s-content .s-title {
-    color: #fff;
-    font-weight: 700;
-    font-size: 13px;
-    margin-bottom: 3px;
-  }
-
-  .suggestion-item .s-content .s-desc {
-    color: rgba(255,255,255,0.7);
-    font-size: 12px;
-    line-height: 1.6;
-  }
-
-  .suggestion-item .s-content .s-desc b {
-    color: #fff;
-    font-weight: 600;
-  }
-
-  @media (max-width: 900px) {
-    .findings-grid { grid-template-columns: 1fr; }
-    .conclusions-grid { grid-template-columns: 1fr; }
-    .page-header h1 { font-size: 28px; }
-    .conclusion-main { padding: 24px 20px; }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分析结论 - Netflix 数据分析看板</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23E50914' width='100' height='100' rx='15'/><text x='50' y='72' text-anchor='middle' fill='white' font-size='60' font-weight='900'>N</text></svg>">
 </head>
 <body>
-<div class="bg-layer"></div>
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
+  <div class="bg-layer">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
 
-<nav class="nav" id="nav">
-  <a href="index.html" class="nav-brand">
-    <div class="logo-mark">N</div>
-    <span>NETFLIX</span>
-  </a>
-  <button class="hamburger" id="hamburger" aria-label="菜单">
-    <span></span><span></span><span></span>
-  </button>
-  <ul class="nav-links">
-    <li><a href="index.html">首页</a></li>
-    <li><a href="requirement.html">需求分析</a></li>
-    <li><a href="code.html">分析代码</a></li>
-    <li><a href="charts.html">可视化结果</a></li>
-    <li><a href="conclusion.html" class="active">分析结论</a></li>
-  </ul>
-</nav>
+  <nav class="nav" id="mainNav">
+    <a href="index.html" class="nav-brand">
+      <div class="logo-mark">N</div>
+      <span>NETFLIX</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="requirement.html">需求分析</a></li>
+      <li><a href="data_preprocessing.html">数据预处理</a></li>
+      <li><a href="charts.html">可视化图表</a></li>
+      <li><a href="conclusion.html" class="active">分析结论</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
 
-<div class="container">
-  <header class="page-header">
-    <div class="page-badge"><span class="dot"></span> ANALYSIS CONCLUSION</div>
-    <h1>案例分析结论</h1>
-    <p class="page-subtitle">Key Findings · Core Conclusions · Business Recommendations</p>
-    <div class="page-divider"></div>
-  </header>
+  <div class="container">
+    <header class="page-header">
+      <div class="page-badge">
+        <span class="dot"></span>
+        <span>PART 04</span>
+      </div>
+      <h1>分析结论</h1>
+      <p class="page-subtitle">Data Analysis Conclusions</p>
+      <div class="page-divider"></div>
+    </header>
 
-  <section class="conclusion-section">
-    <div class="section-header">
-      <div class="line"></div>
-      <h2>案例分析结论</h2>
-      <span class="tag">CONCLUSION & INSIGHTS</span>
-    </div>
+    <section class="conclusion-section">
+      <div class="conclusion-main">
+        <h2><span class="icon">💡</span> 核心发现</h2>
+        
+        <div class="findings-grid">
+          <div class="finding-card">
+            <div class="finding-num">发现 01</div>
+            <div class="finding-title">电影占据主导地位</div>
+            <div class="finding-desc">
+              电影内容占比 <b>69.6%</b>，是电视剧的 2.3 倍。
+              Netflix 平台上电影内容占据绝对主导地位，是其内容策略的核心。
+            </div>
+          </div>
 
-    <div class="conclusion-main" id="conclusion-main">
-      <h2><span class="icon">📊</span> 核心发现</h2>
+          <div class="finding-card">
+            <div class="finding-num">发现 02</div>
+            <div class="finding-title">美国内容一家独大</div>
+            <div class="finding-desc">
+              美国产出 <b>3,690 部</b> 内容，远超第二名印度（902 部）。
+              美国是 Netflix 最大的内容来源地，占总量的 41.9%。
+            </div>
+          </div>
 
-      <div class="findings-grid">
-        <div class="finding-card">
-          <div class="finding-num">01</div>
-          <div class="finding-title">内容结构特征</div>
-          <div class="finding-desc">电影占比约 <b>70%</b>，电视节目约 <b>30%</b>。电影在数量上占据主导，但剧集内容增长势头迅猛，平台内容结构正逐步多元化。</div>
+          <div class="finding-card">
+            <div class="finding-num">发现 03</div>
+            <div class="finding-title">国际化战略明显</div>
+            <div class="finding-desc">
+              国际内容占比超过 <b>40%</b>，涵盖 122 个国家/地区。
+              Netflix 正在积极推进全球化内容布局。
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-num">发现 04</div>
+            <div class="finding-title">2019 年为内容峰值</div>
+            <div class="finding-desc">
+              2019 年新增 <b>2,016 部</b> 内容，为历年最高。
+              Netflix 在 2019 年实现了内容数量的爆发式增长。
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-num">发现 05</div>
+            <div class="finding-title">剧情片最受欢迎</div>
+            <div class="finding-desc">
+              剧情片（Dramas）是最常见的流派类型，
+              其次是 comedies 和 thrillers，反映用户对剧情内容的偏好。
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-num">发现 06</div>
+            <div class="finding-title">电视剧多为短季</div>
+            <div class="finding-desc">
+              约 <b>67%</b> 的电视剧只有 1 季，说明 Netflix 倾向于投资短篇内容，
+              或大量试播剧集。
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-num">发现 07</div>
+            <div class="finding-title">电影时长集中</div>
+            <div class="finding-desc">
+              电影平均时长 <b>99.5 分钟</b>，约 60-120 分钟区间最为集中。
+              时长分布呈正态分布，符合标准电影时长惯例。
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-num">发现 08</div>
+            <div class="finding-title">TV-MA 评级最多</div>
+            <div class="finding-desc">
+              <b>TV-MA</b>（成熟观众）内容占比最高，其次是 <b>TV-14</b>。
+              成人向内容占据主导，适合全球成熟市场。
+            </div>
+          </div>
+
+          <div class="finding-card">
+            <div class="finding-num">发现 09</div>
+            <div class="finding-title">内容持续增长</div>
+            <div class="finding-desc">
+              2016 年后内容数量呈指数级增长，反映 Netflix 的内容扩张战略
+              和对原创内容的持续投入。
+            </div>
+          </div>
         </div>
-        <div class="finding-card">
-          <div class="finding-num">02</div>
-          <div class="finding-title">增长周期演变</div>
-          <div class="finding-desc">2016-2019 年为<b>快速扩张期</b>，2019 年达到峰值后增速放缓，标志着平台从"规模优先"转向"质量优先"的战略转型。</div>
+
+        <div class="sub-section">
+          <h3><span class="sub-icon">📊</span> 数据洞察</h3>
+          
+          <div class="conclusions-grid">
+            <div class="conclusion-item">
+              <div class="c-title"><span class="c-num">1</span>内容结构洞察</div>
+              <div class="c-desc">
+                电影与电视剧的比例约为 7:3，说明 Netflix 目前以电影为核心内容，
+                但电视剧数量正在稳步增长，未来可能进一步平衡。
+              </div>
+            </div>
+            <div class="conclusion-item">
+              <div class="c-title"><span class="c-num">2</span>地理分布洞察</div>
+              <div class="c-desc">
+                美国内容占据绝对主导，但印度、英国等市场增长迅速。
+                Netflix 的国际化战略正在改变内容地理分布格局。
+              </div>
+            </div>
+            <div class="conclusion-item">
+              <div class="c-title"><span class="c-num">3</span>用户偏好洞察</div>
+              <div class="c-desc">
+                剧情片、惊悚片、喜剧片是最受欢迎的内容类型，
+                反映了用户对深度叙事和娱乐性内容的需求。
+              </div>
+            </div>
+            <div class="conclusion-item">
+              <div class="c-title"><span class="c-num">4</span>机器学习洞察</div>
+              <div class="c-desc">
+                随机森林分类准确率达 99.89%，K-Means 聚类轮廓系数 0.3058。
+                模型验证了内容类型分类的可行性。
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="finding-card">
-          <div class="finding-num">03</div>
-          <div class="finding-title">全球内容布局</div>
-          <div class="finding-desc">美国以约 <b>40%</b> 的占比位居首位，印度、英国、日本、韩国紧随其后，呈现"一超多强"的全球化内容生产格局。</div>
-        </div>
-        <div class="finding-card">
-          <div class="finding-num">04</div>
-          <div class="finding-title">流派偏好洞察</div>
-          <div class="finding-desc"><b>国际电影、剧情片、喜剧</b>是三大主流流派，反映出用户对跨文化内容的旺盛需求以及全球化内容战略的成功。</div>
-        </div>
-        <div class="finding-card">
-          <div class="finding-num">05</div>
-          <div class="finding-title">相关性分析</div>
-          <div class="finding-desc">各数值变量间<b>整体相关性较弱</b>，表明内容特征维度相对独立，单一指标难以预测内容的整体属性。</div>
-        </div>
-        <div class="finding-card">
-          <div class="finding-num">06</div>
-          <div class="finding-title">时长分布规律</div>
-          <div class="finding-desc">电影平均时长约 <b>100 分钟</b>，呈正态分布；约 <b>2/3</b> 的剧集仅 1 季，短剧、限定剧已成为内容创新的重要阵地。</div>
-        </div>
-        <div class="finding-card">
-          <div class="finding-num">07</div>
-          <div class="finding-title">回归建模分析</div>
-          <div class="finding-desc">仅靠元数据特征难以准确预测电影时长（R² 较低），说明内容时长受创作意图、叙事节奏等深层因素影响更大。</div>
-        </div>
-        <div class="finding-card">
-          <div class="finding-num">08</div>
-          <div class="finding-title">聚类分群效果</div>
-          <div class="finding-desc">K=4 时聚类效果最佳，可识别出<b>经典长片、主流电影、新锐短剧、长篇剧集</b>四类典型内容群体。</div>
-        </div>
-        <div class="finding-card">
-          <div class="finding-num">09</div>
-          <div class="finding-title">分类模型表现</div>
-          <div class="finding-desc">随机森林分类准确率超过 <b>97%</b>，其中<b>时长</b>是区分电影与剧集最具判别力的特征，验证了内容形态的本质差异。</div>
+
+        <div class="sub-section">
+          <h3><span class="sub-icon">🎯</span> 战略建议</h3>
+          
+          <ul class="suggestions-list">
+            <li class="suggestion-item">
+              <div class="s-num">1</div>
+              <div class="s-content">
+                <div class="s-title">加大原创内容投入</div>
+                <div class="s-desc">
+                  基于增长趋势分析，建议继续加大原创内容投入，特别是在 <b>2021-2022 年</b>
+                  实现内容数量的稳定增长，避免增长放缓。
+                </div>
+              </div>
+            </li>
+            <li class="suggestion-item">
+              <div class="s-num">2</div>
+              <div class="s-content">
+                <div class="s-title">深化国际市场布局</div>
+                <div class="s-desc">
+                  虽然美国内容占主导，但 <b>122 个国家/地区</b> 的内容分布说明国际化潜力巨大。
+                  建议针对亚洲、非洲等新兴市场开发更多本土内容。
+                </div>
+              </div>
+            </li>
+            <li class="suggestion-item">
+              <div class="s-num">3</div>
+              <div class="s-content">
+                <div class="s-title">优化电视剧续订策略</div>
+                <div class="s-desc">
+                  67% 的电视剧只有 1 季，建议评估高潜力剧集并及时续订，
+                  同时评估第 3-4 季后的收视表现与成本效益。
+                </div>
+              </div>
+            </li>
+            <li class="suggestion-item">
+              <div class="s-num">4</div>
+              <div class="s-content">
+                <div class="s-title">强化内容推荐系统</div>
+                <div class="s-desc">
+                  基于机器学习分析，建议利用 <b>随机森林</b> 等算法优化推荐系统，
+                  提升用户粘性和观看时长。
+                </div>
+              </div>
+            </li>
+            <li class="suggestion-item">
+              <div class="s-num">5</div>
+              <div class="s-content">
+                <div class="s-title">丰富内容类型多样性</div>
+                <div class="s-desc">
+                  虽然剧情片最受欢迎，但建议在保持核心类型优势的同时，
+                  探索 <b>纪录片、动画片、独立电影</b> 等细分领域，满足长尾需求。
+                </div>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
+    </section>
 
-      <div class="sub-section">
-        <h3><span class="sub-icon">🎯</span> 核心结论</h3>
-        <div class="conclusions-grid">
-          <div class="conclusion-item">
-            <div class="c-title"><span class="c-num">1</span>内容战略转型</div>
-            <div class="c-desc">Netflix 已完成从"数量扩张"到"质量深耕"的战略转型。2019 年后内容增速放缓并非衰退信号，而是平台进入成熟阶段、注重投入产出比的必然选择。</div>
+    <section class="code-section">
+      <div class="section-header">
+        <div class="line"></div>
+        <h2>分析代码</h2>
+        <span class="tag">ANALYSIS CODE</span>
+      </div>
+
+      <div class="code-tabs">
+        <div class="code-tab-buttons">
+          <button class="code-tab-btn active" data-tab="stats">描述性统计</button>
+          <button class="code-tab-btn" data-tab="corr">相关性分析</button>
+          <button class="code-tab-btn" data-tab="rf">随机森林</button>
+          <button class="code-tab-btn" data-tab="kmeans">K-Means</button>
+        </div>
+        <div class="code-tab-content">
+          <div id="stats" class="code-panel active">
+            <div class="code-panel-header">
+              <h3>描述性统计分析</h3>
+              <div class="code-panel-desc">计算各字段的基本统计量</div>
+            </div>
+            <div class="code-block">
+              <pre class="language-python"><code># 描述性统计
+print("=" * 60)
+print("描述性统计分析")
+print("=" * 60)
+
+# 类型分布
+print("\n【类型分布】")
+type_counts = df['type'].value_counts()
+print(type_counts)
+print(f"电影占比: {type_counts['Movie'] / len(df) * 100:.1f}%")
+
+# 年份趋势
+print("\n【年度发布趋势】")
+year_counts = df['release_year'].value_counts().sort_index()
+print(year_counts.tail(10))
+
+# 国家分布
+print("\n【制片国家 Top10】")
+country_counts = df['primary_country'].value_counts().head(10)
+print(country_counts)</code></pre>
+            </div>
           </div>
-          <div class="conclusion-item">
-            <div class="c-title"><span class="c-num">2</span>剧集化趋势</div>
-            <div class="c-desc">电视节目占比持续上升，尤其是单季短剧和限定剧的兴起，反映出用户收视习惯正从"观影"向"追剧"迁移，系列化内容的用户粘性优势日益凸显。</div>
+          <div id="corr" class="code-panel">
+            <div class="code-panel-header">
+              <h3>相关性分析</h3>
+              <div class="code-panel-desc">分析数值变量之间的相关性</div>
+            </div>
+            <div class="code-block">
+              <pre class="language-python"><code># 相关性分析
+print("=" * 60)
+print("相关性分析")
+print("=" * 60)
+
+numeric_cols = ['release_year', 'year_added', 'duration_num', 
+                'genre_count', 'country_count', 'cast_count']
+
+corr_matrix = df[numeric_cols].corr()
+print("\n相关系数矩阵:")
+print(corr_matrix.round(4))</code></pre>
+            </div>
           </div>
-          <div class="conclusion-item">
-            <div class="c-title"><span class="c-num">3</span>本地化深耕</div>
-            <div class="c-desc">以印度、韩国、日本为代表的非英语内容增长强劲，"全球本土化（Glocal）"战略成效显著——本地内容不仅服务区域市场，更通过平台触达全球观众。</div>
+          <div id="rf" class="code-panel">
+            <div class="code-panel-header">
+              <h3>随机森林分类</h3>
+              <div class="code-panel-desc">预测内容类型（电影/电视剧）</div>
+            </div>
+            <div class="code-block">
+              <pre class="language-python"><code># 随机森林分类
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report
+
+# 准备特征
+features = ['release_year', 'year_added', 'duration_num', 
+            'genre_count', 'cast_count']
+X = df[features].fillna(0)
+y = (df['type'] == 'Movie').astype(int)
+
+# 划分数据集
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42)
+
+# 训练模型
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+y_pred = rf.predict(X_test)
+
+print(f"准确率: {accuracy_score(y_test, y_pred):.4f}")
+print(f"\n分类报告:\n{classification_report(y_test, y_pred)}")</code></pre>
+            </div>
           </div>
-          <div class="conclusion-item">
-            <div class="c-title"><span class="c-num">4</span>数据价值挖掘</div>
-            <div class="c-desc">元数据对内容分类有良好判别力，但对内容质量和受欢迎程度的预测能力有限。真正的数据驱动决策需要结合用户行为、完播率、互动数据等多维指标。</div>
+          <div id="kmeans" class="code-panel">
+            <div class="code-panel-header">
+              <h3>K-Means 聚类</h3>
+              <div class="code-panel-desc">对内容进行聚类分析</div>
+            </div>
+            <div class="code-block">
+              <pre class="language-python"><code># K-Means 聚类
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+# 准备聚类特征
+features = ['release_year', 'duration_num', 'genre_count']
+X = df[features].fillna(0)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 寻找最佳 K 值
+print("轮廓系数:")
+for k in [2, 3, 4, 5]:
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    labels = kmeans.fit_predict(X_scaled)
+    score = silhouette_score(X_scaled, labels)
+    print(f"K={k}: {score:.4f}")
+
+# 使用 K=4 进行聚类
+kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
+df['cluster'] = kmeans.fit_predict(X_scaled)
+print(f"\n各簇样本数:\n{df['cluster'].value_counts()}")</code></pre>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="sub-section">
-        <h3><span class="sub-icon">💡</span> 战略建议</h3>
-        <ul class="suggestions-list">
-          <li class="suggestion-item">
-            <span class="s-num">1</span>
-            <div class="s-content">
-              <div class="s-title">优化内容组合策略</div>
-              <div class="s-desc">在保持电影内容优势的基础上，加大<b>限定剧、短剧集</b>的内容投入，针对不同用户群体设计差异化内容矩阵，提升整体内容消费时长。</div>
-            </div>
-          </li>
-          <li class="suggestion-item">
-            <span class="s-num">2</span>
-            <div class="s-content">
-              <div class="s-title">深化区域内容布局</div>
-              <div class="s-desc">继续加码<b>印度、日韩、东南亚、拉美</b>等高增长市场的本土化内容制作，同时建立跨区域内容流通机制，让优质本地内容获得全球曝光。</div>
-            </div>
-          </li>
-          <li class="suggestion-item">
-            <span class="s-num">3</span>
-            <div class="s-content">
-              <div class="s-title">构建智能推荐体系</div>
-              <div class="s-desc">基于聚类识别的四类内容群体，结合用户观影行为数据，构建<b>分群分层的精准推荐系统</b>，提升内容发现效率和用户留存率。</div>
-            </div>
-          </li>
-          <li class="suggestion-item">
-            <span class="s-num">4</span>
-            <div class="s-content">
-              <div class="s-title">数据驱动投资决策</div>
-              <div class="s-desc">建立多维度内容评估框架，将元数据特征、用户反馈、市场趋势等纳入统一评估模型，为内容采购、续订、投资提供<b>量化决策支持</b>。</div>
-            </div>
-          </li>
-          <li class="suggestion-item">
-            <span class="s-num">5</span>
-            <div class="s-content">
-              <div class="s-title">完善内容标签体系</div>
-              <div class="s-desc">进一步细化内容元数据标签，引入更深层的内容特征（如叙事结构、情绪曲线、主题元素等），为推荐算法和内容策划提供更丰富的特征维度。</div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
   <footer class="footer">
-    <div class="brand">NETFLIX DATA ANALYSIS</div>
-    <div class="copy">Powered by ECharts 5.4 · 数据分析小组作业 · Netflix Titles Dataset</div>
+    <div class="brand">NETFLIX</div>
+    <div class="copy">© 2024 Netflix 数据分析报告 | 基于 Netflix Titles Dataset</div>
   </footer>
-</div>
 
-<script src="js/main.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const conclusionMain = document.getElementById('conclusion-main');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    observer.observe(conclusionMain);
-
-    const findingCards = document.querySelectorAll('.finding-card');
-    findingCards.forEach((card, index) => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(20px)';
+  <script>
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('mainNav');
+      if (window.scrollY > 50) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
     });
 
-    const findingObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-          const idx = Array.from(findingCards).indexOf(entry.target);
-          setTimeout(() => {
-            entry.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease, background 0.3s ease, border-color 0.3s ease';
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-          }, idx * 60);
-          findingObserver.unobserve(entry.target);
-        }
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      navLinks.classList.toggle('open');
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
       });
     }, { threshold: 0.1 });
 
-    findingCards.forEach(card => findingObserver.observe(card));
-  });
-</script>
+    document.querySelectorAll('.finding-card, .conclusion-item, .suggestion-item').forEach(card => {
+      observer.observe(card);
+    });
+
+    document.querySelectorAll('.code-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.code-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>

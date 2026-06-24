@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据预处理 - Netflix 数据分析看板</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23E50914' width='100' height='100' rx='15'/><text x='50' y='72' text-anchor='middle' fill='white' font-size='60' font-weight='900'>N</text></svg>">
+</head>
+<body>
+  <div class="bg-layer">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <nav class="nav" id="mainNav">
+    <a href="index.html" class="nav-brand">
+      <div class="logo-mark">N</div>
+      <span>NETFLIX</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="requirement.html">需求分析</a></li>
+      <li><a href="data_preprocessing.html" class="active">数据预处理</a></li>
+      <li><a href="charts.html">可视化图表</a></li>
+      <li><a href="conclusion.html">分析结论</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="container">
+    <header class="page-header">
+      <div class="page-badge">
+        <span class="dot"></span>
+        <span>PART 02</span>
+      </div>
+      <h1>数据预处理</h1>
+      <p class="page-subtitle">Data Preprocessing</p>
+      <div class="page-divider"></div>
+    </header>
+
+    <section class="req-section">
+      <div class="req-cards">
+        <div class="req-card">
+          <div class="card-icon">🔧</div>
+          <h3>数据清洗 <span class="badge">REQUIRED</span></h3>
+          <p>对原始数据进行清洗处理，包括去除重复记录、处理缺失值、格式化日期等。</p>
+          
+          <div class="stats-row" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="stat-mini">
+              <div class="stat-value">0</div>
+              <div class="stat-label">重复记录</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-value">11</div>
+              <div class="stat-label">新增字段</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-value">8,807</div>
+              <div class="stat-label">有效记录</div>
+            </div>
+          </div>
+          
+          <ul style="margin-top: 16px; padding-left: 0; list-style: none;">
+            <li style="color: var(--netflix-gray-light); padding: 8px 0; padding-left: 18px; position: relative;">
+              <span style="position: absolute; left: 0; color: var(--netflix-red);">▸</span>
+              删除完全重复的记录
+            </li>
+            <li style="color: var(--netflix-gray-light); padding: 8px 0; padding-left: 18px; position: relative;">
+              <span style="position: absolute; left: 0; color: var(--netflix-red);">▸</span>
+              统一日期格式为 YYYY-MM-DD
+            </li>
+            <li style="color: var(--netflix-gray-light); padding: 8px 0; padding-left: 18px; position: relative;">
+              <span style="position: absolute; left: 0; color: var(--netflix-red);">▸</span>
+              统一分类标签格式
+            </li>
+            <li style="color: var(--netflix-gray-light); padding: 8px 0; padding-left: 18px; position: relative;">
+              <span style="position: absolute; left: 0; color: var(--netflix-red);">▸</span>
+              处理特殊字符和空格
+            </li>
+          </ul>
+        </div>
+
+        <div class="req-card">
+          <div class="card-icon">⚠️</div>
+          <h3>缺失值处理</h3>
+          <p>识别并处理各字段中的缺失值，采用不同的策略进行填充或标记。</p>
+          
+          <table class="dataset-table" style="margin-top: 16px;">
+            <thead>
+              <tr>
+                <th>字段</th>
+                <th>缺失数</th>
+                <th>处理策略</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="field-name">director</td>
+                <td>2,586</td>
+                <td>填充为"Unknown"</td>
+              </tr>
+              <tr>
+                <td class="field-name">cast</td>
+                <td>530</td>
+                <td>填充为"Unknown"</td>
+              </tr>
+              <tr>
+                <td class="field-name">country</td>
+                <td>831</td>
+                <td>填充为"Unknown"</td>
+              </tr>
+              <tr>
+                <td class="field-name">date_added</td>
+                <td>11</td>
+                <td>删除该记录</td>
+              </tr>
+              <tr>
+                <td class="field-name">rating</td>
+                <td>4</td>
+                <td>删除该记录</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="req-card">
+          <div class="card-icon">📏</div>
+          <h3>异常值检测</h3>
+          <p>使用统计学方法检测数据中的异常值，确保分析结果的可靠性。</p>
+          
+          <div class="stats-row" style="grid-template-columns: repeat(2, 1fr); margin-top: 16px;">
+            <div class="stat-mini">
+              <div class="stat-value">IQR</div>
+              <div class="stat-label">方法一</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-value">Z-score</div>
+              <div class="stat-label">方法二</div>
+            </div>
+          </div>
+          
+          <p style="margin-top: 16px; color: var(--netflix-gray-light);">
+            <strong style="color: var(--netflix-white);">IQR 法：</strong>使用四分位距识别极端值，检测电影时长异常<br>
+            <strong style="color: var(--netflix-white);">Z-score 法：</strong>标准化后识别偏离超过3个标准差的值
+          </p>
+        </div>
+
+        <div class="req-card">
+          <div class="card-icon">🧬</div>
+          <h3>特征工程</h3>
+          <p>从原始字段中提取或生成新的衍生特征，丰富分析维度。</p>
+          
+          <div class="stats-row" style="grid-template-columns: repeat(4, 1fr); margin-top: 16px;">
+            <div class="stat-mini">
+              <div class="stat-value">year_added</div>
+              <div class="stat-label">添加年份</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-value">duration_num</div>
+              <div class="stat-label">时长数值</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-value">genre_count</div>
+              <div class="stat-label">流派数量</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-value">has_director</div>
+              <div class="stat-label">是否有导演</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="code-section">
+      <div class="section-header">
+        <div class="line"></div>
+        <h2>预处理代码</h2>
+        <span class="tag">PREPROCESSING CODE</span>
+      </div>
+
+      <div class="code-tabs">
+        <div class="code-tab-buttons">
+          <button class="code-tab-btn active" data-tab="cleaning">数据清洗</button>
+          <button class="code-tab-btn" data-tab="missing">缺失值处理</button>
+          <button class="code-tab-btn" data-tab="outlier">异常值检测</button>
+          <button class="code-tab-btn" data-tab="feature">特征工程</button>
+        </div>
+        <div class="code-tab-content">
+          <div id="cleaning" class="code-panel active">
+            <div class="code-panel-header">
+              <h3>数据清洗</h3>
+              <div class="code-panel-desc">去除重复记录、格式化日期、统一格式</div>
+            </div>
+            <div class="code-block">
+              <pre class="language-python"><code># 去除重复记录
+df.drop_duplicates(inplace=True)
+print(f"去重后数据形状: {df.shape}")
+
+# 格式化日期
+df['date_added'] = pd.to_datetime(df['date_added'], format='mixed', errors='coerce')
+
+# 提取年份
+df['year_added'] = df['date_added'].dt.year
+
+# 统一类型标签
+df['type'] = df['type'].str.strip()
+
+# 处理时长字段
+df['duration_num'] = df['duration'].str.extract(r'(\d+)').astype(float)
+
+# 删除时长缺失的记录
+df.dropna(subset=['duration_num'], inplace=True)
+print(f"处理后数据形状: {df.shape}")</code></pre>
+            </div>
+          </div>
+          <div id="missing" class="code-panel">
+            <div class="code-panel-header">
+              <h3>缺失值处理</h3>
+              <div class="code-panel-desc">填充或删除缺失值</div>
+            </div>
+            <div class="code-block">
+              <pre class="language-python"><code># 查看缺失值
+print("缺失值统计:")
+print(df.isnull().sum())
+
+# 填充分类字段
+df['director'].fillna('Unknown', inplace=True)
+df['cast'].fillna('Unknown', inplace=True)
+df['country'].fillna('Unknown', inplace=True)
+
+# 删除日期缺失的记录
+df.dropna(subset=['date_added', 'rating'], inplace=True)
+
+# 确认处理结果
+print(f"\n处理后缺失值:")
+print(df.isnull().sum())
+print(f"处理后数据形状: {df.shape}")</code></pre>
+            </div>
+          </div>
+          <div id="outlier" class="code-panel">
+            <div class="code-panel-header">
+              <h3>异常值检测</h3>
+              <div class="code-panel-desc">IQR 和 Z-score 双方法检测</div>
+            </div>
+            <div class="code-block">
+              <pre class="language-python"><code># IQR 法检测异常值
+Q1 = df['duration_num'].quantile(0.25)
+Q3 = df['duration_num'].quantile(0.75)
+IQR = Q3 - Q1
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+df['is_outlier_duration'] = (
+    (df['duration_num'] < lower) | (df['duration_num'] > upper)
+).astype(int)
+print(f"IQR异常值数量: {df['is_outlier_duration'].sum()}")
+
+# Z-score 法
+from scipy import stats
+df['duration_zscore'] = stats.zscore(df['duration_num'])
+df['is_outlier_zscore'] = (abs(df['duration_zscore']) > 3).astype(int)
+print(f"Z-score异常值数量: {df['is_outlier_zscore'].sum()}")</code></pre>
+            </div>
+          </div>
+          <div id="feature" class="code-panel">
+            <div class="code-panel-header">
+              <h3>特征工程</h3>
+              <div class="code-panel-desc">提取和生成新的衍生特征</div>
+            </div>
+            <div class="code-block">
+              <pre class="language-python"><code># 拆分列表字段
+df['genres_list'] = df['listed_in'].str.split(', ')
+df['countries_list'] = df['country'].str.split(', ')
+df['cast_list'] = df['cast'].str.split(', ')
+
+# 统计数量
+df['genre_count'] = df['genres_list'].apply(len)
+df['country_count'] = df['countries_list'].apply(lambda x: len(x) if isinstance(x, list) else 0)
+df['cast_count'] = df['cast_list'].apply(lambda x: len(x) if isinstance(x, list) else 0)
+
+# 提取主特征
+df['primary_genre'] = df['genres_list'].apply(lambda x: x[0] if isinstance(x, list) and len(x) > 0 else 'Unknown')
+df['primary_country'] = df['countries_list'].apply(lambda x: x[0] if isinstance(x, list) and len(x) > 0 else 'Unknown')
+df['has_director'] = (df['director'] != 'Unknown').astype(int)
+
+# 保存清洗后数据
+df.to_csv('netflix_titles_cleaned.csv', index=False)
+print(f"处理后数据形状: {df.shape}")
+print(f"新增 11 个衍生字段")</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <div class="brand">NETFLIX</div>
+    <div class="copy">© 2024 Netflix 数据分析报告 | 基于 Netflix Titles Dataset</div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('mainNav');
+      if (window.scrollY > 50) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    });
+
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      navLinks.classList.toggle('open');
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.req-card').forEach(card => observer.observe(card));
+
+    document.querySelectorAll('.code-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.code-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
