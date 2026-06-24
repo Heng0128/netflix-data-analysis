@@ -411,34 +411,63 @@ function computeAnalysisData(rows) {
 }
 
 function loadData() {
-  return fetch('netflix_titles_cleaned.csv')
+  // 优先加载预处理的 JSON 数据（32KB），比 CSV（5.4MB）快很多
+  return fetch('data/analysis_data.json')
     .then(r => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.text();
+      return r.json();
     })
-    .then(csvText => {
-      return new Promise((resolve, reject) => {
-        Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          complete: (results) => {
-            if (results.errors && results.errors.length > 0) {
-              console.warn('CSV parsing warnings:', results.errors);
-            }
-            try {
-              const analysisData = computeAnalysisData(results.data);
-              resolve(analysisData);
-            } catch (err) {
-              reject(err);
-            }
-          },
-          error: (err) => reject(err)
-        });
-      });
+    .then(jsonData => {
+      // 将 JSON 数据转换为 computeAnalysisData 的输出格式
+      const data = {
+        overview: jsonData.overview,
+        type_dist: jsonData.type_dist.map(item => ({
+          type: item['类型'],
+          count: item['数量'],
+          percentage: item['占比(%)']
+        })),
+        year_trend: jsonData.year_trend,
+        countries: jsonData.countries.map(item => ({
+          country: item['国家'],
+          count: item['数量']
+        })),
+        genres: jsonData.genres.map(item => ({
+          genre: item['流派'],
+          count: item['数量']
+        })),
+        ratings: jsonData.ratings.map(item => ({
+          rating: item['评级'],
+          count: item['数量']
+        })),
+        duration_stats: jsonData.duration_stats,
+        duration_histogram: jsonData.duration_histogram,
+        genre_type_breakdown: jsonData.genre_type_breakdown.map(item => ({
+          genre: item['流派'],
+          movie: item['电影'],
+          tvshow: item['电视节目']
+        })),
+        season_distribution: jsonData.season_distribution.map(item => ({
+          seasonNum: item['季数'],
+          count: item['数量']
+        })),
+        heatmap_data: jsonData.heatmap_data,
+        heatmap_meta: jsonData.heatmap_meta,
+        desc_stats: {
+          release_year: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
+          year_added: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
+          duration_num: jsonData.duration_stats,
+          genre_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
+          country_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
+          cast_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 }
+        },
+        corr_matrix: {},
+        numVars: ['release_year', 'year_added', 'duration_num', 'genre_count', 'country_count', 'cast_count']
+      };
+      return data;
     })
     .catch(err => {
       console.error('Data load error:', err);
-      showError(err.message || '无法加载 CSV 数据文件，请确认网络连接正常后重试。');
+      showError('数据加载失败，请刷新页面重试。');
       throw err;
     });
 }
