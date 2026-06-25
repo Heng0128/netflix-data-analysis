@@ -37,37 +37,40 @@ const nav = document.getElementById('nav');
 let scrollTicking = false;
 let lastScrollY = 0;
 
-window.addEventListener('scroll', () => {
-  if (!scrollTicking) {
-    requestAnimationFrame(() => {
-      const currentScrollY = window.scrollY;
-      
-      // Netflix-style: Add scrolled class with smooth transition
-      if (currentScrollY > CONFIG.SCROLL_NAV_THRESHOLD) {
-        nav.classList.add('scrolled');
-      } else {
-        nav.classList.remove('scrolled');
-      }
-      
-      // Hide/show nav on scroll direction (Netflix-style)
-      if (currentScrollY > lastScrollY && currentScrollY > 200) {
-        nav.style.transform = 'translateY(-100%)';
-      } else {
-        nav.style.transform = 'translateY(0)';
-      }
-      
-      lastScrollY = currentScrollY;
-      scrollTicking = false;
-    });
-    scrollTicking = true;
-  }
-});
+// Only bind scroll events if nav element exists
+if (nav) {
+  window.addEventListener('scroll', () => {
+    if (!scrollTicking) {
+      requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        
+        // Netflix-style: Add scrolled class with smooth transition
+        if (currentScrollY > CONFIG.SCROLL_NAV_THRESHOLD) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+        
+        // Hide/show nav on scroll direction (Netflix-style)
+        if (currentScrollY > lastScrollY && currentScrollY > 200) {
+          nav.style.transform = 'translateY(-100%)';
+        } else {
+          nav.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollY = currentScrollY;
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
+  });
+}
 
 // ===== Netflix Hamburger Menu - Enhanced Animation =====
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.querySelector('.nav-links');
 
-if (hamburger) {
+if (hamburger && navLinks) {
   hamburger.addEventListener('click', function() {
     this.classList.toggle('open');
     navLinks.classList.toggle('open');
@@ -172,9 +175,11 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, observerOptions);
 
-// Observe all cards and charts
-document.querySelectorAll('.chart-card, .nav-card, .req-card, .team-card, .stat-card, .ml-card').forEach(el => {
-  observer.observe(el);
+// Observe all cards and charts after DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.chart-card, .nav-card, .req-card, .team-card, .stat-card, .ml-card').forEach(el => {
+    observer.observe(el);
+  });
 });
 
 // Netflix-style fade-in animation keyframes
@@ -189,6 +194,7 @@ netflixAnimationStyle.textContent = `
 document.head.appendChild(netflixAnimationStyle);
 
 // ===== Netflix Loading State - Optimized for Speed =====
+// Note: Loader styles are defined in css/style.css (#data-loader)
 const loader = document.createElement('div');
 loader.id = 'data-loader';
 loader.innerHTML = `
@@ -197,30 +203,12 @@ loader.innerHTML = `
 `;
 Object.assign(loader.style, {
   position: 'fixed', inset: 0, zIndex: 9999,
-  background: 'rgba(8,8,8,0.98)',
+  background: 'rgba(8,8,8,0.95)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-  gap: '16px', transition: 'opacity 0.3s ease'
+  gap: '20px', transition: 'opacity 0.5s'
 });
-
-const loaderCSS = document.createElement('style');
-loaderCSS.textContent = `
-  #data-loader .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid rgba(229,9,20,0.2);
-    border-top-color: #E50914;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  #data-loader p {
-    color: #E5E5E5;
-    font-size: 14px;
-    letter-spacing: 2px;
-  }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-`;
-document.head.appendChild(loaderCSS);
 
 // 预加载数据，不等待DOM
 const dataPromise = fetch('data/analysis_data.json')

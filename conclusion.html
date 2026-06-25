@@ -20,68 +20,7 @@
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
 <style>
-  .page-header {
-    padding: 120px 0 40px;
-    text-align: center;
-    position: relative;
-  }
-
-  .page-header .page-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(229, 9, 20, 0.1);
-    border: 1px solid rgba(229, 9, 20, 0.25);
-    border-radius: 100px;
-    padding: 6px 20px 6px 8px;
-    margin-bottom: 20px;
-    font-size: 12px;
-    color: var(--red);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    animation: fadeInUp 0.8s ease both;
-  }
-
-  .page-header .page-badge .dot {
-    width: 8px;
-    height: 8px;
-    background: var(--red);
-    border-radius: 50%;
-    animation: pulseDot 2s ease-in-out infinite;
-  }
-
-  .page-header h1 {
-    font-size: 42px;
-    font-weight: 800;
-    letter-spacing: -1px;
-    margin-bottom: 12px;
-    background: linear-gradient(135deg, #fff 30%, rgba(255,107,107,0.9));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: fadeInUp 0.8s 0.1s ease both;
-  }
-
-  .page-header .page-subtitle {
-    font-size: 14px;
-    color: var(--text-muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    animation: fadeInUp 0.8s 0.2s ease both;
-  }
-
-  .page-divider {
-    margin: 28px auto 0;
-    width: 80px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-    border-radius: 2px;
-    animation: fadeInUp 0.8s 0.3s ease both;
-  }
-
   .conclusion-section {
-    margin-top: 20px;
-  }
 
   .conclusion-main {
     background: var(--bg-card);
@@ -327,11 +266,6 @@
     .page-header h1 { font-size: 28px; }
     .conclusion-main { padding: 24px 20px; }
   }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
 </style>
 </head>
 <body>
@@ -345,7 +279,7 @@
     <div class="logo-mark">N</div>
     <span>NETFLIX</span>
   </a>
-  <button class="hamburger" id="hamburger" aria-label="菜单">
+  <button class="hamburger" id="hamburger" aria-label="菜单" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
   <ul class="nav-links">
