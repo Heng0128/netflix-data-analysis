@@ -273,58 +273,63 @@ body {
 
 /* ===== Netflix Hero Section ===== */
 .hero {
-  padding: 160px 0 100px;
+  padding: 120px 48px 80px;
   text-align: center;
   position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #0a0a0a 0%, #141414 50%, #1a1a1a 100%);
+  overflow: hidden;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(229, 9, 20, 0.12);
-  border: 1px solid rgba(229, 9, 20, 0.35);
+  gap: 8px;
+  background: rgba(229, 9, 20, 0.1);
+  border: 1px solid rgba(229, 9, 20, 0.3);
   border-radius: 100px;
-  padding: 8px 24px 8px 10px;
-  margin-bottom: 32px;
+  padding: 8px 16px;
+  margin-bottom: 24px;
   font-size: 13px;
   color: var(--red);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
-  animation: fadeInUp 0.8s ease both;
+  animation: fadeInUp 0.6s ease-out both;
   box-shadow: 0 4px 20px rgba(229, 9, 20, 0.2);
 }
 
-.hero-badge .dot {
-  width: 10px;
-  height: 10px;
+.hero-badge-dot {
+  width: 8px;
+  height: 8px;
   background: var(--red);
   border-radius: 50%;
   animation: pulseDot 2s ease-in-out infinite;
   box-shadow: 0 0 10px var(--red);
 }
 
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px var(--red); }
-  50% { opacity: 0.6; transform: scale(0.85); box-shadow: 0 0 20px var(--red); }
-}
-
-.hero .logo {
-  font-size: clamp(72px, 15vw, 140px);
+.hero-netflix {
+  font-size: clamp(48px, 10vw, 120px);
   font-weight: 900;
-  letter-spacing: -5px;
+  letter-spacing: -2px;
   line-height: 1;
-  background: linear-gradient(135deg, #E50914 0%, #FF4444 40%, #FF6B6B 70%, #E50914 100%);
+  background: linear-gradient(135deg, #E50914 0%, #ff1f2f 50%, #E50914 100%);
+  background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: fadeInUp 0.8s 0.1s ease both;
+  animation: logoGlow 8s ease-in-out infinite;
   position: relative;
+  z-index: 2;
+  margin-bottom: 24px;
   filter: drop-shadow(0 0 40px rgba(229, 9, 20, 0.4));
 }
 
-.hero .logo::after {
+.hero-netflix::before {
   content: 'NETFLIX';
   position: absolute;
   inset: 0;
@@ -332,42 +337,159 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: blur(50px);
-  opacity: 0.6;
-  animation: logoGlow 4s ease-in-out infinite;
+  filter: blur(80px);
+  opacity: 0.5;
+  animation: logoPulse 5s ease-in-out infinite;
+  z-index: -1;
 }
 
-@keyframes logoGlow {
-  0%, 100% { opacity: 0.4; filter: blur(50px); }
-  50% { opacity: 0.7; filter: blur(60px); }
+.hero-title {
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 16px;
+  line-height: 1.1;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 
-.hero h1 {
-  font-size: clamp(24px, 4vw, 36px);
-  font-weight: 600;
-  margin: 24px 0 16px;
-  letter-spacing: 8px;
-  color: rgba(255,255,255,0.9);
-  animation: fadeInUp 0.8s 0.2s ease both;
-  text-transform: uppercase;
-}
-
-.hero .subtitle {
-  font-size: clamp(12px, 2vw, 14px);
-  color: var(--text-muted);
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  animation: fadeInUp 0.8s 0.3s ease both;
-  margin-bottom: 48px;
+.hero-subtitle {
+  font-size: clamp(16px, 2.5vw, 20px);
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 600px;
+  margin: 0 auto 40px;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
 }
 
 .hero-divider {
-  margin: 48px auto 0;
-  width: 150px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--red), transparent);
-  border-radius: 3px;
-  animation: fadeInUp 0.8s 0.4s ease both;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #E50914, transparent);
+  border-radius: 2px;
+  margin: 0 auto 48px;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+/* Hero Stats */
+.hero-stats {
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 48px;
+  animation: fadeInUp 0.8s ease-out 0.8s both;
+}
+
+.hero-stat {
+  text-align: center;
+}
+
+.hero-stat-value {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 700;
+  color: #E50914;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.hero-stat-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* CTA Buttons */
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeInUp 0.8s ease-out 1s both;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: #E50914;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #ff1f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(229, 9, 20, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: fadeInUp 0.8s ease-out 1.2s both;
+}
+
+.scroll-indicator-wheel {
+  width: 24px;
+  height: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  position: relative;
+}
+
+.scroll-indicator-wheel::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  animation: scrollWheel 2s ease-in-out infinite;
+}
+
+@keyframes scrollWheel {
+  0%, 100% { opacity: 0; transform: translateX(-50%) translateY(0); }
+  50% { opacity: 1; transform: translateX(-50%) translateY(12px); }
+}
+
+@keyframes logoPulse {
+  0%, 100% { opacity: 0.4; filter: blur(50px); }
+  50% { opacity: 0.7; filter: blur(60px); }
 }
 
 @keyframes fadeInUp {
