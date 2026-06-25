@@ -19,9 +19,425 @@
 <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+<style>
+  pre[class*="language-"] {
+    margin: 0;
+    border-radius: 0 0 16px 16px;
+    background: #0d0d0d !important;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  code[class*="language-"] {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+  .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #6a9955; }
+  .token.punctuation { color: #d4d4d4; }
+  .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #b5cea8; }
+  .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #ce9178; }
+  .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #d4d4d4; }
+  .token.atrule, .token.attr-value, .token.keyword { color: #569cd6; }
+  .token.function, .token.class-name { color: #dcdcaa; }
+  .token.regex, .token.important, .token.variable { color: #d16969; }
+
+  /* Netflix Page Header Style */
+  .page-header {
+    padding: 140px 0 60px;
+    text-align: center;
+    position: relative;
+    background: linear-gradient(180deg, 
+      rgba(0,0,0,0) 0%, 
+      rgba(0,0,0,0.2) 40%, 
+      rgba(0,0,0,0.5) 70%, 
+      rgba(20,20,20,0.9) 100%
+    );
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 100% 70% at 50% -20%, rgba(229, 9, 20, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 80% 0%, rgba(229, 9, 20, 0.08) 0%, transparent 40%);
+    animation: headerGlow 6s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  @keyframes headerGlow {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
+  .page-header .page-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(229, 9, 20, 0.15);
+    border: 1px solid rgba(229, 9, 20, 0.4);
+    border-radius: 100px;
+    padding: 10px 28px 10px 14px;
+    margin-bottom: 28px;
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 700;
+    letter-spacing: 1px;
+    animation: fadeInUp 1s ease both;
+    box-shadow: 0 8px 32px rgba(229, 9, 20, 0.25);
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-header .page-badge .dot {
+    width: 10px;
+    height: 10px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 15px var(--red);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 15px var(--red); }
+    50% { opacity: 0.5; transform: scale(0.8); box-shadow: 0 0 25px var(--red); }
+  }
+
+  .page-header h1 {
+    font-size: clamp(36px, 6vw, 56px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 50%, rgba(229,9,20,0.9) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 1s 0.2s ease both;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 4px 20px rgba(229, 9, 20, 0.3));
+  }
+
+  .page-header .page-subtitle {
+    font-size: clamp(12px, 2vw, 16px);
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: fadeInUp 1s 0.3s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-divider {
+    margin: 36px auto 0;
+    width: 120px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    border-radius: 3px;
+    animation: fadeInUp 1s 0.4s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Requirement Section - Netflix Style */
+  .req-section {
+    margin-top: 40px;
+  }
+
+  .req-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .req-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 36px;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  .req-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.8s ease, transform 0.8s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+  }
+
+  .req-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--red), var(--red-light));
+    opacity: 0.8;
+  }
+
+  .req-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.08) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+
+  .req-card:hover {
+    border-color: rgba(229, 9, 20, 0.5);
+    box-shadow: 0 24px 80px rgba(229,9,20,0.25);
+    transform: translateY(-12px) scale(1.02);
+  }
+
+  .req-card:hover::after {
+    opacity: 1;
+  }
+
+  .req-card .card-icon {
+    font-size: 40px;
+    margin-bottom: 24px;
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.3));
+    transition: transform 0.5s ease;
+  }
+
+  .req-card:hover .card-icon {
+    transform: scale(1.2) translateY(-5px);
+  }
+
+  .req-card h3 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    letter-spacing: -0.5px;
+  }
+
+  .req-card h3 .badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: rgba(229, 9, 20, 0.15);
+    color: var(--red);
+    letter-spacing: 1px;
+    border: 1px solid rgba(229, 9, 20, 0.3);
+  }
+
+  .req-card p {
+    color: rgba(255,255,255,0.8);
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 16px;
+  }
+
+  /* Dataset Table - Netflix Style */
+  .dataset-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+    font-size: 13px;
+  }
+
+  .dataset-table th {
+    text-align: left;
+    padding: 14px 16px;
+    background: rgba(229, 9, 20, 0.15);
+    color: #fff;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(229, 9, 20, 0.3);
+    white-space: nowrap;
+    letter-spacing: 1px;
+  }
+
+  .dataset-table td {
+    padding: 12px 16px;
+    color: rgba(255,255,255,0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: all 0.3s ease;
+  }
+
+  .dataset-table tr:hover td {
+    background: rgba(229, 9, 20, 0.08);
+    color: #fff;
+  }
+
+  .dataset-table .field-name {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    color: var(--red);
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(229, 9, 20, 0.3);
+  }
+
+  /* Goals Grid - Netflix Style */
+  .goals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .goal-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 20px 24px;
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .goal-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 16px;
+    bottom: 16px;
+    width: 4px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--red), var(--red-light));
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+  }
+
+  .goal-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.08) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .goal-item:hover {
+    background: rgba(229, 9, 20, 0.08);
+    border-color: rgba(229, 9, 20, 0.25);
+    transform: translateX(8px) scale(1.02);
+  }
+
+  .goal-item:hover::after {
+    opacity: 1;
+  }
+
+  .goal-item .goal-num {
+    color: var(--red);
+    font-weight: 900;
+    font-size: 16px;
+    margin-right: 8px;
+    text-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+  }
+
+  .goal-item .goal-title {
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+
+  .goal-item .goal-desc {
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* Stats Row - Netflix Style */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-mini {
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-mini::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .stat-mini::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .stat-mini:hover {
+    background: linear-gradient(180deg, rgba(229,9,20,0.12), rgba(229,9,20,0.04));
+    border-color: rgba(229, 9, 20, 0.4);
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 16px 48px rgba(229,9,20,0.25);
+  }
+
+  .stat-mini:hover::before,
+  .stat-mini:hover::after {
+    opacity: 1;
+  }
+
+  .stat-mini .stat-value {
+    font-size: 28px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #E50914 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 10px rgba(229, 9, 20, 0.3));
+  }
+
+  .stat-mini .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .req-cards { grid-template-columns: 1fr; }
+    .goals-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .page-header h1 { font-size: 32px; }
+    .req-card { padding: 28px; }
+  }
+</style>
 </head>
 <body>
 <div class="bg-layer"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
 <nav class="nav" id="nav">
   <a href="index.html" class="nav-brand">
