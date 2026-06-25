@@ -177,7 +177,7 @@ const observer = new IntersectionObserver((entries) => {
 
 // Observe all cards and charts after DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.chart-card, .nav-card, .req-card, .team-card, .stat-card, .ml-card').forEach(el => {
+  document.querySelectorAll('.chart-card, .nav-card, .req-card, .stat-card, .ml-card').forEach(el => {
     observer.observe(el);
   });
 });
@@ -199,7 +199,7 @@ const loader = document.createElement('div');
 loader.id = 'data-loader';
 loader.innerHTML = `
   <div class="spinner"></div>
-  <p>正在加载...</p>
+  <p>正在加载 Netflix 数据...</p>
 `;
 Object.assign(loader.style, {
   position: 'fixed', inset: 0, zIndex: 9999,
@@ -209,6 +209,7 @@ Object.assign(loader.style, {
   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
   gap: '20px', transition: 'opacity 0.5s'
 });
+document.body.appendChild(loader); // ✅ 关键修复：将 loader 插入 DOM，使其可见
 
 // 预加载数据，不等待DOM
 const dataPromise = fetch('data/analysis_data.json')
@@ -948,8 +949,7 @@ function renderAllFast(d) {
 
 // ===== 启动 =====
 document.addEventListener('DOMContentLoaded', function() {
-  setupCodeTabs();
-  setupNavHighlight();
+  // setupCodeTabs 和 setupNavHighlight 会在 renderAllFast 末尾调用，这里不需要重复调用
   
   const hasCharts = document.getElementById('chart1') || document.getElementById('overviewGrid');
   if (hasCharts) {
