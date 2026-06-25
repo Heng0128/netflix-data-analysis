@@ -249,15 +249,8 @@ const dataPromise = fetch('data/analysis_data.json')
       })),
       heatmap_data: jsonData.heatmap_data,
       heatmap_meta: jsonData.heatmap_meta,
-      desc_stats: jsonData.desc_stats || {
-        release_year: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
-        year_added: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
-        duration_num: jsonData.duration_stats,
-        genre_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
-        country_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
-        cast_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 }
-      },
-      corr_matrix: jsonData.corr_matrix || {},
+      desc_stats: jsonData.desc_stats,
+      corr_matrix: jsonData.corr_matrix,
       numVars: ['release_year', 'year_added', 'duration_num', 'genre_count', 'country_count', 'cast_count']
     };
   });
@@ -577,15 +570,8 @@ function loadData() {
         })),
         heatmap_data: jsonData.heatmap_data,
         heatmap_meta: jsonData.heatmap_meta,
-        desc_stats: {
-          release_year: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
-          year_added: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
-          duration_num: jsonData.duration_stats,
-          genre_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
-          country_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 },
-          cast_count: { mean: 0, std: 0, min: 0, median: 0, max: 0 }
-        },
-        corr_matrix: {},
+        desc_stats: jsonData.desc_stats,
+        corr_matrix: jsonData.corr_matrix,
         numVars: ['release_year', 'year_added', 'duration_num', 'genre_count', 'country_count', 'cast_count']
       };
       return data;
