@@ -1649,5 +1649,38 @@
       "release_year": 2021,
       "rating": "TV-MA"
     }
-  ]
+  ],
+  "desc_stats": {
+    "release_year": {
+      "mean": 2015.11,
+      "std": 10.12,
+      "min": 1975,
+      "median": 2021.0,
+      "max": 2021
+    },
+    "genre_count": {
+      "mean": 2.26,
+      "std": 0.8,
+      "min": 1,
+      "median": 2.0,
+      "max": 3
+    }
+  },
+  "corr_matrix": {
+    "release_year": {
+      "release_year": 1.0,
+      "year_added": 0.1,
+      "duration_num": 0.05
+    },
+    "year_added": {
+      "release_year": 0.1,
+      "year_added": 1.0,
+      "duration_num": -0.02
+    },
+    "duration_num": {
+      "release_year": 0.05,
+      "year_added": -0.02,
+      "duration_num": 1.0
+    }
+  }
 }
