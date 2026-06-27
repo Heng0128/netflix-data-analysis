@@ -718,6 +718,10 @@ body {
   margin-bottom: 20px;
 }
 
+.chart-card-wide {
+  grid-column: 1 / -1;
+}
+
 .chart-card {
   background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
   border: 1px solid rgba(255,255,255,0.08);
@@ -818,7 +822,7 @@ body {
 }
 
 .chart-card .chart-container.tall {
-  height: 320px;
+  height: 380px;
 }
 
 /* ===== Drill-down Table ===== */

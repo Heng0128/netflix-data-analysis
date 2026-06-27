@@ -6,13 +6,12 @@
 <title>可视化结果 - Netflix 数据分析</title>
 <meta name="description" content="Netflix 电影与电视节目数据分析可视化 — 8,807 部作品的深度洞察">
 <meta name="keywords" content="Netflix, 数据分析，可视化，ECharts, Python, 数据科学">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Netflix 数据分析 · 可视化看板">
 <meta property="og:description" content="8,807部作品 × 9个交互式图表，深度分析Netflix内容库。">
 <meta property="og:url" content="https://heng0128.github.io/netflix-data-analysis/">
-<meta property="og:image" content="https://heng0128.github.io/netflix-data-analysis/css/style.css">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Netflix 数据分析 · 可视化看板">
@@ -29,6 +28,12 @@
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
+
+<!-- 加载动画 -->
+<div class="loader" id="loader">
+  <div class="loader-spinner"></div>
+  <div class="loader-text">正在加载可视化数据...</div>
+</div>
 
 <nav class="nav" id="nav">
   <a href="index.html" class="nav-brand">
@@ -55,6 +60,48 @@
     <div class="page-divider"></div>
   </header>
 
+  <!-- 数据概览卡片 -->
+  <section class="overview-section" id="overviewSection">
+    <div class="section-header">
+      <div class="line"></div>
+      <h2>数据概览</h2>
+      <span class="tag">OVERVIEW</span>
+    </div>
+    <div class="overview-grid" id="overviewGrid">
+      <div class="stat-card" id="stat-total">
+        <div class="stat-icon">📊</div>
+        <div class="stat-value" data-value="8807">0</div>
+        <div class="stat-label">总内容数</div>
+      </div>
+      <div class="stat-card" id="stat-movie">
+        <div class="stat-icon">🎬</div>
+        <div class="stat-value" data-value="6131">0</div>
+        <div class="stat-label">电影数量</div>
+      </div>
+      <div class="stat-card" id="stat-tv">
+        <div class="stat-icon">📺</div>
+        <div class="stat-value" data-value="2676">0</div>
+        <div class="stat-label">电视节目</div>
+      </div>
+      <div class="stat-card" id="stat-country">
+        <div class="stat-icon">🌍</div>
+        <div class="stat-value" data-value="122">0</div>
+        <div class="stat-label">制片国家</div>
+      </div>
+      <div class="stat-card" id="stat-year">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value" data-value="2021">0</div>
+        <div class="stat-label">最新年份</div>
+      </div>
+      <div class="stat-card" id="stat-genre">
+        <div class="stat-icon">🎭</div>
+        <div class="stat-value" data-value="42">0</div>
+        <div class="stat-label">内容流派</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 图表区域 -->
   <section class="charts-page-section">
     <div class="section-header">
       <div class="line"></div>
@@ -62,34 +109,103 @@
       <span class="tag">9 CHARTS</span>
     </div>
 
-    <div class="charts-page-grid">
-      <div class="chart-page-card">
+    <div class="charts-grid">
+      <!-- Chart 1: 内容类型环形图 -->
+      <div class="chart-card">
         <div class="card-head">
-          <div class="title"><span class="emoji">🎬</span> Netflix 内容类型分布</div>
+          <div class="title"><span class="emoji">🎬</span> 内容类型分布</div>
           <span class="badge">PIE CHART</span>
         </div>
-        <div class="chart-wrap">
-          <div id="chart-type-pie" style="width:100%; height:400px;"></div>
+        <div class="chart-container tall">
+          <div id="chart1" style="width:100%; height:100%;"></div>
         </div>
       </div>
 
-      <div class="chart-page-card">
+      <!-- Chart 2: 年度趋势折线图 -->
+      <div class="chart-card">
         <div class="card-head">
-          <div class="title"><span class="emoji">📈</span> 年度新增内容趋势</div>
+          <div class="title"><span class="emoji">📈</span> 年度新增趋势</div>
           <span class="badge">LINE CHART</span>
         </div>
-        <div class="chart-wrap">
-          <div id="chart-year-trend" style="width:100%; height:450px;"></div>
+        <div class="chart-container tall">
+          <div id="chart2" style="width:100%; height:100%;"></div>
         </div>
       </div>
 
-      <div class="chart-page-card">
+      <!-- Chart 3: 制片国家柱状图 -->
+      <div class="chart-card">
         <div class="card-head">
           <div class="title"><span class="emoji">🌍</span> 制片国家 Top 15</div>
           <span class="badge">BAR CHART</span>
         </div>
-        <div class="chart-wrap">
-          <div id="chart-countries" style="width:100%; height:500px;"></div>
+        <div class="chart-container tall">
+          <div id="chart3" style="width:100%; height:100%;"></div>
+        </div>
+      </div>
+
+      <!-- Chart 4: 内容流派分布 -->
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🎭</span> 内容流派 Top 15</div>
+          <span class="badge">BAR CHART</span>
+        </div>
+        <div class="chart-container tall">
+          <div id="chart4" style="width:100%; height:100%;"></div>
+        </div>
+      </div>
+
+      <!-- Chart 5: 评级分布 -->
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🔞</span> 年龄评级分布</div>
+          <span class="badge">BAR CHART</span>
+        </div>
+        <div class="chart-container tall">
+          <div id="chart5" style="width:100%; height:100%;"></div>
+        </div>
+      </div>
+
+      <!-- Chart 6: 电影时长分布 -->
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">⏱️</span> 电影时长分布</div>
+          <span class="badge">HISTOGRAM</span>
+        </div>
+        <div class="chart-container tall">
+          <div id="chart6" style="width:100%; height:100%;"></div>
+        </div>
+      </div>
+
+      <!-- Chart 7: 流派与类型堆叠图 -->
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">📊</span> 流派与类型关系</div>
+          <span class="badge">STACKED BAR</span>
+        </div>
+        <div class="chart-container tall">
+          <div id="chart7" style="width:100%; height:100%;"></div>
+        </div>
+      </div>
+
+      <!-- Chart 8: 剧集季数分布 -->
+      <div class="chart-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">📺</span> 剧集季数分布</div>
+          <span class="badge">ROSE CHART</span>
+        </div>
+        <div class="chart-container tall">
+          <div id="chart8" style="width:100%; height:100%;"></div>
+        </div>
+      </div>
+
+      <!-- Chart 9: 年份与评级热力图 -->
+      <div class="chart-card chart-card-wide">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🔥</span> 年份-评级热力图</div>
+          <span class="badge">HEATMAP</span>
+        </div>
+        <div class="chart-container tall">
+          <div id="chart9" style="width:100%; height:100%;"></div>
         </div>
       </div>
     </div>
@@ -103,221 +219,21 @@
 
 <script src="js/main.js"></script>
 <script>
+  // 图表卡片滚动动画
   document.addEventListener('DOMContentLoaded', function() {
-    const chartCards = document.querySelectorAll('.chart-page-card');
+    const chartCards = document.querySelectorAll('.chart-card');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
           setTimeout(() => {
             entry.target.classList.add('visible');
-          }, index * 120);
+          }, index * 100);
           observer.unobserve(entry.target);
         }
       });
     }, { threshold: 0.1 });
 
     chartCards.forEach(card => observer.observe(card));
-
-    // Chart 1: Content Type Pie
-    var chart1 = echarts.init(document.getElementById('chart-type-pie'), null, {renderer: 'canvas', locale: 'ZH'});
-    var option1 = {
-      backgroundColor: 'transparent',
-      tooltip: {
-        trigger: 'item',
-        formatter: '{b}: {c} ({d}%)',
-        backgroundColor: 'rgba(14, 14, 14, 0.98)',
-        borderColor: 'rgba(229, 9, 20, 0.5)',
-        borderWidth: 2,
-        textStyle: { color: '#fff', fontSize: 14 },
-        extraCssText: 'box-shadow: 0 12px 40px rgba(229, 9, 20, 0.35); border-radius: 12px; backdrop-filter: blur(16px);'
-      },
-      legend: {
-        orient: 'vertical',
-        right: '5%',
-        top: 'middle',
-        textStyle: { color: 'rgba(255,255,255,0.7)', fontSize: 13 },
-        itemGap: 16,
-        icon: 'roundRect'
-      },
-      series: [
-        {
-          name: '内容类型',
-          type: 'pie',
-          radius: ['45%', '75%'],
-          center: ['38%', '50%'],
-          avoidLabelOverlap: true,
-          itemStyle: {
-            borderRadius: 10,
-            borderColor: 'rgba(8,8,8,0.8)',
-            borderWidth: 4
-          },
-          label: {
-            show: true,
-            color: '#fff',
-            formatter: '{b}\n{d}%',
-            fontSize: 14,
-            fontWeight: 600,
-            lineHeight: 22
-          },
-          emphasis: {
-            scale: true,
-            scaleSize: 10,
-            itemStyle: {
-              shadowBlur: 30,
-              shadowColor: 'rgba(229, 9, 20, 0.5)'
-            }
-          },
-          data: [
-            { value: 6131, name: '电影', itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{ offset: 0, color: '#E50914' }, { offset: 1, color: '#FF4444' }]) } },
-            { value: 2676, name: '电视节目', itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{ offset: 0, color: '#FFD700' }, { offset: 1, color: '#FFA500' }]) } }
-          ]
-        }
-      ]
-    };
-    chart1.setOption(option1);
-
-    // Chart 2: Year Trend
-    var chart2 = echarts.init(document.getElementById('chart-year-trend'), null, {renderer: 'canvas', locale: 'ZH'});
-    var years = [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021];
-    var moviesData = [1, 2, 1, 13, 3, 6, 19, 56, 253, 839, 1237, 1424, 1284, 993];
-    var tvShowsData = [1, 0, 0, 0, 0, 5, 5, 26, 176, 349, 412, 592, 605, 505];
-    var option2 = {
-      backgroundColor: 'transparent',
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'cross', label: { backgroundColor: '#E50914' }, crossStyle: { color: '#999' } },
-        backgroundColor: 'rgba(14, 14, 14, 0.98)',
-        borderColor: 'rgba(229, 9, 20, 0.5)',
-        borderWidth: 2,
-        textStyle: { color: '#fff', fontSize: 14 },
-        extraCssText: 'box-shadow: 0 12px 40px rgba(229, 9, 20, 0.35); border-radius: 12px; backdrop-filter: blur(16px);'
-      },
-      legend: {
-        data: ['电影', '电视节目'],
-        top: 0,
-        textStyle: { color: 'rgba(255,255,255,0.7)' },
-        icon: 'roundRect',
-        itemGap: 24
-      },
-      grid: { left: '3%', right: '3%', top: 50, bottom: 30, containLabel: true },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: years,
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
-        axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 12 }
-      },
-      yAxis: {
-        type: 'value',
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
-        axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 12 },
-        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)', type: 'dashed' } }
-      },
-      series: [
-        {
-          name: '电影',
-          type: 'line',
-          smooth: 0.4,
-          symbol: 'circle',
-          symbolSize: 6,
-          showSymbol: false,
-          data: moviesData,
-          itemStyle: { color: '#E50914' },
-          lineStyle: { width: 3, color: '#E50914', shadowBlur: 8, shadowColor: 'rgba(229,9,20,0.3)' },
-          areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(229, 9, 20, 0.35)' }, { offset: 1, color: 'rgba(229, 9, 20, 0)' }]) },
-          emphasis: { focus: 'series' }
-        },
-        {
-          name: '电视节目',
-          type: 'line',
-          smooth: 0.4,
-          symbol: 'circle',
-          symbolSize: 6,
-          showSymbol: false,
-          data: tvShowsData,
-          itemStyle: { color: '#FFD700' },
-          lineStyle: { width: 3, color: '#FFD700', shadowBlur: 8, shadowColor: 'rgba(255,215,0,0.2)' },
-          areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(255, 215, 0, 0.25)' }, { offset: 1, color: 'rgba(255, 215, 0, 0)' }]) },
-          emphasis: { focus: 'series' }
-        }
-      ]
-    };
-    chart2.setOption(option2);
-
-    // Chart 3: Top Countries
-    var chart3 = echarts.init(document.getElementById('chart-countries'), null, {renderer: 'canvas', locale: 'ZH'});
-    var countries = [
-      'United States', 'India', 'United Kingdom', 'Japan', 'South Korea',
-      'Canada', 'Spain', 'France', 'Egypt', 'Mexico',
-      'Turkey', 'Australia', 'Taiwan', 'China', 'Nigeria'
-    ].reverse();
-    var countryCounts = [
-      2818, 972, 419, 245, 199,
-      181, 145, 124, 112, 110,
-      106, 102, 90, 87, 83
-    ].reverse();
-    var option3 = {
-      backgroundColor: 'transparent',
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-        backgroundColor: 'rgba(14, 14, 14, 0.98)',
-        borderColor: 'rgba(229, 9, 20, 0.5)',
-        borderWidth: 2,
-        textStyle: { color: '#fff', fontSize: 14 },
-        extraCssText: 'box-shadow: 0 12px 40px rgba(229, 9, 20, 0.35); border-radius: 12px; backdrop-filter: blur(16px);',
-        formatter: function(params) {
-          return params[0].name + '<br/>数量：<b>' + params[0].value + '</b>';
-        }
-      },
-      grid: { left: '2%', right: '10%', top: 10, bottom: 10, containLabel: true },
-      xAxis: {
-        type: 'value',
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
-        axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 12 },
-        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)', type: 'dashed' } }
-      },
-      yAxis: {
-        type: 'category',
-        data: countries,
-        axisLine: { show: false },
-        axisLabel: { color: 'rgba(255,255,255,0.75)', fontSize: 12 }
-      },
-      series: [
-        {
-          type: 'bar',
-          data: countryCounts.map((v, i) => ({
-            value: v,
-            itemStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                { offset: 0, color: 'rgba(131, 16, 16, 0.6)' },
-                { offset: 1, color: '#E50914' }
-              ]),
-              borderRadius: [0, 8, 8, 0]
-            }
-          })),
-          barWidth: '55%',
-          label: {
-            show: true,
-            position: 'right',
-            color: 'rgba(255,255,255,0.85)',
-            fontWeight: 600,
-            fontSize: 12
-          },
-          emphasis: {
-            itemStyle: { shadowBlur: 15, shadowColor: 'rgba(229,9,20,0.4)' }
-          }
-        }
-      ]
-    };
-    chart3.setOption(option3);
-
-    // Responsive resize
-    window.addEventListener('resize', function() {
-      chart1.resize();
-      chart2.resize();
-      chart3.resize();
-    });
   });
 </script>
 </body>
