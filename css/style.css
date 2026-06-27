@@ -10,6 +10,10 @@
   --red-light: #FF4444;
   --red-glow: rgba(229, 9, 20, 0.6);
   
+  /* Additional Colors */
+  --gold: #FFD700;
+  --teal: #4ECDC4;
+
   /* Background Colors */
   --bg: #141414;
   --bg-dark: #000000;
@@ -107,6 +111,15 @@ body {
   right: -10%;
   background: radial-gradient(circle, rgba(229, 9, 20, 0.06) 0%, transparent 70%);
   animation-delay: -15s;
+}
+
+.orb-3 {
+  width: 500px;
+  height: 500px;
+  top: 40%;
+  right: 20%;
+  background: radial-gradient(circle, rgba(78, 205, 196, 0.06) 0%, transparent 70%);
+  animation-delay: -10s;
 }
 
 @keyframes orbFloat {
