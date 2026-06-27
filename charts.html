@@ -1,406 +1,1567 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Netflix 数据分析 · 可视化结果</title>
-<meta name="description" content="Netflix 电影与电视节目数据分析可视化结果 - 9 张交互式图表与数据表格，深度展示内容库分布规律">
-<meta name="keywords" content="Netflix, 数据分析，可视化，ECharts, 数据表格">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
+    <meta charset="UTF-8">
+    <title>Awesome-pyecharts</title>
+                <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"
-        onerror="this.onerror=null;this.src='https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'"></script>
-<link rel="stylesheet" href="css/style.css">
-<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
-<style>
-  /* ML Model Cards - Netflix Style */
-  .ml-model-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-top: 16px;
-  }
-
-  .ml-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .ml-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  .ml-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.1) 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  .ml-card:hover {
-    background: linear-gradient(180deg, rgba(229,9,20,0.12), rgba(229,9,20,0.04));
-    border-color: rgba(229, 9, 20, 0.4);
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 16px 48px rgba(229,9,20,0.25);
-  }
-
-  .ml-card:hover::before,
-  .ml-card:hover::after {
-    opacity: 1;
-  }
-
-  .ml-card .ml-icon {
-    font-size: 28px;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
-    transition: transform 0.4s ease;
-  }
-
-  .ml-card:hover .ml-icon {
-    transform: scale(1.2) translateY(-5px);
-  }
-
-  .ml-card .ml-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 8px;
-  }
-
-  .ml-card .ml-metric {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-  }
-
-  .ml-card .ml-value {
-    font-size: 24px;
-    font-weight: 900;
-    font-variant-numeric: tabular-nums;
-    background: linear-gradient(135deg, #fff 0%, #E50914 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 2px 8px rgba(229, 9, 20, 0.3));
-  }
-
-  @media (max-width: 768px) {
-    .ml-model-grid {
-      grid-template-columns: 1fr;
-    }
-    .page-header h1 {
-      font-size: 32px;
-    }
-  }
-</style>
+    
 </head>
-<body>
-<div class="bg-layer"></div>
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
-
-<nav class="nav" id="nav">
-  <a href="index.html" class="nav-brand">
-    <div class="logo-mark">N</div>
-    <span>NETFLIX</span>
-  </a>
-  <button class="hamburger" id="hamburger" aria-label="菜单" aria-expanded="false">
-    <span></span><span></span><span></span>
-  </button>
-  <ul class="nav-links">
-    <li><a href="index.html">首页</a></li>
-    <li><a href="requirement.html">需求分析</a></li>
-    <li><a href="code.html">分析代码</a></li>
-    <li><a href="charts.html" class="active">可视化结果</a></li>
-    <li><a href="conclusion.html">分析结论</a></li>
-  </ul>
-</nav>
-
-<div class="container">
-  <section class="page-header">
-    <div class="page-badge"><span class="dot"></span> DATA VISUALIZATION</div>
-    <h1>可视化结果</h1>
-    <p class="page-subtitle">9 Charts · 4 Tables · Interactive Dashboard</p>
-    <div class="page-divider"></div>
-  </section>
-
-  <section class="overview-section" id="overview">
-    <div class="section-header">
-      <div class="line"></div>
-      <h2>数据概览</h2>
-      <span class="tag">OVERVIEW</span>
-    </div>
-    <div class="overview-grid" id="overviewGrid">
-      <div class="stat-card">
-        <span class="icon">🎬</span>
-        <div class="label">总作品数</div>
-        <div class="value">0</div>
-      </div>
-      <div class="stat-card">
-        <span class="icon">🎥</span>
-        <div class="label">电影</div>
-        <div class="value">0</div>
-      </div>
-      <div class="stat-card">
-        <span class="icon">📺</span>
-        <div class="label">电视节目</div>
-        <div class="value">0</div>
-      </div>
-      <div class="stat-card">
-        <span class="icon">🌍</span>
-        <div class="label">制片国家</div>
-        <div class="value">0</div>
-      </div>
-      <div class="stat-card">
-        <span class="icon">🎭</span>
-        <div class="label">流派类型</div>
-        <div class="value">0</div>
-      </div>
-      <div class="stat-card">
-        <span class="icon">🎬</span>
-        <div class="label">导演数量</div>
-        <div class="value">0</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="charts-section" id="charts">
-    <div class="section-header">
-      <div class="line"></div>
-      <h2>可视化图表</h2>
-      <span class="tag">9 CHARTS</span>
-    </div>
-
-    <div class="charts-grid">
-      <div class="chart-card">
-        <div class="card-head">
-          <div class="title"><span class="emoji">🍩</span>内容类型分布</div>
-          <span class="badge">CHART 01</span>
-        </div>
-        <div class="desc">电影与电视节目的数量占比对比</div>
-        <div class="chart-container" id="chart1"></div>
-      </div>
-
-      <div class="chart-card">
-        <div class="card-head">
-          <div class="title"><span class="emoji">📈</span>年度发布趋势</div>
-          <span class="badge">CHART 02</span>
-        </div>
-        <div class="desc">2008-2021 年每年新增内容数量变化</div>
-        <div class="chart-container" id="chart2"></div>
-      </div>
-
-      <div class="chart-card">
-        <div class="card-head">
-          <div class="title"><span class="emoji">🌍</span>制片国家 TOP15</div>
-          <span class="badge">CHART 03</span>
-        </div>
-        <div class="desc">按作品数量排名的前 15 个制片国家</div>
-        <div class="chart-container tall" id="chart3"></div>
-      </div>
-
-      <div class="chart-card">
-        <div class="card-head">
-          <div class="title"><span class="emoji">🎭</span>热门流派 TOP10</div>
-          <span class="badge">CHART 04</span>
-        </div>
-        <div class="desc">作品数量最多的十大内容流派</div>
-        <div class="chart-container tall" id="chart4"></div>
-      </div>
-
-      <div class="chart-card">
-        <div class="card-head">
-          <div class="title"><span class="emoji">🏷️</span>内容评级分布</div>
-          <span class="badge">CHART 05</span>
-        </div>
-        <div class="desc">各年龄评级的作品数量分布</div>
-        <div class="chart-container tall" id="chart5"></div>
-      </div>
-
-      <div class="chart-card">
-        <div class="card-head">
-          <div class="title"><span class="emoji">⏱️</span>电影时长分布</div>
-          <span class="badge">CHART 06</span>
-        </div>
-        <div class="desc">电影时长直方图（单位：分钟）</div>
-        <div class="chart-container" id="chart6"></div>
-      </div>
-
-      <div class="chart-card">
-        <div class="card-head">
-          <div class="title"><span class="emoji">📊</span>流派×类型对比</div>
-          <span class="badge">CHART 07</span>
-        </div>
-        <div class="desc">各流派中电影与电视节目的堆叠对比</div>
-        <div class="chart-container" id="chart7"></div>
-      </div>
-
-      <div class="chart-card">
-        <div class="card-head">
-          <div class="title"><span class="emoji">🌹</span>TV 剧集季数分布</div>
-          <span class="badge">CHART 08</span>
-        </div>
-        <div class="desc">电视节目季数的玫瑰图分布</div>
-        <div class="chart-container" id="chart8"></div>
-      </div>
-
-      <div class="chart-card">
-        <div class="card-head">
-          <div class="title"><span class="emoji">🔥</span>年份×评级热力图</div>
-          <span class="badge">CHART 09</span>
-        </div>
-        <div class="desc">各年份不同评级作品数量热力图</div>
-        <div class="chart-container" id="chart9"></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="tables-section">
-    <div class="section-header">
-      <div class="line"></div>
-      <h2>数据表格</h2>
-      <span class="tag">DATA TABLES</span>
-    </div>
-
-    <div class="tables-grid">
-      <div class="table-card">
-        <div class="table-card-header">
-          <span class="t-icon">📋</span>
-          <h4>数值型变量描述性统计</h4>
-          <span class="t-badge">DESC STATS</span>
-        </div>
-        <div class="table-wrapper">
-          <table class="data-table" id="descStatsTable">
-            <thead>
-              <tr>
-                <th>统计量</th>
-                <th class="num">发行年份</th>
-                <th class="num">上线年份</th>
-                <th class="num">时长</th>
-                <th class="num">流派数</th>
-                <th class="num">国家数</th>
-                <th class="num">演员数</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <div class="table-card-header">
-          <span class="t-icon">🔗</span>
-          <h4>相关系数矩阵</h4>
-          <span class="t-badge">CORRELATION</span>
-        </div>
-        <div class="table-wrapper">
-          <table class="data-table" id="corrTable">
-            <thead>
-              <tr>
-                <th>变量</th>
-                <th class="num">发行年份</th>
-                <th class="num">上线年份</th>
-                <th class="num">时长</th>
-                <th class="num">流派数</th>
-                <th class="num">国家数</th>
-                <th class="num">演员数</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <div class="table-card-header">
-          <span class="t-icon">🌍</span>
-          <h4>制片国家 Top 10</h4>
-          <span class="t-badge">COUNTRIES</span>
-        </div>
-        <div class="table-wrapper">
-          <table class="data-table" id="countryTable">
-            <thead>
-              <tr>
-                <th>排名</th>
-                <th>国家</th>
-                <th class="num">作品数</th>
-                <th class="num">占比</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <div class="table-card-header">
-          <span class="t-icon">🤖</span>
-          <h4>机器学习模型结果</h4>
-          <span class="t-badge">ML MODELS</span>
-        </div>
-        <div class="table-wrapper" style="padding: 16px;">
-          <div class="ml-model-grid">
-            <div class="ml-card">
-              <div class="ml-icon">📉</div>
-              <div class="ml-name">线性回归</div>
-              <div class="ml-metric">R² Score</div>
-              <div class="ml-value" id="lrR2">—</div>
-            </div>
-            <div class="ml-card">
-              <div class="ml-icon">🔢</div>
-              <div class="ml-name">线性回归</div>
-              <div class="ml-metric">RMSE</div>
-              <div class="ml-value" id="lrRmse">—</div>
-            </div>
-            <div class="ml-card">
-              <div class="ml-icon">🎯</div>
-              <div class="ml-name">K-Means 聚类</div>
-              <div class="ml-metric">轮廓系数</div>
-              <div class="ml-value" id="kmSil">—</div>
-            </div>
-          </div>
-          <div class="ml-model-grid" style="grid-template-columns: 1fr; margin-top: 12px;">
-            <div class="ml-card">
-              <div class="ml-icon">🌲</div>
-              <div class="ml-name">随机森林分类</div>
-              <div class="ml-metric">准确率 (Accuracy)</div>
-              <div class="ml-value" id="rfAcc">—</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <div class="brand">NETFLIX DATA ANALYSIS</div>
-    <div class="copy">Powered by ECharts 5.4 · 数据分析小组作业 · Netflix Titles Dataset</div>
-  </footer>
-</div>
-
-<script src="js/main.js"></script>
+<body >
+    <style>.box {  } </style>
+    <div class="box">
+                <div id="4a157727c7184568a07bdd19cc55185c" class="chart-container" style="width:100%; height:500px; "></div>
+    <script>
+        var chart_4a157727c7184568a07bdd19cc55185c = echarts.init(
+            document.getElementById('4a157727c7184568a07bdd19cc55185c'), 'dark', {renderer: 'canvas', locale: 'ZH'});
+        var option_4a157727c7184568a07bdd19cc55185c = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "series": [
+        {
+            "type": "pie",
+            "name": "Content Type",
+            "colorBy": "data",
+            "legendHoverLink": true,
+            "selectedMode": false,
+            "selectedOffset": 10,
+            "clockwise": true,
+            "startAngle": 90,
+            "minAngle": 0,
+            "minShowLabelAngle": 0,
+            "avoidLabelOverlap": true,
+            "stillShowZeroSum": true,
+            "percentPrecision": 2,
+            "showEmptyCircle": true,
+            "emptyCircleStyle": {
+                "color": "lightgray",
+                "borderColor": "#000",
+                "borderWidth": 0,
+                "borderType": "solid",
+                "borderDashOffset": 0,
+                "borderCap": "butt",
+                "borderJoin": "bevel",
+                "borderMiterLimit": 10,
+                "opacity": 1
+            },
+            "data": [
+                {
+                    "name": "Movie",
+                    "value": null
+                },
+                {
+                    "name": "TV Show",
+                    "value": null
+                }
+            ],
+            "radius": [
+                "40%",
+                "70%"
+            ],
+            "center": [
+                "50%",
+                "50%"
+            ],
+            "label": {
+                "show": true,
+                "color": "#fff",
+                "margin": 8,
+                "fontSize": 14,
+                "formatter": "{b}: {c} ({d}%)",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "labelLine": {
+                "show": true,
+                "showAbove": false,
+                "length": 15,
+                "length2": 15,
+                "smooth": false,
+                "minTurnAngle": 90,
+                "maxSurfaceAngle": 90
+            },
+            "itemStyle": {
+                "borderColor": "#0e0e0e",
+                "borderWidth": 2
+            }
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "Movie",
+                "TV Show"
+            ],
+            "selected": {},
+            "show": true,
+            "right": "10px",
+            "top": "middle",
+            "orient": "vertical",
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14,
+            "backgroundColor": "transparent",
+            "borderColor": "#ccc",
+            "borderRadius": 0,
+            "pageButtonItemGap": 5,
+            "pageButtonPosition": "end",
+            "pageFormatter": "{current}/{total}",
+            "pageIconColor": "#2f4554",
+            "pageIconInactiveColor": "#aaa",
+            "pageIconSize": 15,
+            "animationDurationUpdate": 800,
+            "selector": false,
+            "selectorPosition": "auto",
+            "selectorItemGap": 7,
+            "selectorButtonGap": 10,
+            "triggerEvent": false
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "displayTransition": true,
+        "textStyle": {
+            "fontSize": 14,
+            "richInheritPlainLabel": true
+        },
+        "borderWidth": 0,
+        "padding": 5,
+        "order": "seriesAsc"
+    },
+    "color": [
+        "#E50914",
+        "#831010"
+    ],
+    "title": [
+        {
+            "show": true,
+            "text": "\ud83c\udfac Netflix Content Type Distribution",
+            "target": "blank",
+            "subtext": "Total: 8807 titles",
+            "subtarget": "blank",
+            "left": "center",
+            "padding": 5,
+            "itemGap": 10,
+            "textAlign": "auto",
+            "textVerticalAlign": "auto",
+            "triggerEvent": false,
+            "textStyle": {
+                "color": "#fff",
+                "fontWeight": "bold",
+                "fontSize": 20,
+                "richInheritPlainLabel": true
+            }
+        }
+    ]
+};
+        chart_4a157727c7184568a07bdd19cc55185c.setOption(option_4a157727c7184568a07bdd19cc55185c);
+            window.addEventListener('resize', function(){
+                chart_4a157727c7184568a07bdd19cc55185c.resize();
+            })
+    </script>
+<br/>                <div id="9408ce8494474051ac0a710f2d3c35d6" class="chart-container" style="width:100%; height:550px; "></div>
+    <script>
+        var chart_9408ce8494474051ac0a710f2d3c35d6 = echarts.init(
+            document.getElementById('9408ce8494474051ac0a710f2d3c35d6'), 'dark', {renderer: 'canvas', locale: 'ZH'});
+        var option_9408ce8494474051ac0a710f2d3c35d6 = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "series": [
+        {
+            "type": "line",
+            "name": "Movies",
+            "connectNulls": false,
+            "xAxisIndex": 0,
+            "symbolSize": 8,
+            "showSymbol": true,
+            "smooth": true,
+            "clip": true,
+            "step": false,
+            "stackStrategy": "samesign",
+            "data": [
+                [
+                    2008,
+                    1.0
+                ],
+                [
+                    2009,
+                    2.0
+                ],
+                [
+                    2010,
+                    1.0
+                ],
+                [
+                    2011,
+                    13.0
+                ],
+                [
+                    2012,
+                    3.0
+                ],
+                [
+                    2013,
+                    6.0
+                ],
+                [
+                    2014,
+                    19.0
+                ],
+                [
+                    2015,
+                    56.0
+                ],
+                [
+                    2016,
+                    253.0
+                ],
+                [
+                    2017,
+                    839.0
+                ],
+                [
+                    2018,
+                    1237.0
+                ],
+                [
+                    2019,
+                    1424.0
+                ],
+                [
+                    2020,
+                    1284.0
+                ],
+                [
+                    2021,
+                    993.0
+                ]
+            ],
+            "hoverAnimation": true,
+            "label": {
+                "show": false,
+                "margin": 8,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "logBase": 10,
+            "seriesLayoutBy": "column",
+            "lineStyle": {
+                "show": false,
+                "width": 4,
+                "color": "#E50914"
+            },
+            "areaStyle": {
+                "opacity": 0.2,
+                "color": "#E50914"
+            },
+            "itemStyle": {
+                "color": "#E50914"
+            },
+            "zlevel": 0,
+            "z": 0
+        },
+        {
+            "type": "line",
+            "name": "TV Shows",
+            "connectNulls": false,
+            "xAxisIndex": 0,
+            "symbolSize": 8,
+            "showSymbol": true,
+            "smooth": true,
+            "clip": true,
+            "step": false,
+            "stackStrategy": "samesign",
+            "data": [
+                [
+                    2008,
+                    1.0
+                ],
+                [
+                    2009,
+                    0.0
+                ],
+                [
+                    2010,
+                    0.0
+                ],
+                [
+                    2011,
+                    0.0
+                ],
+                [
+                    2012,
+                    0.0
+                ],
+                [
+                    2013,
+                    5.0
+                ],
+                [
+                    2014,
+                    5.0
+                ],
+                [
+                    2015,
+                    26.0
+                ],
+                [
+                    2016,
+                    176.0
+                ],
+                [
+                    2017,
+                    349.0
+                ],
+                [
+                    2018,
+                    412.0
+                ],
+                [
+                    2019,
+                    592.0
+                ],
+                [
+                    2020,
+                    605.0
+                ],
+                [
+                    2021,
+                    505.0
+                ]
+            ],
+            "hoverAnimation": true,
+            "label": {
+                "show": false,
+                "margin": 8,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "logBase": 10,
+            "seriesLayoutBy": "column",
+            "lineStyle": {
+                "show": false,
+                "width": 4,
+                "color": "#FFD700"
+            },
+            "areaStyle": {
+                "opacity": 0.2,
+                "color": "#FFD700"
+            },
+            "itemStyle": {
+                "color": "#FFD700"
+            },
+            "zlevel": 0,
+            "z": 0
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "Movies",
+                "TV Shows"
+            ],
+            "selected": {},
+            "show": true,
+            "top": "50px",
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14,
+            "textStyle": {
+                "color": "#fff",
+                "richInheritPlainLabel": true
+            },
+            "backgroundColor": "transparent",
+            "borderColor": "#ccc",
+            "borderRadius": 0,
+            "pageButtonItemGap": 5,
+            "pageButtonPosition": "end",
+            "pageFormatter": "{current}/{total}",
+            "pageIconColor": "#2f4554",
+            "pageIconInactiveColor": "#aaa",
+            "pageIconSize": 15,
+            "animationDurationUpdate": 800,
+            "selector": false,
+            "selectorPosition": "auto",
+            "selectorItemGap": 7,
+            "selectorButtonGap": 10,
+            "triggerEvent": false
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "axis",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "displayTransition": true,
+        "textStyle": {
+            "fontSize": 14,
+            "richInheritPlainLabel": true
+        },
+        "borderWidth": 0,
+        "padding": 5,
+        "order": "seriesAsc"
+    },
+    "xAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLabel": {
+                "show": true,
+                "color": "#ccc",
+                "margin": 8,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0,
+            "data": [
+                2008,
+                2009,
+                2010,
+                2011,
+                2012,
+                2013,
+                2014,
+                2015,
+                2016,
+                2017,
+                2018,
+                2019,
+                2020,
+                2021
+            ]
+        }
+    ],
+    "yAxis": [
+        {
+            "name": "Count",
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLabel": {
+                "show": true,
+                "color": "#ccc",
+                "margin": 8,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0
+        }
+    ],
+    "title": [
+        {
+            "show": true,
+            "text": "\ud83d\udcc8 Yearly Content Addition Trend",
+            "target": "blank",
+            "subtarget": "blank",
+            "left": "center",
+            "padding": 5,
+            "itemGap": 10,
+            "textAlign": "auto",
+            "textVerticalAlign": "auto",
+            "triggerEvent": false,
+            "textStyle": {
+                "color": "#fff",
+                "fontWeight": "bold",
+                "fontSize": 20,
+                "richInheritPlainLabel": true
+            }
+        }
+    ]
+};
+        chart_9408ce8494474051ac0a710f2d3c35d6.setOption(option_9408ce8494474051ac0a710f2d3c35d6);
+            window.addEventListener('resize', function(){
+                chart_9408ce8494474051ac0a710f2d3c35d6.resize();
+            })
+    </script>
+<br/>                <div id="0e289ab5bb3d4266bc137a6941fe62c7" class="chart-container" style="width:100%; height:600px; "></div>
+    <script>
+        var chart_0e289ab5bb3d4266bc137a6941fe62c7 = echarts.init(
+            document.getElementById('0e289ab5bb3d4266bc137a6941fe62c7'), 'dark', {renderer: 'canvas', locale: 'ZH'});
+        var option_0e289ab5bb3d4266bc137a6941fe62c7 = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "series": [
+        {
+            "type": "bar",
+            "name": "Count",
+            "legendHoverLink": true,
+            "data": [
+                2036,
+                2144,
+                4281,
+                4354,
+                4554,
+                7088,
+                7281,
+                8592,
+                8807,
+                8807,
+                9527,
+                10182,
+                10542,
+                12880,
+                20024
+            ],
+            "realtimeSort": false,
+            "showBackground": false,
+            "stackStrategy": "samesign",
+            "cursor": "pointer",
+            "barMinHeight": 0,
+            "barCategoryGap": "40%",
+            "barGap": "30%",
+            "large": false,
+            "largeThreshold": 400,
+            "seriesLayoutBy": "column",
+            "datasetIndex": 0,
+            "clip": true,
+            "zlevel": 0,
+            "z": 2,
+            "label": {
+                "show": true,
+                "position": "right",
+                "color": "#fff",
+                "margin": 8,
+                "fontSize": 12,
+                "fontWeight": "bold",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "itemStyle": {
+                "color": {
+                    "type": "linear",
+                    "x": 0,
+                    "y": 0,
+                    "x2": 1,
+                    "y2": 0,
+                    "colorStops": [
+                        {
+                            "offset": 0,
+                            "color": "#E50914"
+                        },
+                        {
+                            "offset": 1,
+                            "color": "#FF6464"
+                        }
+                    ]
+                },
+                "borderRadius": [
+                    0,
+                    8,
+                    8,
+                    0
+                ]
+            }
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "Count"
+            ],
+            "selected": {},
+            "show": false,
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14,
+            "backgroundColor": "transparent",
+            "borderColor": "#ccc",
+            "borderRadius": 0,
+            "pageButtonItemGap": 5,
+            "pageButtonPosition": "end",
+            "pageFormatter": "{current}/{total}",
+            "pageIconColor": "#2f4554",
+            "pageIconInactiveColor": "#aaa",
+            "pageIconSize": 15,
+            "animationDurationUpdate": 800,
+            "selector": false,
+            "selectorPosition": "auto",
+            "selectorItemGap": 7,
+            "selectorButtonGap": 10,
+            "triggerEvent": false
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "displayTransition": true,
+        "textStyle": {
+            "fontSize": 14,
+            "richInheritPlainLabel": true
+        },
+        "borderWidth": 0,
+        "padding": 5,
+        "order": "seriesAsc"
+    },
+    "xAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLabel": {
+                "show": true,
+                "color": "#ccc",
+                "margin": 8,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0
+        }
+    ],
+    "yAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLabel": {
+                "show": true,
+                "color": "#fff",
+                "margin": 8,
+                "fontSize": 13,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0,
+            "data": [
+                ",",
+                "o",
+                "s",
+                "S",
+                "U",
+                " ",
+                "d",
+                "i",
+                "]",
+                "[",
+                "n",
+                "a",
+                "e",
+                "t",
+                "'"
+            ]
+        }
+    ],
+    "title": [
+        {
+            "show": true,
+            "text": "\ud83c\udf0d Top Countries by Production",
+            "target": "blank",
+            "subtarget": "blank",
+            "left": "center",
+            "padding": 5,
+            "itemGap": 10,
+            "textAlign": "auto",
+            "textVerticalAlign": "auto",
+            "triggerEvent": false,
+            "textStyle": {
+                "color": "#fff",
+                "fontWeight": "bold",
+                "fontSize": 20,
+                "richInheritPlainLabel": true
+            }
+        }
+    ]
+};
+        chart_0e289ab5bb3d4266bc137a6941fe62c7.setOption(option_0e289ab5bb3d4266bc137a6941fe62c7);
+            window.addEventListener('resize', function(){
+                chart_0e289ab5bb3d4266bc137a6941fe62c7.resize();
+            })
+    </script>
+<br/>                <div id="c4b54ef40a864cf5a23cd89f7f70110f" class="chart-container" style="width:100%; height:550px; "></div>
+    <script>
+        var chart_c4b54ef40a864cf5a23cd89f7f70110f = echarts.init(
+            document.getElementById('c4b54ef40a864cf5a23cd89f7f70110f'), 'dark', {renderer: 'canvas', locale: 'ZH'});
+        var option_c4b54ef40a864cf5a23cd89f7f70110f = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "series": [
+        {
+            "type": "bar",
+            "name": "Count",
+            "legendHoverLink": true,
+            "data": [
+                14384,
+                14879,
+                19615,
+                19865,
+                19931,
+                20760,
+                21515,
+                25225,
+                30414,
+                38195
+            ],
+            "realtimeSort": false,
+            "showBackground": false,
+            "stackStrategy": "samesign",
+            "cursor": "pointer",
+            "barMinHeight": 0,
+            "barCategoryGap": "45%",
+            "barGap": "30%",
+            "large": false,
+            "largeThreshold": 400,
+            "seriesLayoutBy": "column",
+            "datasetIndex": 0,
+            "clip": true,
+            "zlevel": 0,
+            "z": 2,
+            "label": {
+                "show": true,
+                "position": "right",
+                "color": "#fff",
+                "margin": 8,
+                "fontSize": 12,
+                "fontWeight": "bold",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "itemStyle": {
+                "color": {
+                    "type": "linear",
+                    "x": 0,
+                    "y": 0,
+                    "x2": 1,
+                    "y2": 0,
+                    "colorStops": [
+                        {
+                            "offset": 0,
+                            "color": "#409EFF"
+                        },
+                        {
+                            "offset": 1,
+                            "color": "#FFD700"
+                        }
+                    ]
+                },
+                "borderRadius": [
+                    0,
+                    8,
+                    8,
+                    0
+                ]
+            }
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "Count"
+            ],
+            "selected": {},
+            "show": false,
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14,
+            "backgroundColor": "transparent",
+            "borderColor": "#ccc",
+            "borderRadius": 0,
+            "pageButtonItemGap": 5,
+            "pageButtonPosition": "end",
+            "pageFormatter": "{current}/{total}",
+            "pageIconColor": "#2f4554",
+            "pageIconInactiveColor": "#aaa",
+            "pageIconSize": 15,
+            "animationDurationUpdate": 800,
+            "selector": false,
+            "selectorPosition": "auto",
+            "selectorItemGap": 7,
+            "selectorButtonGap": 10,
+            "triggerEvent": false
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "displayTransition": true,
+        "textStyle": {
+            "fontSize": 14,
+            "richInheritPlainLabel": true
+        },
+        "borderWidth": 0,
+        "padding": 5,
+        "order": "seriesAsc"
+    },
+    "xAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLabel": {
+                "show": true,
+                "color": "#ccc",
+                "margin": 8,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0
+        }
+    ],
+    "yAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLabel": {
+                "show": true,
+                "color": "#fff",
+                "margin": 8,
+                "fontSize": 12,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0,
+            "data": [
+                "r",
+                "t",
+                "s",
+                "o",
+                "a",
+                "n",
+                "i",
+                "e",
+                " ",
+                "'"
+            ]
+        }
+    ],
+    "title": [
+        {
+            "show": true,
+            "text": "\ud83c\udfad Top Genres",
+            "target": "blank",
+            "subtarget": "blank",
+            "left": "center",
+            "padding": 5,
+            "itemGap": 10,
+            "textAlign": "auto",
+            "textVerticalAlign": "auto",
+            "triggerEvent": false,
+            "textStyle": {
+                "color": "#fff",
+                "fontWeight": "bold",
+                "fontSize": 20,
+                "richInheritPlainLabel": true
+            }
+        }
+    ]
+};
+        chart_c4b54ef40a864cf5a23cd89f7f70110f.setOption(option_c4b54ef40a864cf5a23cd89f7f70110f);
+            window.addEventListener('resize', function(){
+                chart_c4b54ef40a864cf5a23cd89f7f70110f.resize();
+            })
+    </script>
+<br/>                <div id="9cee15c36d484f1abae670b13b96b9d4" class="chart-container" style="width:100%; height:550px; "></div>
+    <script>
+        var chart_9cee15c36d484f1abae670b13b96b9d4 = echarts.init(
+            document.getElementById('9cee15c36d484f1abae670b13b96b9d4'), 'dark', {renderer: 'canvas', locale: 'ZH'});
+        var option_9cee15c36d484f1abae670b13b96b9d4 = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "series": [
+        {
+            "type": "funnel",
+            "name": "Rating Distribution",
+            "data": [
+                {
+                    "name": "TV-MA",
+                    "value": null
+                },
+                {
+                    "name": "TV-14",
+                    "value": null
+                },
+                {
+                    "name": "TV-PG",
+                    "value": null
+                },
+                {
+                    "name": "R",
+                    "value": null
+                },
+                {
+                    "name": "PG-13",
+                    "value": null
+                },
+                {
+                    "name": "TV-Y7",
+                    "value": null
+                },
+                {
+                    "name": "TV-Y",
+                    "value": null
+                },
+                {
+                    "name": "PG",
+                    "value": null
+                },
+                {
+                    "name": "TV-G",
+                    "value": null
+                },
+                {
+                    "name": "NR",
+                    "value": null
+                }
+            ],
+            "min": 0,
+            "max": 100,
+            "minSize": "0%",
+            "maxSize": "100%",
+            "orient": "vertical",
+            "sort": "descending",
+            "gap": 2,
+            "legendHoverLink": true,
+            "funnelAlign": "center",
+            "label": {
+                "show": true,
+                "position": "inside",
+                "color": "#fff",
+                "margin": 8,
+                "fontSize": 13,
+                "fontWeight": "bold",
+                "formatter": "{b}: {c}",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "selectedMode": false,
+            "zlevel": 0,
+            "z": 2
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "TV-MA",
+                "TV-14",
+                "TV-PG",
+                "TV-Y",
+                "TV-G",
+                "NR",
+                "TV-Y7",
+                "R",
+                "PG",
+                "PG-13"
+            ],
+            "selected": {},
+            "show": true,
+            "top": "50px",
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14,
+            "textStyle": {
+                "color": "#fff",
+                "richInheritPlainLabel": true
+            },
+            "backgroundColor": "transparent",
+            "borderColor": "#ccc",
+            "borderRadius": 0,
+            "pageButtonItemGap": 5,
+            "pageButtonPosition": "end",
+            "pageFormatter": "{current}/{total}",
+            "pageIconColor": "#2f4554",
+            "pageIconInactiveColor": "#aaa",
+            "pageIconSize": 15,
+            "animationDurationUpdate": 800,
+            "selector": false,
+            "selectorPosition": "auto",
+            "selectorItemGap": 7,
+            "selectorButtonGap": 10,
+            "triggerEvent": false
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "displayTransition": true,
+        "formatter": "{b}: {c} ({d}%)",
+        "textStyle": {
+            "fontSize": 14,
+            "richInheritPlainLabel": true
+        },
+        "borderWidth": 0,
+        "padding": 5,
+        "order": "seriesAsc"
+    },
+    "color": [
+        "#E50914",
+        "#FF6B6B",
+        "#FFD700",
+        "#4ECDC4",
+        "#45B7D1",
+        "#96CEB4",
+        "#FFEAA7",
+        "#DDA0DD",
+        "#A29BFE",
+        "#81ECEC"
+    ],
+    "title": [
+        {
+            "show": true,
+            "text": "\ud83d\udd16 Age Rating Distribution",
+            "target": "blank",
+            "subtarget": "blank",
+            "left": "center",
+            "padding": 5,
+            "itemGap": 10,
+            "textAlign": "auto",
+            "textVerticalAlign": "auto",
+            "triggerEvent": false,
+            "textStyle": {
+                "color": "#fff",
+                "fontWeight": "bold",
+                "fontSize": 20,
+                "richInheritPlainLabel": true
+            }
+        }
+    ]
+};
+        chart_9cee15c36d484f1abae670b13b96b9d4.setOption(option_9cee15c36d484f1abae670b13b96b9d4);
+            window.addEventListener('resize', function(){
+                chart_9cee15c36d484f1abae670b13b96b9d4.resize();
+            })
+    </script>
+<br/>                <div id="dd1f04b93d7f4992a2d48636e1a8894b" class="chart-container" style="width:100%; height:550px; "></div>
+    <script>
+        var chart_dd1f04b93d7f4992a2d48636e1a8894b = echarts.init(
+            document.getElementById('dd1f04b93d7f4992a2d48636e1a8894b'), 'dark', {renderer: 'canvas', locale: 'ZH'});
+        var option_dd1f04b93d7f4992a2d48636e1a8894b = {
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "series": [
+        {
+            "type": "bar",
+            "name": "Movie Count",
+            "legendHoverLink": true,
+            "data": [
+                7,
+                22,
+                98,
+                46,
+                107,
+                181,
+                266,
+                326,
+                788,
+                1368,
+                1030,
+                694,
+                452,
+                318,
+                166,
+                105,
+                71,
+                37,
+                19,
+                10,
+                9,
+                2,
+                3,
+                3,
+                0,
+                1,
+                0,
+                1,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "realtimeSort": false,
+            "showBackground": false,
+            "stackStrategy": "samesign",
+            "cursor": "pointer",
+            "barMinHeight": 0,
+            "barCategoryGap": "5%",
+            "barGap": "30%",
+            "large": false,
+            "largeThreshold": 400,
+            "seriesLayoutBy": "column",
+            "datasetIndex": 0,
+            "clip": true,
+            "zlevel": 0,
+            "z": 2,
+            "label": {
+                "show": false,
+                "margin": 8,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "itemStyle": {
+                "color": {
+                    "type": "linear",
+                    "x": 0,
+                    "y": 0,
+                    "x2": 0,
+                    "y2": 1,
+                    "colorStops": [
+                        {
+                            "offset": 0,
+                            "color": "#FF6B6B"
+                        },
+                        {
+                            "offset": 1,
+                            "color": "#E50914"
+                        }
+                    ]
+                },
+                "borderRadius": [
+                    6,
+                    6,
+                    0,
+                    0
+                ]
+            }
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "Movie Count"
+            ],
+            "selected": {},
+            "show": false,
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14,
+            "backgroundColor": "transparent",
+            "borderColor": "#ccc",
+            "borderRadius": 0,
+            "pageButtonItemGap": 5,
+            "pageButtonPosition": "end",
+            "pageFormatter": "{current}/{total}",
+            "pageIconColor": "#2f4554",
+            "pageIconInactiveColor": "#aaa",
+            "pageIconSize": 15,
+            "animationDurationUpdate": 800,
+            "selector": false,
+            "selectorPosition": "auto",
+            "selectorItemGap": 7,
+            "selectorButtonGap": 10,
+            "triggerEvent": false
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "displayTransition": true,
+        "textStyle": {
+            "fontSize": 14,
+            "richInheritPlainLabel": true
+        },
+        "borderWidth": 0,
+        "padding": 5,
+        "order": "seriesAsc"
+    },
+    "xAxis": [
+        {
+            "name": "Duration (minutes)",
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLabel": {
+                "show": true,
+                "color": "#ccc",
+                "rotate": 45,
+                "margin": 8,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0,
+            "data": [
+                "0-10",
+                "10-20",
+                "20-30",
+                "30-40",
+                "40-50",
+                "50-60",
+                "60-70",
+                "70-80",
+                "80-90",
+                "90-100",
+                "100-110",
+                "110-120",
+                "120-130",
+                "130-140",
+                "140-150",
+                "150-160",
+                "160-170",
+                "170-180",
+                "180-190",
+                "190-200",
+                "200-210",
+                "210-220",
+                "220-230",
+                "230-240",
+                "240-250",
+                "250-260",
+                "260-270",
+                "270-280",
+                "280-290",
+                "290-300",
+                "300-310",
+                "310-320",
+                "320-330"
+            ]
+        }
+    ],
+    "yAxis": [
+        {
+            "name": "Movie Count",
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLabel": {
+                "show": true,
+                "color": "#ccc",
+                "margin": 8,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0
+        }
+    ],
+    "title": [
+        {
+            "show": true,
+            "text": "\u23f1 Movie Duration Distribution",
+            "target": "blank",
+            "subtext": "Average: 99 min | Median: 98 min",
+            "subtarget": "blank",
+            "left": "center",
+            "padding": 5,
+            "itemGap": 10,
+            "textAlign": "auto",
+            "textVerticalAlign": "auto",
+            "triggerEvent": false,
+            "textStyle": {
+                "color": "#fff",
+                "fontWeight": "bold",
+                "fontSize": 20,
+                "richInheritPlainLabel": true
+            },
+            "subtextStyle": {
+                "color": "#ccc",
+                "fontSize": 13,
+                "richInheritPlainLabel": true
+            }
+        }
+    ]
+};
+        chart_dd1f04b93d7f4992a2d48636e1a8894b.setOption(option_dd1f04b93d7f4992a2d48636e1a8894b);
+            window.addEventListener('resize', function(){
+                chart_dd1f04b93d7f4992a2d48636e1a8894b.resize();
+            })
+    </script>
+<br/>    </div>
+    <script>
+    </script>
 </body>
 </html>
