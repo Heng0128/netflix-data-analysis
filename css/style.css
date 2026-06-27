@@ -3,50 +3,88 @@
    ============================================================ */
 
 :root {
-  /* Netflix Official Colors */
+  /* Netflix Official Colors - Primary Red */
   --red: #E50914;
   --red-hover: #F40612;
   --red-dark: #B81D24;
   --red-light: #FF4444;
   --red-glow: rgba(229, 9, 20, 0.6);
-  
-  /* Accent Colors */
+  --red-subtle: rgba(229, 9, 20, 0.15);
+  --red-border: rgba(229, 9, 20, 0.3);
+
+  /* Accent Colors - Gold (Secondary) */
   --gold: #FFD700;
   --gold-light: #FFE44D;
   --gold-dark: #DAA520;
+  --gold-subtle: rgba(255, 215, 0, 0.15);
+  --gold-glow: rgba(255, 215, 0, 0.4);
+
+  /* Accent Colors - Teal (Tertiary) */
   --teal: #4ECDC4;
   --teal-light: #7EDDD6;
   --teal-dark: #3DB5AD;
-  
+  --teal-subtle: rgba(78, 205, 196, 0.15);
+  --teal-glow: rgba(78, 205, 196, 0.4);
+
+  /* Neutral Accent - Purple */
+  --purple: #8B5CF6;
+  --purple-light: #A78BFA;
+  --purple-dark: #7C3AED;
+  --purple-subtle: rgba(139, 92, 246, 0.15);
+
   /* Background Colors */
   --bg: #141414;
-  --bg-dark: #000000;
+  --bg-dark: #0A0A0A;
+  --bg-darker: #000000;
+  --bg-elevated: #1A1A1A;
   --bg-card: rgba(20, 20, 20, 0.85);
   --bg-card-hover: rgba(35, 35, 35, 0.95);
   --bg-gradient: linear-gradient(180deg, rgba(20,20,20,0) 0%, rgba(20,20,20,0.15) 15%, rgba(20,20,20,0.35) 29%, rgba(20,20,20,0.58) 44%, #141414 68%, #141414 100%);
-  
+
   /* Text Colors */
   --text: #FFFFFF;
+  --text-bright: #FFFFFF;
   --text-dim: #E5E5E5;
   --text-muted: #B3B3B3;
   --text-secondary: #808080;
-  
-  /* Border & Shadow */
+  --text-faint: #525252;
+
+  /* Border Colors */
   --border: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.12);
+  --border-medium: rgba(255, 255, 255, 0.18);
   --border-hover: rgba(229, 9, 20, 0.5);
+
+  /* Shadow System */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
   --shadow: 0 4px 24px rgba(0,0,0,0.75);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.6);
   --shadow-hover: 0 16px 48px rgba(229,9,20,0.35);
   --shadow-card: 0 8px 32px rgba(0,0,0,0.5);
-  
+  --shadow-glow-red: 0 0 20px rgba(229, 9, 20, 0.5);
+  --shadow-glow-gold: 0 0 20px rgba(255, 215, 0, 0.4);
+  --shadow-glow-teal: 0 0 20px rgba(78, 205, 196, 0.4);
+
   /* Radius */
   --radius: 8px;
   --radius-sm: 4px;
   --radius-lg: 12px;
-  
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
   /* Animation */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Gradients */
+  --gradient-red: linear-gradient(135deg, var(--red) 0%, var(--red-light) 100%);
+  --gradient-red-dark: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 100%);
+  --gradient-gold: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 100%);
+  --gradient-teal: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 100%);
+  --gradient-card: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+  --gradient-shine: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -71,16 +109,17 @@ body {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  background: var(--bg-dark);
+  background: var(--bg-darker);
 }
 
 .bg-layer::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: 
+  background:
     radial-gradient(ellipse 80% 50% at 50% -20%, rgba(229, 9, 20, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 0%, rgba(229, 9, 20, 0.08) 0%, transparent 50%);
+    radial-gradient(ellipse 60% 40% at 80% 0%, rgba(229, 9, 20, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 20% 100%, rgba(78, 205, 196, 0.05) 0%, transparent 40%);
   animation: bgPulse 8s ease-in-out infinite;
 }
 
@@ -113,7 +152,7 @@ body {
   height: 600px;
   bottom: -20%;
   right: -10%;
-  background: radial-gradient(circle, rgba(229, 9, 20, 0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
   animation-delay: -15s;
 }
 
@@ -152,8 +191,8 @@ body {
   background: rgba(20, 20, 20, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .nav-brand {
@@ -177,15 +216,15 @@ body {
   justify-content: center;
   font-weight: 900;
   font-size: 20px;
-  color: #fff;
+  color: var(--text);
   letter-spacing: -1px;
   border-radius: var(--radius-sm);
-  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+  box-shadow: var(--shadow-glow-red);
   transition: all var(--transition-normal);
 }
 
 .nav-brand:hover .logo-mark {
-  box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6);
+  box-shadow: 0 6px 20px var(--red-glow);
   transform: translateY(-2px);
 }
 
@@ -194,7 +233,7 @@ body {
   font-size: 24px;
   letter-spacing: 3px;
   color: var(--red);
-  text-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+  text-shadow: 0 0 20px var(--red-glow);
 }
 
 .nav-links {
@@ -308,7 +347,7 @@ body {
   gap: 8px;
   background: rgba(229, 9, 20, 0.1);
   border: 1px solid rgba(229, 9, 20, 0.3);
-  border-radius: 100px;
+  border-radius: var(--radius-full);
   padding: 8px 16px;
   margin-bottom: 24px;
   font-size: 13px;
@@ -317,7 +356,7 @@ body {
   letter-spacing: 1px;
   text-transform: uppercase;
   animation: fadeInUp 0.6s ease-out both;
-  box-shadow: 0 4px 20px rgba(229, 9, 20, 0.2);
+  box-shadow: var(--shadow-sm), 0 4px 20px rgba(229, 9, 20, 0.2);
 }
 
 .hero-badge-dot {
@@ -334,7 +373,7 @@ body {
   font-weight: 900;
   letter-spacing: -2px;
   line-height: 1;
-  background: linear-gradient(135deg, #E50914 0%, #ff1f2f 50%, #E50914 100%);
+  background: var(--gradient-red);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -343,7 +382,7 @@ body {
   position: relative;
   z-index: 2;
   margin-bottom: 24px;
-  filter: drop-shadow(0 0 40px rgba(229, 9, 20, 0.4));
+  filter: drop-shadow(0 0 40px var(--red-glow));
 }
 
 .hero-netflix::before {
@@ -607,12 +646,12 @@ body {
 .overview-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
+  gap: 16px;
 }
 
 .stat-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 24px 20px;
   text-align: center;
@@ -628,7 +667,7 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  background: var(--gradient-red);
   opacity: 0;
   transition: opacity var(--transition-normal);
 }
@@ -637,20 +676,32 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 0%, var(--red-subtle) 0%, transparent 70%);
   opacity: 0;
   transition: opacity var(--transition-normal);
 }
 
 .stat-card:hover {
   transform: translateY(-8px) scale(1.05);
-  border-color: rgba(229, 9, 20, 0.4);
-  box-shadow: 0 12px 40px rgba(229,9,20,0.25);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-red);
 }
 
 .stat-card:hover::before,
 .stat-card:hover::after {
   opacity: 1;
+}
+
+/* 为不同卡片添加不同强调色 */
+.stat-card:nth-child(1) { --accent: var(--red); }
+.stat-card:nth-child(2) { --accent: var(--gold); }
+.stat-card:nth-child(3) { --accent: var(--teal); }
+.stat-card:nth-child(4) { --accent: var(--purple); }
+.stat-card:nth-child(5) { --accent: var(--gold); }
+.stat-card:nth-child(6) { --accent: var(--teal); }
+
+.stat-card:nth-child(n)::before {
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
 
 .stat-card .stat-icon {
@@ -723,8 +774,8 @@ body {
 }
 
 .chart-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--gradient-card);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 24px;
   transition: all var(--transition-slow);
@@ -747,7 +798,7 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  background: linear-gradient(90deg, transparent, var(--accent, var(--red)), transparent);
   opacity: 0;
   transition: opacity var(--transition-normal);
 }
@@ -763,9 +814,9 @@ body {
 }
 
 .chart-card:hover {
-  border-color: rgba(229, 9, 20, 0.4);
+  border-color: var(--border-hover);
   transform: translateY(-10px) scale(1.03);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(229, 9, 20, 0.2);
+  box-shadow: var(--shadow-xl), var(--shadow-glow-red);
 }
 
 .chart-card:hover::before,
@@ -773,11 +824,22 @@ body {
   opacity: 1;
 }
 
+/* 为不同图表卡片添加不同强调色 */
+.chart-card:nth-child(1) { --accent: var(--red); }
+.chart-card:nth-child(2) { --accent: var(--gold); }
+.chart-card:nth-child(3) { --accent: var(--teal); }
+.chart-card:nth-child(4) { --accent: var(--purple); }
+.chart-card:nth-child(5) { --accent: var(--red); }
+.chart-card:nth-child(6) { --accent: var(--gold); }
+.chart-card:nth-child(7) { --accent: var(--teal); }
+.chart-card:nth-child(8) { --accent: var(--purple); }
+.chart-card:nth-child(9) { --accent: var(--gold); }
+
 .chart-card .card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .chart-card .title {
@@ -786,6 +848,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  color: var(--text);
 }
 
 .chart-card .title .emoji {
@@ -798,10 +861,10 @@ body {
   font-weight: 700;
   letter-spacing: 1px;
   padding: 4px 12px;
-  border-radius: 100px;
-  background: rgba(229, 9, 20, 0.15);
+  border-radius: var(--radius-full);
+  background: var(--red-subtle);
   color: var(--red);
-  border: 1px solid rgba(229, 9, 20, 0.3);
+  border: 1px solid var(--red-border);
 }
 
 .chart-card .desc {
