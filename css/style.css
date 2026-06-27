@@ -10,6 +10,14 @@
   --red-light: #FF4444;
   --red-glow: rgba(229, 9, 20, 0.6);
   
+  /* Accent Colors */
+  --gold: #FFD700;
+  --gold-light: #FFE44D;
+  --gold-dark: #DAA520;
+  --teal: #4ECDC4;
+  --teal-light: #7EDDD6;
+  --teal-dark: #3DB5AD;
+  
   /* Background Colors */
   --bg: #141414;
   --bg-dark: #000000;
@@ -107,6 +115,15 @@ body {
   right: -10%;
   background: radial-gradient(circle, rgba(229, 9, 20, 0.06) 0%, transparent 70%);
   animation-delay: -15s;
+}
+
+.orb-3 {
+  width: 500px;
+  height: 500px;
+  top: 30%;
+  left: 60%;
+  background: radial-gradient(circle, rgba(78, 205, 196, 0.06) 0%, transparent 70%);
+  animation-delay: -7s;
 }
 
 @keyframes orbFloat {
@@ -1755,5 +1772,123 @@ code[class*="language-"] {
   .page-divider {
     width: 80px;
     height: 2px;
+  }
+}
+
+/* ===== Charts Page Styles ===== */
+.charts-page-section {
+  margin-top: 40px;
+  margin-bottom: 60px;
+}
+
+.charts-page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.chart-page-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all var(--transition-slow);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.chart-page-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s ease, transform 0.7s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.chart-page-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.chart-page-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.06) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+.chart-page-card:hover {
+  border-color: rgba(229, 9, 20, 0.4);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 32px rgba(229, 9, 20, 0.15);
+}
+
+.chart-page-card:hover::before,
+.chart-page-card:hover::after {
+  opacity: 1;
+}
+
+.chart-page-card .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.chart-page-card .card-head .title {
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-page-card .card-head .title .emoji {
+  font-size: 22px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.chart-page-card .card-head .badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 5px 14px;
+  border-radius: 100px;
+  background: rgba(229, 9, 20, 0.15);
+  color: var(--red);
+  border: 1px solid rgba(229, 9, 20, 0.3);
+}
+
+.chart-page-card .chart-wrap {
+  width: 100%;
+  position: relative;
+}
+
+.chart-page-card .chart-wrap canvas {
+  width: 100% !important;
+  border-radius: var(--radius);
+}
+
+@media (max-width: 768px) {
+  .chart-page-card {
+    padding: 20px;
+  }
+  
+  .chart-page-card .card-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }

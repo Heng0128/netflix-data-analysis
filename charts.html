@@ -23,621 +23,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<style>
-  /* Netflix Hero - Full Screen Immersive Style */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 120px 48px 80px;
-    position: relative;
-    text-align: center;
-    background: linear-gradient(180deg, 
-      rgba(0,0,0,0) 0%, 
-      rgba(0,0,0,0.3) 30%, 
-      rgba(0,0,0,0.6) 60%, 
-      rgba(20,20,20,0.95) 100%
-    );
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: 
-      radial-gradient(ellipse 120% 80% at 50% -30%, rgba(229, 9, 20, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse 80% 60% at 70% 10%, rgba(229, 9, 20, 0.1) 0%, transparent 40%);
-    animation: heroGlow 6s ease-in-out infinite;
-    z-index: 0;
-  }
-
-  @keyframes heroGlow {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(229, 9, 20, 0.15);
-    border: 1px solid rgba(229, 9, 20, 0.4);
-    border-radius: 100px;
-    padding: 10px 28px 10px 14px;
-    margin-bottom: 40px;
-    font-size: 13px;
-    color: var(--red);
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    animation: fadeInUp 1s ease both;
-    box-shadow: 0 8px 32px rgba(229, 9, 20, 0.25);
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-badge .dot {
-    width: 10px;
-    height: 10px;
-    background: var(--red);
-    border-radius: 50%;
-    animation: pulseDot 2s ease-in-out infinite;
-    box-shadow: 0 0 15px var(--red);
-  }
-
-  @keyframes pulseDot {
-    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 15px var(--red); }
-    50% { opacity: 0.5; transform: scale(0.8); box-shadow: 0 0 25px var(--red); }
-  }
-
-  .hero-netflix {
-    font-size: clamp(100px, 20vw, 240px);
-    font-weight: 900;
-    letter-spacing: -8px;
-    line-height: 0.85;
-    background: linear-gradient(135deg, 
-      #E50914 0%, 
-      #FF4444 30%, 
-      #FF6B6B 50%, 
-      #E50914 70%, 
-      #B81D24 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: fadeInUp 1s 0.2s ease both;
-    margin-bottom: 16px;
-    position: relative;
-    z-index: 1;
-    filter: drop-shadow(0 0 60px rgba(229, 9, 20, 0.5));
-  }
-
-  .hero-netflix::before {
-    content: 'NETFLIX';
-    position: absolute;
-    inset: 0;
-    background: inherit;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: blur(80px);
-    opacity: 0.5;
-    animation: logoPulse 5s ease-in-out infinite;
-  }
-
-  @keyframes logoPulse {
-    0%, 100% { opacity: 0.4; filter: blur(80px); }
-    50% { opacity: 0.7; filter: blur(100px); }
-  }
-
-  .hero-title {
-    font-size: clamp(28px, 5vw, 52px);
-    font-weight: 700;
-    letter-spacing: 10px;
-    margin-bottom: 20px;
-    color: #fff;
-    animation: fadeInUp 1s 0.4s ease both;
-    text-transform: uppercase;
-    position: relative;
-    z-index: 1;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }
-
-  .hero-subtitle {
-    font-size: clamp(14px, 2vw, 18px);
-    color: var(--text-dim);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    animation: fadeInUp 1s 0.5s ease both;
-    margin-bottom: 56px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-    max-width: 900px;
-    width: 100%;
-    animation: fadeInUp 1s 0.6s ease both;
-    margin-bottom: 64px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-stat {
-    text-align: center;
-    padding: 28px 20px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-stat::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  .hero-stat::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.12) 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  .hero-stat:hover {
-    border-color: rgba(229, 9, 20, 0.5);
-    transform: translateY(-10px) scale(1.08);
-    background: linear-gradient(180deg, rgba(229,9,20,0.12), rgba(229,9,20,0.04));
-    box-shadow: 0 20px 60px rgba(229,9,20,0.3);
-  }
-
-  .hero-stat:hover::before,
-  .hero-stat:hover::after {
-    opacity: 1;
-  }
-
-  .hero-stat .num {
-    font-size: clamp(32px, 5vw, 48px);
-    font-weight: 900;
-    background: linear-gradient(135deg, #fff 0%, #E50914 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 8px;
-    font-variant-numeric: tabular-nums;
-    filter: drop-shadow(0 2px 8px rgba(229, 9, 20, 0.3));
-  }
-
-  .hero-stat .label {
-    font-size: 12px;
-    color: var(--text-muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-
-  .hero-cta {
-    display: flex;
-    gap: 20px;
-    animation: fadeInUp 1s 0.7s ease both;
-    flex-wrap: wrap;
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    padding: 18px 40px;
-    background: var(--red);
-    color: #fff;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 16px;
-    border-radius: 8px;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    letter-spacing: 1px;
-    box-shadow: 0 8px 24px rgba(229, 9, 20, 0.4);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-primary::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transform: translateX(-100%);
-    transition: transform 0.5s ease;
-  }
-
-  .btn-primary:hover {
-    background: #F40612;
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 16px 48px rgba(229, 9, 20, 0.5);
-  }
-
-  .btn-primary:hover::before {
-    transform: translateX(100%);
-  }
-
-  .btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    padding: 18px 40px;
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 2px solid rgba(255,255,255,0.25);
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    letter-spacing: 1px;
-  }
-
-  .btn-secondary:hover {
-    border-color: rgba(255,255,255,0.5);
-    background: rgba(255,255,255,0.12);
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
-  }
-
-  .scroll-indicator {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    color: var(--text-muted);
-    font-size: 12px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    animation: bounce 2.5s ease-in-out infinite;
-    z-index: 1;
-  }
-
-  .scroll-indicator .arrow {
-    width: 24px;
-    height: 24px;
-    border-right: 3px solid var(--text-muted);
-    border-bottom: 3px solid var(--text-muted);
-    transform: rotate(45deg);
-    transition: border-color 0.3s ease;
-  }
-
-  .scroll-indicator:hover .arrow {
-    border-color: var(--red);
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
-    50% { transform: translateX(-50%) translateY(15px); opacity: 1; }
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(50px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .nav-cards-section {
-    padding: 100px 0;
-    position: relative;
-  }
-
-  .nav-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-    margin-top: 32px;
-  }
-
-  .nav-card {
-    display: block;
-    text-decoration: none;
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 36px 28px;
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    position: relative;
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(50px);
-  }
-
-  .nav-card.visible {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.8s ease, transform 0.8s ease, border-color 0.5s ease, box-shadow 0.5s ease;
-  }
-
-  .nav-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--red), var(--red-light));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.5s ease;
-  }
-
-  .nav-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.1) 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    pointer-events: none;
-  }
-
-  .nav-card:hover {
-    border-color: rgba(229, 9, 20, 0.5);
-    transform: translateY(-12px) scale(1.05);
-    box-shadow: 0 24px 80px rgba(229,9,20,0.25), 0 0 60px rgba(229,9,20,0.15);
-  }
-
-  .nav-card:hover::before {
-    transform: scaleX(1);
-  }
-
-  .nav-card:hover::after {
-    opacity: 1;
-  }
-
-  .nav-card .nav-step {
-    font-size: 12px;
-    font-weight: 800;
-    color: var(--red);
-    letter-spacing: 3px;
-    margin-bottom: 20px;
-    text-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
-  }
-
-  .nav-card .nav-icon {
-    font-size: 48px;
-    margin-bottom: 24px;
-    display: block;
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
-    transition: transform 0.5s ease;
-  }
-
-  .nav-card:hover .nav-icon {
-    transform: scale(1.15) translateY(-5px);
-  }
-
-  .nav-card h3 {
-    font-size: 20px;
-    font-weight: 800;
-    margin-bottom: 12px;
-    color: #fff;
-    letter-spacing: -0.5px;
-  }
-
-  .nav-card p {
-    font-size: 14px;
-    color: var(--text-dim);
-    line-height: 1.8;
-    margin-bottom: 24px;
-  }
-
-  .nav-card .nav-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--red);
-    transition: all 0.4s ease;
-    position: relative;
-  }
-
-  .nav-card .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--red);
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.4s ease;
-  }
-
-  .nav-card:hover .nav-link {
-    gap: 16px;
-  }
-
-  .nav-card:hover .nav-link::after {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-
-  .feature-section {
-    padding: 100px 0;
-    position: relative;
-  }
-
-  .feature-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 48px;
-    align-items: center;
-    margin-top: 40px;
-  }
-
-  .feature-content h3 {
-    font-size: 32px;
-    font-weight: 800;
-    margin-bottom: 20px;
-    color: #fff;
-    line-height: 1.3;
-    letter-spacing: -1px;
-  }
-
-  .feature-content p {
-    color: var(--text-dim);
-    line-height: 1.9;
-    margin-bottom: 24px;
-    font-size: 15px;
-  }
-
-  .feature-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .feature-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 14px 0;
-    color: rgba(255,255,255,0.85);
-    font-size: 14px;
-    line-height: 1.8;
-    transition: all 0.3s ease;
-  }
-
-  .feature-list li:hover {
-    color: #fff;
-    transform: translateX(8px);
-  }
-
-  .feature-list li::before {
-    content: '✓';
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    background: rgba(229, 9, 20, 0.2);
-    color: var(--red);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 900;
-    margin-top: 2px;
-    box-shadow: 0 0 10px rgba(229, 9, 20, 0.3);
-  }
-
-  .feature-visual {
-    background: linear-gradient(135deg, rgba(229,9,20,0.15), rgba(229,9,20,0.05));
-    border: 1px solid rgba(229, 9, 20, 0.3);
-    border-radius: 20px;
-    padding: 48px;
-    min-height: 360px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 12px 48px rgba(229, 9, 20, 0.2);
-  }
-
-  .feature-visual::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(229,9,20,0.2) 0%, transparent 60%);
-    animation: rotate 25s linear infinite;
-  }
-
-  .feature-visual::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(229, 9, 20, 0.1) 0%, transparent 50%);
-    animation: pulse 4s ease-in-out infinite;
-  }
-
-  @keyframes rotate {
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 0.5; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.1); }
-  }
-
-  .feature-visual-content {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-  }
-
-  .feature-visual-content .big-num {
-    font-size: 96px;
-    font-weight: 900;
-    background: linear-gradient(135deg, #fff 0%, #E50914 50%, #FF4444 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 0 40px rgba(229, 9, 20, 0.5));
-    animation: numPulse 3s ease-in-out infinite;
-  }
-
-  @keyframes numPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-  }
-
-  .feature-visual-content .big-label {
-    font-size: 16px;
-    color: var(--text-dim);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    font-weight: 700;
-  }
-
-  @media (max-width: 900px) {
-    .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .nav-cards-grid { grid-template-columns: 1fr 1fr; }
-    .feature-grid { grid-template-columns: 1fr; gap: 24px; }
-    .hero-netflix { letter-spacing: -3px; }
-  }
-
-  @media (max-width: 600px) {
-    .nav-cards-grid { grid-template-columns: 1fr; }
-    .hero-stats { grid-template-columns: repeat(2, 1fr); }
-  }
-</style>
 </head>
 <body>
 <div class="bg-layer"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
 <nav class="nav" id="nav">
   <a href="index.html" class="nav-brand">
@@ -656,829 +47,64 @@
   </ul>
 </nav>
 
-<div class="container" style="padding-top: 40px; padding-bottom: 60px;">
-    <div class="box">
-                <div id="4a157727c7184568a07bdd19cc55185c" class="chart-container" style="width:100%; height:500px; "></div>
-    <script>
-        var chart_4a157727c7184568a07bdd19cc55185c = echarts.init(
-            document.getElementById('4a157727c7184568a07bdd19cc55185c'), 'dark', {renderer: 'canvas', locale: 'ZH'});
-        var option_4a157727c7184568a07bdd19cc55185c = {
-    "animation": true,
-    "animationThreshold": 2000,
-    "animationDuration": 1000,
-    "animationEasing": "cubicOut",
-    "animationDelay": 0,
-    "animationDurationUpdate": 300,
-    "animationEasingUpdate": "cubicOut",
-    "animationDelayUpdate": 0,
-    "aria": {
-        "enabled": false
-    },
-    "series": [
-        {
-            "type": "pie",
-            "name": "Content Type",
-            "colorBy": "data",
-            "legendHoverLink": true,
-            "selectedMode": false,
-            "selectedOffset": 10,
-            "clockwise": true,
-            "startAngle": 90,
-            "minAngle": 0,
-            "minShowLabelAngle": 0,
-            "avoidLabelOverlap": true,
-            "stillShowZeroSum": true,
-            "percentPrecision": 2,
-            "showEmptyCircle": true,
-            "emptyCircleStyle": {
-                "color": "lightgray",
-                "borderColor": "#000",
-                "borderWidth": 0,
-                "borderType": "solid",
-                "borderDashOffset": 0,
-                "borderCap": "butt",
-                "borderJoin": "bevel",
-                "borderMiterLimit": 10,
-                "opacity": 1
-            },
-            "data": [
-                {
-                    "name": "Movie",
-                    "value": null
-                },
-                {
-                    "name": "TV Show",
-                    "value": null
-                }
-            ],
-            "radius": [
-                "40%",
-                "70%"
-            ],
-            "center": [
-                "50%",
-                "50%"
-            ],
-            "label": {
-                "show": true,
-                "color": "#fff",
-                "margin": 8,
-                "fontSize": 14,
-                "formatter": "{b}: {c} ({d}%)",
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "labelLine": {
-                "show": true,
-                "showAbove": false,
-                "length": 15,
-                "length2": 15,
-                "smooth": false,
-                "minTurnAngle": 90,
-                "maxSurfaceAngle": 90
-            },
-            "itemStyle": {
-                "borderColor": "#0e0e0e",
-                "borderWidth": 2
-            }
-        }
-    ],
-    "legend": [
-        {
-            "data": [
-                "Movie",
-                "TV Show"
-            ],
-            "selected": {},
-            "show": true,
-            "right": "10px",
-            "top": "middle",
-            "orient": "vertical",
-            "padding": 5,
-            "itemGap": 10,
-            "itemWidth": 25,
-            "itemHeight": 14,
-            "backgroundColor": "transparent",
-            "borderColor": "#ccc",
-            "borderRadius": 0,
-            "pageButtonItemGap": 5,
-            "pageButtonPosition": "end",
-            "pageFormatter": "{current}/{total}",
-            "pageIconColor": "#2f4554",
-            "pageIconInactiveColor": "#aaa",
-            "pageIconSize": 15,
-            "animationDurationUpdate": 800,
-            "selector": false,
-            "selectorPosition": "auto",
-            "selectorItemGap": 7,
-            "selectorButtonGap": 10,
-            "triggerEvent": false
-        }
-    ],
-    "tooltip": {
-        "show": true,
-        "trigger": "item",
-        "triggerOn": "mousemove|click",
-        "axisPointer": {
-            "type": "line"
-        },
-        "showContent": true,
-        "alwaysShowContent": false,
-        "showDelay": 0,
-        "hideDelay": 100,
-        "enterable": false,
-        "confine": false,
-        "appendToBody": false,
-        "transitionDuration": 0.4,
-        "displayTransition": true,
-        "textStyle": {
-            "fontSize": 14,
-            "richInheritPlainLabel": true
-        },
-        "borderWidth": 0,
-        "padding": 5,
-        "order": "seriesAsc"
-    },
-    "color": [
-        "#E50914",
-        "#831010"
-    ],
-    "title": [
-        {
-            "show": true,
-            "text": "\ud83c\udfac Netflix Content Type Distribution",
-            "target": "blank",
-            "subtext": "Total: 8807 titles",
-            "subtarget": "blank",
-            "left": "center",
-            "padding": 5,
-            "itemGap": 10,
-            "textAlign": "auto",
-            "textVerticalAlign": "auto",
-            "triggerEvent": false,
-            "textStyle": {
-                "color": "#fff",
-                "fontWeight": "bold",
-                "fontSize": 20,
-                "richInheritPlainLabel": true
-            }
-        }
-    ]
-};
-        chart_4a157727c7184568a07bdd19cc55185c.setOption(option_4a157727c7184568a07bdd19cc55185c);
-            window.addEventListener('resize', function(){
-                chart_4a157727c7184568a07bdd19cc55185c.resize();
-            })
-    </script>
-<br/>                <div id="9408ce8494474051ac0a710f2d3c35d6" class="chart-container" style="width:100%; height:550px; "></div>
-    <script>
-        var chart_9408ce8494474051ac0a710f2d3c35d6 = echarts.init(
-            document.getElementById('9408ce8494474051ac0a710f2d3c35d6'), 'dark', {renderer: 'canvas', locale: 'ZH'});
-        var option_9408ce8494474051ac0a710f2d3c35d6 = {
-    "animation": true,
-    "animationThreshold": 2000,
-    "animationDuration": 1000,
-    "animationEasing": "cubicOut",
-    "animationDelay": 0,
-    "animationDurationUpdate": 300,
-    "animationEasingUpdate": "cubicOut",
-    "animationDelayUpdate": 0,
-    "aria": {
-        "enabled": false
-    },
-    "series": [
-        {
-            "type": "line",
-            "name": "Movies",
-            "connectNulls": false,
-            "xAxisIndex": 0,
-            "symbolSize": 8,
-            "showSymbol": true,
-            "smooth": true,
-            "clip": true,
-            "step": false,
-            "stackStrategy": "samesign",
-            "data": [
-                [
-                    2008,
-                    1.0
-                ],
-                [
-                    2009,
-                    2.0
-                ],
-                [
-                    2010,
-                    1.0
-                ],
-                [
-                    2011,
-                    13.0
-                ],
-                [
-                    2012,
-                    3.0
-                ],
-                [
-                    2013,
-                    6.0
-                ],
-                [
-                    2014,
-                    19.0
-                ],
-                [
-                    2015,
-                    56.0
-                ],
-                [
-                    2016,
-                    253.0
-                ],
-                [
-                    2017,
-                    839.0
-                ],
-                [
-                    2018,
-                    1237.0
-                ],
-                [
-                    2019,
-                    1424.0
-                ],
-                [
-                    2020,
-                    1284.0
-                ],
-                [
-                    2021,
-                    993.0
-                ]
-            ],
-            "hoverAnimation": true,
-            "label": {
-                "show": false,
-                "margin": 8,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "logBase": 10,
-            "seriesLayoutBy": "column",
-            "lineStyle": {
-                "show": false,
-                "width": 4,
-                "color": "#E50914"
-            },
-            "areaStyle": {
-                "opacity": 0.2,
-                "color": "#E50914"
-            },
-            "itemStyle": {
-                "color": "#E50914"
-            },
-            "zlevel": 0,
-            "z": 0
-        },
-        {
-            "type": "line",
-            "name": "TV Shows",
-            "connectNulls": false,
-            "xAxisIndex": 0,
-            "symbolSize": 8,
-            "showSymbol": true,
-            "smooth": true,
-            "clip": true,
-            "step": false,
-            "stackStrategy": "samesign",
-            "data": [
-                [
-                    2008,
-                    1.0
-                ],
-                [
-                    2009,
-                    0.0
-                ],
-                [
-                    2010,
-                    0.0
-                ],
-                [
-                    2011,
-                    0.0
-                ],
-                [
-                    2012,
-                    0.0
-                ],
-                [
-                    2013,
-                    5.0
-                ],
-                [
-                    2014,
-                    5.0
-                ],
-                [
-                    2015,
-                    26.0
-                ],
-                [
-                    2016,
-                    176.0
-                ],
-                [
-                    2017,
-                    349.0
-                ],
-                [
-                    2018,
-                    412.0
-                ],
-                [
-                    2019,
-                    592.0
-                ],
-                [
-                    2020,
-                    605.0
-                ],
-                [
-                    2021,
-                    505.0
-                ]
-            ],
-            "hoverAnimation": true,
-            "label": {
-                "show": false,
-                "margin": 8,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "logBase": 10,
-            "seriesLayoutBy": "column",
-            "lineStyle": {
-                "show": false,
-                "width": 4,
-                "color": "#FFD700"
-            },
-            "areaStyle": {
-                "opacity": 0.2,
-                "color": "#FFD700"
-            },
-            "itemStyle": {
-                "color": "#FFD700"
-            },
-            "zlevel": 0,
-            "z": 0
-        }
-    ],
-    "legend": [
-        {
-            "data": [
-                "Movies",
-                "TV Shows"
-            ],
-            "selected": {},
-            "show": true,
-            "top": "50px",
-            "padding": 5,
-            "itemGap": 10,
-            "itemWidth": 25,
-            "itemHeight": 14,
-            "textStyle": {
-                "color": "#fff",
-                "richInheritPlainLabel": true
-            },
-            "backgroundColor": "transparent",
-            "borderColor": "#ccc",
-            "borderRadius": 0,
-            "pageButtonItemGap": 5,
-            "pageButtonPosition": "end",
-            "pageFormatter": "{current}/{total}",
-            "pageIconColor": "#2f4554",
-            "pageIconInactiveColor": "#aaa",
-            "pageIconSize": 15,
-            "animationDurationUpdate": 800,
-            "selector": false,
-            "selectorPosition": "auto",
-            "selectorItemGap": 7,
-            "selectorButtonGap": 10,
-            "triggerEvent": false
-        }
-    ],
-    "tooltip": {
-        "show": true,
-        "trigger": "axis",
-        "triggerOn": "mousemove|click",
-        "axisPointer": {
-            "type": "line"
-        },
-        "showContent": true,
-        "alwaysShowContent": false,
-        "showDelay": 0,
-        "hideDelay": 100,
-        "enterable": false,
-        "confine": false,
-        "appendToBody": false,
-        "transitionDuration": 0.4,
-        "displayTransition": true,
-        "textStyle": {
-            "fontSize": 14,
-            "richInheritPlainLabel": true
-        },
-        "borderWidth": 0,
-        "padding": 5,
-        "order": "seriesAsc"
-    },
-    "xAxis": [
-        {
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLabel": {
-                "show": true,
-                "color": "#ccc",
-                "margin": 8,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": true,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0,
-            "data": [
-                2008,
-                2009,
-                2010,
-                2011,
-                2012,
-                2013,
-                2014,
-                2015,
-                2016,
-                2017,
-                2018,
-                2019,
-                2020,
-                2021
-            ]
-        }
-    ],
-    "yAxis": [
-        {
-            "name": "Count",
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLabel": {
-                "show": true,
-                "color": "#ccc",
-                "margin": 8,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": true,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0
-        }
-    ],
-    "title": [
-        {
-            "show": true,
-            "text": "\ud83d\udcc8 Yearly Content Addition Trend",
-            "target": "blank",
-            "subtarget": "blank",
-            "left": "center",
-            "padding": 5,
-            "itemGap": 10,
-            "textAlign": "auto",
-            "textVerticalAlign": "auto",
-            "triggerEvent": false,
-            "textStyle": {
-                "color": "#fff",
-                "fontWeight": "bold",
-                "fontSize": 20,
-                "richInheritPlainLabel": true
-            }
-        }
-    ]
-};
-        chart_9408ce8494474051ac0a710f2d3c35d6.setOption(option_9408ce8494474051ac0a710f2d3c35d6);
-            window.addEventListener('resize', function(){
-                chart_9408ce8494474051ac0a710f2d3c35d6.resize();
-            })
-    </script>
-<br/>                <div id="0e289ab5bb3d4266bc137a6941fe62c7" class="chart-container" style="width:100%; height:600px; "></div>
-    <script>
-        var chart_0e289ab5bb3d4266bc137a6941fe62c7 = echarts.init(
-            document.getElementById('0e289ab5bb3d4266bc137a6941fe62c7'), 'dark', {renderer: 'canvas', locale: 'ZH'});
-        var option_0e289ab5bb3d4266bc137a6941fe62c7 = {
-    "animation": true,
-    "animationThreshold": 2000,
-    "animationDuration": 1000,
-    "animationEasing": "cubicOut",
-    "animationDelay": 0,
-    "animationDurationUpdate": 300,
-    "animationEasingUpdate": "cubicOut",
-    "animationDelayUpdate": 0,
-    "aria": {
-        "enabled": false
-    },
-    "series": [
-        {
-            "type": "bar",
-            "name": "Count",
-            "legendHoverLink": true,
-            "data": [
-                2036,
-                2144,
-                4281,
-                4354,
-                4554,
-                7088,
-                7281,
-                8592,
-                8807,
-                8807,
-                9527,
-                10182,
-                10542,
-                12880,
-                20024
-            ],
-            "realtimeSort": false,
-            "showBackground": false,
-            "stackStrategy": "samesign",
-            "cursor": "pointer",
-            "barMinHeight": 0,
-            "barCategoryGap": "40%",
-            "barGap": "30%",
-            "large": false,
-            "largeThreshold": 400,
-            "seriesLayoutBy": "column",
-            "datasetIndex": 0,
-            "clip": true,
-            "zlevel": 0,
-            "z": 2,
-            "label": {
-                "show": true,
-                "position": "right",
-                "color": "#fff",
-                "margin": 8,
-                "fontSize": 12,
-                "fontWeight": "bold",
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "itemStyle": {
-                "color": {
-                    "type": "linear",
-                    "x": 0,
-                    "y": 0,
-                    "x2": 1,
-                    "y2": 0,
-                    "colorStops": [
-                        {
-                            "offset": 0,
-                            "color": "#E50914"
-                        },
-                        {
-                            "offset": 1,
-                            "color": "#FF6464"
-                        }
-                    ]
-                },
-                "borderRadius": [
-                    0,
-                    8,
-                    8,
-                    0
-                ]
-            }
-        }
-    ],
-    "legend": [
-        {
-            "data": [
-                "Count"
-            ],
-            "selected": {},
-            "show": false,
-            "padding": 5,
-            "itemGap": 10,
-            "itemWidth": 25,
-            "itemHeight": 14,
-            "backgroundColor": "transparent",
-            "borderColor": "#ccc",
-            "borderRadius": 0,
-            "pageButtonItemGap": 5,
-            "pageButtonPosition": "end",
-            "pageFormatter": "{current}/{total}",
-            "pageIconColor": "#2f4554",
-            "pageIconInactiveColor": "#aaa",
-            "pageIconSize": 15,
-            "animationDurationUpdate": 800,
-            "selector": false,
-            "selectorPosition": "auto",
-            "selectorItemGap": 7,
-            "selectorButtonGap": 10,
-            "triggerEvent": false
-        }
-    ],
-    "tooltip": {
-        "show": true,
-        "trigger": "item",
-        "triggerOn": "mousemove|click",
-        "axisPointer": {
-            "type": "line"
-        },
-        "showContent": true,
-        "alwaysShowContent": false,
-        "showDelay": 0,
-        "hideDelay": 100,
-        "enterable": false,
-        "confine": false,
-        "appendToBody": false,
-        "transitionDuration": 0.4,
-        "displayTransition": true,
-        "textStyle": {
-            "fontSize": 14,
-            "richInheritPlainLabel": true
-        },
-        "borderWidth": 0,
-        "padding": 5,
-        "order": "seriesAsc"
-    },
-    "xAxis": [
-        {
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLabel": {
-                "show": true,
-                "color": "#ccc",
-                "margin": 8,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": true,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0
-        }
-    ],
-    "yAxis": [
-        {
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLabel": {
-                "show": true,
-                "color": "#fff",
-                "margin": 8,
-                "fontSize": 13,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": true,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0,
-            "data": [
-                ",",
-                "o",
-                "s",
-                "S",
-                "U",
-                " ",
-                "d",
-                "i",
-                "]",
-                "[",
-                "n",
-                "a",
-                "e",
-                "t",
-                "'"
-            ]
-        }
-    ],
-    "title": [
-        {
-            "show": true,
-            "text": "\ud83c\udf0d Top Countries by Production",
-            "target": "blank",
-            "subtarget": "blank",
-            "left": "center",
-            "padding": 5,
-            "itemGap": 10,
-            "textAlign": "auto",
-            "textVerticalAlign": "auto",
-            "triggerEvent": false,
-            "textStyle": {
-                "color": "#fff",
-                "fontWeight": "bold",
-                "fontSize": 20,
-                "richInheritPlainLabel": true
-            }
-        }
-    ]
-};
-        chart_0e289ab5bb3d4266bc137a6941fe62c7.setOption(option_0e289ab5bb3d4266bc137a6941fe62c7);
-            window.addEventListener('resize', function(){
-                chart_0e289ab5bb3d4266bc137a6941fe62c7.resize();
-            })
-    </script>
-</div>
+<div class="container">
+  <header class="page-header">
+    <div class="page-badge"><span class="dot"></span> DATA VISUALIZATION</div>
+    <h1>可视化分析结果</h1>
+    <p class="page-subtitle">Interactive Charts · Data Insights · Visual Analytics</p>
+    <div class="page-divider"></div>
+  </header>
 
-<footer class="footer">
-  <div class="brand">NETFLIX DATA ANALYSIS</div>
-  <div class="copy">基于 Netflix Titles Dataset · 数据分析案例报告</div>
-</footer>
+  <section class="charts-page-section">
+    <div class="section-header">
+      <div class="line"></div>
+      <h2>数据图表</h2>
+      <span class="tag">9 CHARTS</span>
+    </div>
+
+    <div class="charts-page-grid">
+      <div class="chart-page-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🎬</span> Netflix 内容类型分布</div>
+          <span class="badge">PIE CHART</span>
+        </div>
+        <div class="chart-wrap">
+          <div id="chart-type-pie" style="width:100%; height:400px;"></div>
+        </div>
+      </div>
+
+      <div class="chart-page-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">📈</span> 年度新增内容趋势</div>
+          <span class="badge">LINE CHART</span>
+        </div>
+        <div class="chart-wrap">
+          <div id="chart-year-trend" style="width:100%; height:450px;"></div>
+        </div>
+      </div>
+
+      <div class="chart-page-card">
+        <div class="card-head">
+          <div class="title"><span class="emoji">🌍</span> 制片国家 Top 15</div>
+          <span class="badge">BAR CHART</span>
+        </div>
+        <div class="chart-wrap">
+          <div id="chart-countries" style="width:100%; height:500px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="brand">NETFLIX DATA ANALYSIS</div>
+    <div class="copy">基于 Netflix Titles Dataset · 数据分析案例报告</div>
+  </footer>
+</div>
 
 <script src="js/main.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const navCards = document.querySelectorAll('.nav-card');
+    const chartCards = document.querySelectorAll('.chart-page-card');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
@@ -1490,7 +116,208 @@
       });
     }, { threshold: 0.1 });
 
-    navCards.forEach(card => observer.observe(card));
+    chartCards.forEach(card => observer.observe(card));
+
+    // Chart 1: Content Type Pie
+    var chart1 = echarts.init(document.getElementById('chart-type-pie'), null, {renderer: 'canvas', locale: 'ZH'});
+    var option1 = {
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'item',
+        formatter: '{b}: {c} ({d}%)',
+        backgroundColor: 'rgba(14, 14, 14, 0.98)',
+        borderColor: 'rgba(229, 9, 20, 0.5)',
+        borderWidth: 2,
+        textStyle: { color: '#fff', fontSize: 14 },
+        extraCssText: 'box-shadow: 0 12px 40px rgba(229, 9, 20, 0.35); border-radius: 12px; backdrop-filter: blur(16px);'
+      },
+      legend: {
+        orient: 'vertical',
+        right: '5%',
+        top: 'middle',
+        textStyle: { color: 'rgba(255,255,255,0.7)', fontSize: 13 },
+        itemGap: 16,
+        icon: 'roundRect'
+      },
+      series: [
+        {
+          name: '内容类型',
+          type: 'pie',
+          radius: ['45%', '75%'],
+          center: ['38%', '50%'],
+          avoidLabelOverlap: true,
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: 'rgba(8,8,8,0.8)',
+            borderWidth: 4
+          },
+          label: {
+            show: true,
+            color: '#fff',
+            formatter: '{b}\n{d}%',
+            fontSize: 14,
+            fontWeight: 600,
+            lineHeight: 22
+          },
+          emphasis: {
+            scale: true,
+            scaleSize: 10,
+            itemStyle: {
+              shadowBlur: 30,
+              shadowColor: 'rgba(229, 9, 20, 0.5)'
+            }
+          },
+          data: [
+            { value: 6131, name: '电影', itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{ offset: 0, color: '#E50914' }, { offset: 1, color: '#FF4444' }]) } },
+            { value: 2676, name: '电视节目', itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{ offset: 0, color: '#FFD700' }, { offset: 1, color: '#FFA500' }]) } }
+          ]
+        }
+      ]
+    };
+    chart1.setOption(option1);
+
+    // Chart 2: Year Trend
+    var chart2 = echarts.init(document.getElementById('chart-year-trend'), null, {renderer: 'canvas', locale: 'ZH'});
+    var years = [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021];
+    var moviesData = [1, 2, 1, 13, 3, 6, 19, 56, 253, 839, 1237, 1424, 1284, 993];
+    var tvShowsData = [1, 0, 0, 0, 0, 5, 5, 26, 176, 349, 412, 592, 605, 505];
+    var option2 = {
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'cross', label: { backgroundColor: '#E50914' }, crossStyle: { color: '#999' } },
+        backgroundColor: 'rgba(14, 14, 14, 0.98)',
+        borderColor: 'rgba(229, 9, 20, 0.5)',
+        borderWidth: 2,
+        textStyle: { color: '#fff', fontSize: 14 },
+        extraCssText: 'box-shadow: 0 12px 40px rgba(229, 9, 20, 0.35); border-radius: 12px; backdrop-filter: blur(16px);'
+      },
+      legend: {
+        data: ['电影', '电视节目'],
+        top: 0,
+        textStyle: { color: 'rgba(255,255,255,0.7)' },
+        icon: 'roundRect',
+        itemGap: 24
+      },
+      grid: { left: '3%', right: '3%', top: 50, bottom: 30, containLabel: true },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: years,
+        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
+        axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 12 }
+      },
+      yAxis: {
+        type: 'value',
+        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
+        axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 12 },
+        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)', type: 'dashed' } }
+      },
+      series: [
+        {
+          name: '电影',
+          type: 'line',
+          smooth: 0.4,
+          symbol: 'circle',
+          symbolSize: 6,
+          showSymbol: false,
+          data: moviesData,
+          itemStyle: { color: '#E50914' },
+          lineStyle: { width: 3, color: '#E50914', shadowBlur: 8, shadowColor: 'rgba(229,9,20,0.3)' },
+          areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(229, 9, 20, 0.35)' }, { offset: 1, color: 'rgba(229, 9, 20, 0)' }]) },
+          emphasis: { focus: 'series' }
+        },
+        {
+          name: '电视节目',
+          type: 'line',
+          smooth: 0.4,
+          symbol: 'circle',
+          symbolSize: 6,
+          showSymbol: false,
+          data: tvShowsData,
+          itemStyle: { color: '#FFD700' },
+          lineStyle: { width: 3, color: '#FFD700', shadowBlur: 8, shadowColor: 'rgba(255,215,0,0.2)' },
+          areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(255, 215, 0, 0.25)' }, { offset: 1, color: 'rgba(255, 215, 0, 0)' }]) },
+          emphasis: { focus: 'series' }
+        }
+      ]
+    };
+    chart2.setOption(option2);
+
+    // Chart 3: Top Countries
+    var chart3 = echarts.init(document.getElementById('chart-countries'), null, {renderer: 'canvas', locale: 'ZH'});
+    var countries = [
+      'United States', 'India', 'United Kingdom', 'Japan', 'South Korea',
+      'Canada', 'Spain', 'France', 'Egypt', 'Mexico',
+      'Turkey', 'Australia', 'Taiwan', 'China', 'Nigeria'
+    ].reverse();
+    var countryCounts = [
+      2818, 972, 419, 245, 199,
+      181, 145, 124, 112, 110,
+      106, 102, 90, 87, 83
+    ].reverse();
+    var option3 = {
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        backgroundColor: 'rgba(14, 14, 14, 0.98)',
+        borderColor: 'rgba(229, 9, 20, 0.5)',
+        borderWidth: 2,
+        textStyle: { color: '#fff', fontSize: 14 },
+        extraCssText: 'box-shadow: 0 12px 40px rgba(229, 9, 20, 0.35); border-radius: 12px; backdrop-filter: blur(16px);',
+        formatter: function(params) {
+          return params[0].name + '<br/>数量：<b>' + params[0].value + '</b>';
+        }
+      },
+      grid: { left: '2%', right: '10%', top: 10, bottom: 10, containLabel: true },
+      xAxis: {
+        type: 'value',
+        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
+        axisLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 12 },
+        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)', type: 'dashed' } }
+      },
+      yAxis: {
+        type: 'category',
+        data: countries,
+        axisLine: { show: false },
+        axisLabel: { color: 'rgba(255,255,255,0.75)', fontSize: 12 }
+      },
+      series: [
+        {
+          type: 'bar',
+          data: countryCounts.map((v, i) => ({
+            value: v,
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                { offset: 0, color: 'rgba(131, 16, 16, 0.6)' },
+                { offset: 1, color: '#E50914' }
+              ]),
+              borderRadius: [0, 8, 8, 0]
+            }
+          })),
+          barWidth: '55%',
+          label: {
+            show: true,
+            position: 'right',
+            color: 'rgba(255,255,255,0.85)',
+            fontWeight: 600,
+            fontSize: 12
+          },
+          emphasis: {
+            itemStyle: { shadowBlur: 15, shadowColor: 'rgba(229,9,20,0.4)' }
+          }
+        }
+      ]
+    };
+    chart3.setOption(option3);
+
+    // Responsive resize
+    window.addEventListener('resize', function() {
+      chart1.resize();
+      chart2.resize();
+      chart3.resize();
+    });
   });
 </script>
 </body>
