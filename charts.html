@@ -1,14 +1,661 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>Awesome-pyecharts</title>
-                <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>可视化结果 - Netflix 数据分析</title>
+<meta name="description" content="Netflix 电影与电视节目数据分析可视化 — 8,807 部作品的深度洞察">
+<meta name="keywords" content="Netflix, 数据分析，可视化，ECharts, Python, 数据科学">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23E50914'/><text x='50' y='68' font-size='56' fill='white' text-anchor='middle' font-weight='900'>N</text></svg>">
 
-    
+<meta property="og:type" content="website">
+<meta property="og:title" content="Netflix 数据分析 · 可视化看板">
+<meta property="og:description" content="8,807部作品 × 9个交互式图表，深度分析Netflix内容库。">
+<meta property="og:url" content="https://heng0128.github.io/netflix-data-analysis/">
+<meta property="og:image" content="https://heng0128.github.io/netflix-data-analysis/css/style.css">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Netflix 数据分析 · 可视化看板">
+<meta name="theme-color" content="#E50914">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* Netflix Hero - Full Screen Immersive Style */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    text-align: center;
+    background: linear-gradient(180deg, 
+      rgba(0,0,0,0) 0%, 
+      rgba(0,0,0,0.3) 30%, 
+      rgba(0,0,0,0.6) 60%, 
+      rgba(20,20,20,0.95) 100%
+    );
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 120% 80% at 50% -30%, rgba(229, 9, 20, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse 80% 60% at 70% 10%, rgba(229, 9, 20, 0.1) 0%, transparent 40%);
+    animation: heroGlow 6s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  @keyframes heroGlow {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(229, 9, 20, 0.15);
+    border: 1px solid rgba(229, 9, 20, 0.4);
+    border-radius: 100px;
+    padding: 10px 28px 10px 14px;
+    margin-bottom: 40px;
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: fadeInUp 1s ease both;
+    box-shadow: 0 8px 32px rgba(229, 9, 20, 0.25);
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badge .dot {
+    width: 10px;
+    height: 10px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulseDot 2s ease-in-out infinite;
+    box-shadow: 0 0 15px var(--red);
+  }
+
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 15px var(--red); }
+    50% { opacity: 0.5; transform: scale(0.8); box-shadow: 0 0 25px var(--red); }
+  }
+
+  .hero-netflix {
+    font-size: clamp(100px, 20vw, 240px);
+    font-weight: 900;
+    letter-spacing: -8px;
+    line-height: 0.85;
+    background: linear-gradient(135deg, 
+      #E50914 0%, 
+      #FF4444 30%, 
+      #FF6B6B 50%, 
+      #E50914 70%, 
+      #B81D24 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 1s 0.2s ease both;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 0 60px rgba(229, 9, 20, 0.5));
+  }
+
+  .hero-netflix::before {
+    content: 'NETFLIX';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: logoPulse 5s ease-in-out infinite;
+  }
+
+  @keyframes logoPulse {
+    0%, 100% { opacity: 0.4; filter: blur(80px); }
+    50% { opacity: 0.7; filter: blur(100px); }
+  }
+
+  .hero-title {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    letter-spacing: 10px;
+    margin-bottom: 20px;
+    color: #fff;
+    animation: fadeInUp 1s 0.4s ease both;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(14px, 2vw, 18px);
+    color: var(--text-dim);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    animation: fadeInUp 1s 0.5s ease both;
+    margin-bottom: 56px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 900px;
+    width: 100%;
+    animation: fadeInUp 1s 0.6s ease both;
+    margin-bottom: 64px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-stat {
+    text-align: center;
+    padding: 28px 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .hero-stat::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.12) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .hero-stat:hover {
+    border-color: rgba(229, 9, 20, 0.5);
+    transform: translateY(-10px) scale(1.08);
+    background: linear-gradient(180deg, rgba(229,9,20,0.12), rgba(229,9,20,0.04));
+    box-shadow: 0 20px 60px rgba(229,9,20,0.3);
+  }
+
+  .hero-stat:hover::before,
+  .hero-stat:hover::after {
+    opacity: 1;
+  }
+
+  .hero-stat .num {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #E50914 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+    filter: drop-shadow(0 2px 8px rgba(229, 9, 20, 0.3));
+  }
+
+  .hero-stat .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 20px;
+    animation: fadeInUp 1s 0.7s ease both;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 40px;
+    background: var(--red);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    letter-spacing: 1px;
+    box-shadow: 0 8px 24px rgba(229, 9, 20, 0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+
+  .btn-primary:hover {
+    background: #F40612;
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 16px 48px rgba(229, 9, 20, 0.5);
+  }
+
+  .btn-primary:hover::before {
+    transform: translateX(100%);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 40px;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.25);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    letter-spacing: 1px;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.12);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: bounce 2.5s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .scroll-indicator .arrow {
+    width: 24px;
+    height: 24px;
+    border-right: 3px solid var(--text-muted);
+    border-bottom: 3px solid var(--text-muted);
+    transform: rotate(45deg);
+    transition: border-color 0.3s ease;
+  }
+
+  .scroll-indicator:hover .arrow {
+    border-color: var(--red);
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
+    50% { transform: translateX(-50%) translateY(15px); opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .nav-cards-section {
+    padding: 100px 0;
+    position: relative;
+  }
+
+  .nav-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .nav-card {
+    display: block;
+    text-decoration: none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 36px 28px;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  .nav-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.8s ease, transform 0.8s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+  }
+
+  .nav-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--red), var(--red-light));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+  }
+
+  .nav-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(229, 9, 20, 0.1) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+
+  .nav-card:hover {
+    border-color: rgba(229, 9, 20, 0.5);
+    transform: translateY(-12px) scale(1.05);
+    box-shadow: 0 24px 80px rgba(229,9,20,0.25), 0 0 60px rgba(229,9,20,0.15);
+  }
+
+  .nav-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .nav-card:hover::after {
+    opacity: 1;
+  }
+
+  .nav-card .nav-step {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--red);
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+  }
+
+  .nav-card .nav-icon {
+    font-size: 48px;
+    margin-bottom: 24px;
+    display: block;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+    transition: transform 0.5s ease;
+  }
+
+  .nav-card:hover .nav-icon {
+    transform: scale(1.15) translateY(-5px);
+  }
+
+  .nav-card h3 {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+
+  .nav-card p {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    margin-bottom: 24px;
+  }
+
+  .nav-card .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--red);
+    transition: all 0.4s ease;
+    position: relative;
+  }
+
+  .nav-card .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s ease;
+  }
+
+  .nav-card:hover .nav-link {
+    gap: 16px;
+  }
+
+  .nav-card:hover .nav-link::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .feature-section {
+    padding: 100px 0;
+    position: relative;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    margin-top: 40px;
+  }
+
+  .feature-content h3 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #fff;
+    line-height: 1.3;
+    letter-spacing: -1px;
+  }
+
+  .feature-content p {
+    color: var(--text-dim);
+    line-height: 1.9;
+    margin-bottom: 24px;
+    font-size: 15px;
+  }
+
+  .feature-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    line-height: 1.8;
+    transition: all 0.3s ease;
+  }
+
+  .feature-list li:hover {
+    color: #fff;
+    transform: translateX(8px);
+  }
+
+  .feature-list li::before {
+    content: '✓';
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: rgba(229, 9, 20, 0.2);
+    color: var(--red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+    margin-top: 2px;
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.3);
+  }
+
+  .feature-visual {
+    background: linear-gradient(135deg, rgba(229,9,20,0.15), rgba(229,9,20,0.05));
+    border: 1px solid rgba(229, 9, 20, 0.3);
+    border-radius: 20px;
+    padding: 48px;
+    min-height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 48px rgba(229, 9, 20, 0.2);
+  }
+
+  .feature-visual::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(229,9,20,0.2) 0%, transparent 60%);
+    animation: rotate 25s linear infinite;
+  }
+
+  .feature-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(229, 9, 20, 0.1) 0%, transparent 50%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes rotate {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+  }
+
+  .feature-visual-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .feature-visual-content .big-num {
+    font-size: 96px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #E50914 50%, #FF4444 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 40px rgba(229, 9, 20, 0.5));
+    animation: numPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes numPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .feature-visual-content .big-label {
+    font-size: 16px;
+    color: var(--text-dim);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  @media (max-width: 900px) {
+    .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .nav-cards-grid { grid-template-columns: 1fr 1fr; }
+    .feature-grid { grid-template-columns: 1fr; gap: 24px; }
+    .hero-netflix { letter-spacing: -3px; }
+  }
+
+  @media (max-width: 600px) {
+    .nav-cards-grid { grid-template-columns: 1fr; }
+    .hero-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
 </head>
-<body >
-    <style>.box {  } </style>
+<body>
+<div class="bg-layer"></div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-brand">
+    <div class="logo-mark">N</div>
+    <span>NETFLIX</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-label="菜单" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="requirement.html">需求分析</a></li>
+    <li><a href="code.html">分析代码</a></li>
+    <li><a href="charts.html" class="active">可视化结果</a></li>
+    <li><a href="conclusion.html">分析结论</a></li>
+  </ul>
+</nav>
+
+<div class="container" style="padding-top: 40px; padding-bottom: 60px;">
     <div class="box">
                 <div id="4a157727c7184568a07bdd19cc55185c" class="chart-container" style="width:100%; height:500px; "></div>
     <script>
@@ -820,748 +1467,30 @@
                 chart_0e289ab5bb3d4266bc137a6941fe62c7.resize();
             })
     </script>
-<br/>                <div id="c4b54ef40a864cf5a23cd89f7f70110f" class="chart-container" style="width:100%; height:550px; "></div>
-    <script>
-        var chart_c4b54ef40a864cf5a23cd89f7f70110f = echarts.init(
-            document.getElementById('c4b54ef40a864cf5a23cd89f7f70110f'), 'dark', {renderer: 'canvas', locale: 'ZH'});
-        var option_c4b54ef40a864cf5a23cd89f7f70110f = {
-    "animation": true,
-    "animationThreshold": 2000,
-    "animationDuration": 1000,
-    "animationEasing": "cubicOut",
-    "animationDelay": 0,
-    "animationDurationUpdate": 300,
-    "animationEasingUpdate": "cubicOut",
-    "animationDelayUpdate": 0,
-    "aria": {
-        "enabled": false
-    },
-    "series": [
-        {
-            "type": "bar",
-            "name": "Count",
-            "legendHoverLink": true,
-            "data": [
-                14384,
-                14879,
-                19615,
-                19865,
-                19931,
-                20760,
-                21515,
-                25225,
-                30414,
-                38195
-            ],
-            "realtimeSort": false,
-            "showBackground": false,
-            "stackStrategy": "samesign",
-            "cursor": "pointer",
-            "barMinHeight": 0,
-            "barCategoryGap": "45%",
-            "barGap": "30%",
-            "large": false,
-            "largeThreshold": 400,
-            "seriesLayoutBy": "column",
-            "datasetIndex": 0,
-            "clip": true,
-            "zlevel": 0,
-            "z": 2,
-            "label": {
-                "show": true,
-                "position": "right",
-                "color": "#fff",
-                "margin": 8,
-                "fontSize": 12,
-                "fontWeight": "bold",
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "itemStyle": {
-                "color": {
-                    "type": "linear",
-                    "x": 0,
-                    "y": 0,
-                    "x2": 1,
-                    "y2": 0,
-                    "colorStops": [
-                        {
-                            "offset": 0,
-                            "color": "#409EFF"
-                        },
-                        {
-                            "offset": 1,
-                            "color": "#FFD700"
-                        }
-                    ]
-                },
-                "borderRadius": [
-                    0,
-                    8,
-                    8,
-                    0
-                ]
-            }
+</div>
+
+<footer class="footer">
+  <div class="brand">NETFLIX DATA ANALYSIS</div>
+  <div class="copy">基于 Netflix Titles Dataset · 数据分析案例报告</div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const navCards = document.querySelectorAll('.nav-card');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 120);
+          observer.unobserve(entry.target);
         }
-    ],
-    "legend": [
-        {
-            "data": [
-                "Count"
-            ],
-            "selected": {},
-            "show": false,
-            "padding": 5,
-            "itemGap": 10,
-            "itemWidth": 25,
-            "itemHeight": 14,
-            "backgroundColor": "transparent",
-            "borderColor": "#ccc",
-            "borderRadius": 0,
-            "pageButtonItemGap": 5,
-            "pageButtonPosition": "end",
-            "pageFormatter": "{current}/{total}",
-            "pageIconColor": "#2f4554",
-            "pageIconInactiveColor": "#aaa",
-            "pageIconSize": 15,
-            "animationDurationUpdate": 800,
-            "selector": false,
-            "selectorPosition": "auto",
-            "selectorItemGap": 7,
-            "selectorButtonGap": 10,
-            "triggerEvent": false
-        }
-    ],
-    "tooltip": {
-        "show": true,
-        "trigger": "item",
-        "triggerOn": "mousemove|click",
-        "axisPointer": {
-            "type": "line"
-        },
-        "showContent": true,
-        "alwaysShowContent": false,
-        "showDelay": 0,
-        "hideDelay": 100,
-        "enterable": false,
-        "confine": false,
-        "appendToBody": false,
-        "transitionDuration": 0.4,
-        "displayTransition": true,
-        "textStyle": {
-            "fontSize": 14,
-            "richInheritPlainLabel": true
-        },
-        "borderWidth": 0,
-        "padding": 5,
-        "order": "seriesAsc"
-    },
-    "xAxis": [
-        {
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLabel": {
-                "show": true,
-                "color": "#ccc",
-                "margin": 8,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": true,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0
-        }
-    ],
-    "yAxis": [
-        {
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLabel": {
-                "show": true,
-                "color": "#fff",
-                "margin": 8,
-                "fontSize": 12,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": true,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0,
-            "data": [
-                "r",
-                "t",
-                "s",
-                "o",
-                "a",
-                "n",
-                "i",
-                "e",
-                " ",
-                "'"
-            ]
-        }
-    ],
-    "title": [
-        {
-            "show": true,
-            "text": "\ud83c\udfad Top Genres",
-            "target": "blank",
-            "subtarget": "blank",
-            "left": "center",
-            "padding": 5,
-            "itemGap": 10,
-            "textAlign": "auto",
-            "textVerticalAlign": "auto",
-            "triggerEvent": false,
-            "textStyle": {
-                "color": "#fff",
-                "fontWeight": "bold",
-                "fontSize": 20,
-                "richInheritPlainLabel": true
-            }
-        }
-    ]
-};
-        chart_c4b54ef40a864cf5a23cd89f7f70110f.setOption(option_c4b54ef40a864cf5a23cd89f7f70110f);
-            window.addEventListener('resize', function(){
-                chart_c4b54ef40a864cf5a23cd89f7f70110f.resize();
-            })
-    </script>
-<br/>                <div id="9cee15c36d484f1abae670b13b96b9d4" class="chart-container" style="width:100%; height:550px; "></div>
-    <script>
-        var chart_9cee15c36d484f1abae670b13b96b9d4 = echarts.init(
-            document.getElementById('9cee15c36d484f1abae670b13b96b9d4'), 'dark', {renderer: 'canvas', locale: 'ZH'});
-        var option_9cee15c36d484f1abae670b13b96b9d4 = {
-    "animation": true,
-    "animationThreshold": 2000,
-    "animationDuration": 1000,
-    "animationEasing": "cubicOut",
-    "animationDelay": 0,
-    "animationDurationUpdate": 300,
-    "animationEasingUpdate": "cubicOut",
-    "animationDelayUpdate": 0,
-    "aria": {
-        "enabled": false
-    },
-    "series": [
-        {
-            "type": "funnel",
-            "name": "Rating Distribution",
-            "data": [
-                {
-                    "name": "TV-MA",
-                    "value": null
-                },
-                {
-                    "name": "TV-14",
-                    "value": null
-                },
-                {
-                    "name": "TV-PG",
-                    "value": null
-                },
-                {
-                    "name": "R",
-                    "value": null
-                },
-                {
-                    "name": "PG-13",
-                    "value": null
-                },
-                {
-                    "name": "TV-Y7",
-                    "value": null
-                },
-                {
-                    "name": "TV-Y",
-                    "value": null
-                },
-                {
-                    "name": "PG",
-                    "value": null
-                },
-                {
-                    "name": "TV-G",
-                    "value": null
-                },
-                {
-                    "name": "NR",
-                    "value": null
-                }
-            ],
-            "min": 0,
-            "max": 100,
-            "minSize": "0%",
-            "maxSize": "100%",
-            "orient": "vertical",
-            "sort": "descending",
-            "gap": 2,
-            "legendHoverLink": true,
-            "funnelAlign": "center",
-            "label": {
-                "show": true,
-                "position": "inside",
-                "color": "#fff",
-                "margin": 8,
-                "fontSize": 13,
-                "fontWeight": "bold",
-                "formatter": "{b}: {c}",
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "selectedMode": false,
-            "zlevel": 0,
-            "z": 2
-        }
-    ],
-    "legend": [
-        {
-            "data": [
-                "TV-MA",
-                "TV-14",
-                "TV-PG",
-                "TV-Y",
-                "TV-G",
-                "NR",
-                "TV-Y7",
-                "R",
-                "PG",
-                "PG-13"
-            ],
-            "selected": {},
-            "show": true,
-            "top": "50px",
-            "padding": 5,
-            "itemGap": 10,
-            "itemWidth": 25,
-            "itemHeight": 14,
-            "textStyle": {
-                "color": "#fff",
-                "richInheritPlainLabel": true
-            },
-            "backgroundColor": "transparent",
-            "borderColor": "#ccc",
-            "borderRadius": 0,
-            "pageButtonItemGap": 5,
-            "pageButtonPosition": "end",
-            "pageFormatter": "{current}/{total}",
-            "pageIconColor": "#2f4554",
-            "pageIconInactiveColor": "#aaa",
-            "pageIconSize": 15,
-            "animationDurationUpdate": 800,
-            "selector": false,
-            "selectorPosition": "auto",
-            "selectorItemGap": 7,
-            "selectorButtonGap": 10,
-            "triggerEvent": false
-        }
-    ],
-    "tooltip": {
-        "show": true,
-        "trigger": "item",
-        "triggerOn": "mousemove|click",
-        "axisPointer": {
-            "type": "line"
-        },
-        "showContent": true,
-        "alwaysShowContent": false,
-        "showDelay": 0,
-        "hideDelay": 100,
-        "enterable": false,
-        "confine": false,
-        "appendToBody": false,
-        "transitionDuration": 0.4,
-        "displayTransition": true,
-        "formatter": "{b}: {c} ({d}%)",
-        "textStyle": {
-            "fontSize": 14,
-            "richInheritPlainLabel": true
-        },
-        "borderWidth": 0,
-        "padding": 5,
-        "order": "seriesAsc"
-    },
-    "color": [
-        "#E50914",
-        "#FF6B6B",
-        "#FFD700",
-        "#4ECDC4",
-        "#45B7D1",
-        "#96CEB4",
-        "#FFEAA7",
-        "#DDA0DD",
-        "#A29BFE",
-        "#81ECEC"
-    ],
-    "title": [
-        {
-            "show": true,
-            "text": "\ud83d\udd16 Age Rating Distribution",
-            "target": "blank",
-            "subtarget": "blank",
-            "left": "center",
-            "padding": 5,
-            "itemGap": 10,
-            "textAlign": "auto",
-            "textVerticalAlign": "auto",
-            "triggerEvent": false,
-            "textStyle": {
-                "color": "#fff",
-                "fontWeight": "bold",
-                "fontSize": 20,
-                "richInheritPlainLabel": true
-            }
-        }
-    ]
-};
-        chart_9cee15c36d484f1abae670b13b96b9d4.setOption(option_9cee15c36d484f1abae670b13b96b9d4);
-            window.addEventListener('resize', function(){
-                chart_9cee15c36d484f1abae670b13b96b9d4.resize();
-            })
-    </script>
-<br/>                <div id="dd1f04b93d7f4992a2d48636e1a8894b" class="chart-container" style="width:100%; height:550px; "></div>
-    <script>
-        var chart_dd1f04b93d7f4992a2d48636e1a8894b = echarts.init(
-            document.getElementById('dd1f04b93d7f4992a2d48636e1a8894b'), 'dark', {renderer: 'canvas', locale: 'ZH'});
-        var option_dd1f04b93d7f4992a2d48636e1a8894b = {
-    "animation": true,
-    "animationThreshold": 2000,
-    "animationDuration": 1000,
-    "animationEasing": "cubicOut",
-    "animationDelay": 0,
-    "animationDurationUpdate": 300,
-    "animationEasingUpdate": "cubicOut",
-    "animationDelayUpdate": 0,
-    "aria": {
-        "enabled": false
-    },
-    "series": [
-        {
-            "type": "bar",
-            "name": "Movie Count",
-            "legendHoverLink": true,
-            "data": [
-                7,
-                22,
-                98,
-                46,
-                107,
-                181,
-                266,
-                326,
-                788,
-                1368,
-                1030,
-                694,
-                452,
-                318,
-                166,
-                105,
-                71,
-                37,
-                19,
-                10,
-                9,
-                2,
-                3,
-                3,
-                0,
-                1,
-                0,
-                1,
-                0,
-                0,
-                0,
-                1,
-                0
-            ],
-            "realtimeSort": false,
-            "showBackground": false,
-            "stackStrategy": "samesign",
-            "cursor": "pointer",
-            "barMinHeight": 0,
-            "barCategoryGap": "5%",
-            "barGap": "30%",
-            "large": false,
-            "largeThreshold": 400,
-            "seriesLayoutBy": "column",
-            "datasetIndex": 0,
-            "clip": true,
-            "zlevel": 0,
-            "z": 2,
-            "label": {
-                "show": false,
-                "margin": 8,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "itemStyle": {
-                "color": {
-                    "type": "linear",
-                    "x": 0,
-                    "y": 0,
-                    "x2": 0,
-                    "y2": 1,
-                    "colorStops": [
-                        {
-                            "offset": 0,
-                            "color": "#FF6B6B"
-                        },
-                        {
-                            "offset": 1,
-                            "color": "#E50914"
-                        }
-                    ]
-                },
-                "borderRadius": [
-                    6,
-                    6,
-                    0,
-                    0
-                ]
-            }
-        }
-    ],
-    "legend": [
-        {
-            "data": [
-                "Movie Count"
-            ],
-            "selected": {},
-            "show": false,
-            "padding": 5,
-            "itemGap": 10,
-            "itemWidth": 25,
-            "itemHeight": 14,
-            "backgroundColor": "transparent",
-            "borderColor": "#ccc",
-            "borderRadius": 0,
-            "pageButtonItemGap": 5,
-            "pageButtonPosition": "end",
-            "pageFormatter": "{current}/{total}",
-            "pageIconColor": "#2f4554",
-            "pageIconInactiveColor": "#aaa",
-            "pageIconSize": 15,
-            "animationDurationUpdate": 800,
-            "selector": false,
-            "selectorPosition": "auto",
-            "selectorItemGap": 7,
-            "selectorButtonGap": 10,
-            "triggerEvent": false
-        }
-    ],
-    "tooltip": {
-        "show": true,
-        "trigger": "item",
-        "triggerOn": "mousemove|click",
-        "axisPointer": {
-            "type": "line"
-        },
-        "showContent": true,
-        "alwaysShowContent": false,
-        "showDelay": 0,
-        "hideDelay": 100,
-        "enterable": false,
-        "confine": false,
-        "appendToBody": false,
-        "transitionDuration": 0.4,
-        "displayTransition": true,
-        "textStyle": {
-            "fontSize": 14,
-            "richInheritPlainLabel": true
-        },
-        "borderWidth": 0,
-        "padding": 5,
-        "order": "seriesAsc"
-    },
-    "xAxis": [
-        {
-            "name": "Duration (minutes)",
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLabel": {
-                "show": true,
-                "color": "#ccc",
-                "rotate": 45,
-                "margin": 8,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": true,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0,
-            "data": [
-                "0-10",
-                "10-20",
-                "20-30",
-                "30-40",
-                "40-50",
-                "50-60",
-                "60-70",
-                "70-80",
-                "80-90",
-                "90-100",
-                "100-110",
-                "110-120",
-                "120-130",
-                "130-140",
-                "140-150",
-                "150-160",
-                "160-170",
-                "170-180",
-                "180-190",
-                "190-200",
-                "200-210",
-                "210-220",
-                "220-230",
-                "230-240",
-                "240-250",
-                "250-260",
-                "260-270",
-                "270-280",
-                "280-290",
-                "290-300",
-                "300-310",
-                "310-320",
-                "320-330"
-            ]
-        }
-    ],
-    "yAxis": [
-        {
-            "name": "Movie Count",
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLabel": {
-                "show": true,
-                "color": "#ccc",
-                "margin": 8,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": true,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0
-        }
-    ],
-    "title": [
-        {
-            "show": true,
-            "text": "\u23f1 Movie Duration Distribution",
-            "target": "blank",
-            "subtext": "Average: 99 min | Median: 98 min",
-            "subtarget": "blank",
-            "left": "center",
-            "padding": 5,
-            "itemGap": 10,
-            "textAlign": "auto",
-            "textVerticalAlign": "auto",
-            "triggerEvent": false,
-            "textStyle": {
-                "color": "#fff",
-                "fontWeight": "bold",
-                "fontSize": 20,
-                "richInheritPlainLabel": true
-            },
-            "subtextStyle": {
-                "color": "#ccc",
-                "fontSize": 13,
-                "richInheritPlainLabel": true
-            }
-        }
-    ]
-};
-        chart_dd1f04b93d7f4992a2d48636e1a8894b.setOption(option_dd1f04b93d7f4992a2d48636e1a8894b);
-            window.addEventListener('resize', function(){
-                chart_dd1f04b93d7f4992a2d48636e1a8894b.resize();
-            })
-    </script>
-<br/>    </div>
-    <script>
-    </script>
+      });
+    }, { threshold: 0.1 });
+
+    navCards.forEach(card => observer.observe(card));
+  });
+</script>
 </body>
 </html>
