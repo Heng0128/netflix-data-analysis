@@ -50,7 +50,7 @@ function parseCSV(text: string): string[][] {
   const rows: string[][] = [];
   let inQuotes = false;
   let currentField = '';
-  const currentRow: string[] = [];
+  let currentRow: string[] = [];
 
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
@@ -67,8 +67,9 @@ function parseCSV(text: string): string[][] {
       if (char === '\r') i++;
       currentRow.push(currentField.trim());
       currentField = '';
-      if (char === ',' && currentRow.length > 0 && !currentRow[currentRow.length - 1]) {
-        i++;
+      if (char !== ',') {
+        rows.push(currentRow);
+        currentRow = [];
       }
     } else {
       currentField += char;
@@ -76,8 +77,6 @@ function parseCSV(text: string): string[][] {
   }
   if (currentField || currentRow.length > 0) {
     currentRow.push(currentField.trim());
-  }
-  if (currentRow.length > 0) {
     rows.push(currentRow);
   }
 
@@ -92,6 +91,7 @@ export function getNetflixRecords(): NetflixRecord[] {
   const rows = parseCSV(csvText);
 
   const headers = rows[0];
+  const numericFields = new Set(['release_year', 'duration_num', 'year_added', 'month_added']);
   const records: NetflixRecord[] = [];
 
   for (let i = 1; i < rows.length; i++) {
@@ -99,7 +99,13 @@ export function getNetflixRecords(): NetflixRecord[] {
     const record: Record<string, unknown> = {};
 
     for (let j = 0; j < headers.length; j++) {
-      record[headers[j]] = row[j] || '';
+      const header = headers[j];
+      let value: unknown = row[j] ?? '';
+      if (numericFields.has(header)) {
+        const num = Number(value);
+        value = Number.isFinite(num) ? num : 0;
+      }
+      record[header] = value;
     }
 
     records.push(record as unknown as NetflixRecord);
@@ -145,17 +151,26 @@ export function computeStats(): NetflixStats {
 }
 
 function pearson(arr1: number[], arr2: number[]): number {
-  const n = arr1.length;
+  const n = Math.min(arr1.length, arr2.length);
   if (n === 0) return 0;
 
-  const sum1 = arr1.reduce((a, b) => a + b, 0);
-  const sum2 = arr2.reduce((a, b) => a + b, 0);
-  const sum1Sq = arr1.reduce((a, b) => a + b * b, 0);
-  const sum2Sq = arr2.reduce((a, b) => a + b * b, 0);
-  const pSum = arr1.reduce((a, b, i) => a + b * arr2[i], 0);
+  let sum1 = 0;
+  let sum2 = 0;
+  let sum1Sq = 0;
+  let sum2Sq = 0;
+  let pSum = 0;
+  for (let i = 0; i < n; i++) {
+    const x = arr1[i];
+    const y = arr2[i];
+    sum1 += x;
+    sum2 += y;
+    sum1Sq += x * x;
+    sum2Sq += y * y;
+    pSum += x * y;
+  }
 
   const num = pSum - (sum1 * sum2) / n;
-  const den = Math.sqrt((sum1Sq - sum1 * sum1 / n) * (sum2Sq - sum2 * sum2 / n));
+  const den = Math.sqrt((sum1Sq - (sum1 * sum1) / n) * (sum2Sq - (sum2 * sum2) / n));
 
   return den === 0 ? 0 : num / den;
 }
