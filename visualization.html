@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>可视化结果 - Netflix数据分析</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">NETFLIX <span>数据分析</span></div>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="analysis.html">需求分析</a></li>
+      <li><a href="code.html">代码</a></li>
+      <li><a href="visualization.html" class="active">可视化</a></li>
+      <li><a href="conclusion.html">结论</a></li>
+    </ul>
+  </nav>
+
+  <!-- Header -->
+  <section class="section" style="padding-top: 120px;">
+    <h1 class="section-title">可视化结果</h1>
+    <p class="section-subtitle">10种不同类型的可视化图表，展示数据分析结果</p>
+  </section>
+
+  <!-- Gallery Section -->
+  <section class="section" id="gallery">
+    <div class="container">
+      <div class="gallery">
+        <!-- Chart 1: Pie Chart -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/01_pie_type.png" alt="内容类型分布" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图1: 饼图</strong> - Netflix 内容类型分布
+          </div>
+        </div>
+
+        <!-- Chart 2: Donut Chart -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/02_donut_rating.png" alt="Rating分布" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图2: 环形图</strong> - Rating分布（Top 8）
+          </div>
+        </div>
+
+        <!-- Chart 3: Line Chart -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/03_line_yearly.png" alt="年度趋势" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图3: 折线图</strong> - 年度添加内容数量趋势
+          </div>
+        </div>
+
+        <!-- Chart 4: Histogram -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/04_hist_duration.png" alt="时长分布" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图4: 直方图</strong> - 电影时长分布
+          </div>
+        </div>
+
+        <!-- Chart 5: Word Cloud -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/05_wordcloud_genres.png" alt="类型词云" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图5: 词云图</strong> - 内容类型标签词云
+          </div>
+        </div>
+
+        <!-- Chart 6: Scatter Plot -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/06_scatter_year_duration.png" alt="散点图" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图6: 散点图</strong> - 年份与时长关系
+          </div>
+        </div>
+
+        <!-- Chart 7: Heatmap -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/07_heatmap_correlation.png" alt="相关性热力图" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图7: 热力图</strong> - 数值字段相关性矩阵
+          </div>
+        </div>
+
+        <!-- Chart 8: Radar Chart -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/08_radar_country.png" alt="雷达图" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图8: 雷达图</strong> - 主要国家内容特征对比
+          </div>
+        </div>
+
+        <!-- Chart 9: Stacked Area -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/09_stacked_area_yearly.png" alt="堆叠面积图" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图9: 堆叠面积图</strong> - 年度内容类型趋势
+          </div>
+        </div>
+
+        <!-- Chart 10: Treemap -->
+        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
+          <img src="images/10_treemap_country.png" alt="树形图" loading="lazy">
+          <div class="gallery-caption">
+            <strong>图10: 树形图</strong> - 国家内容数量层级结构
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chart Descriptions -->
+  <section class="section" id="descriptions">
+    <div class="container">
+      <h2 class="section-title" style="font-size: 24px;">图表说明</h2>
+
+      <div class="grid grid-2">
+        <div class="card fade-in-on-scroll">
+          <h3 class="card-title">图表1-3: 分布特征</h3>
+          <p class="card-text">
+            <strong>饼图</strong>展示电影与电视节目的比例分布；
+            <strong>环形图</strong>展示内容分级（Rating）的分布情况；
+            <strong>折线图</strong>展示Netflix年度内容添加数量的变化趋势。
+          </p>
+        </div>
+
+        <div class="card fade-in-on-scroll">
+          <h3 class="card-title">图表4-6: 数值分析</h3>
+          <p class="card-text">
+            <strong>直方图</strong>展示电影时长的概率分布；
+            <strong>词云图</strong>以文字大小展示内容类型的频率；
+            <strong>散点图</strong>展示发布年份与时长的关系。
+          </p>
+        </div>
+
+        <div class="card fade-in-on-scroll">
+          <h3 class="card-title">图表7-8: 相关性与对比</h3>
+          <p class="card-text">
+            <strong>热力图</strong>展示数值变量之间的相关性强度；
+            <strong>雷达图</strong>以多维度对比主要国家的内容特征。
+          </p>
+        </div>
+
+        <div class="card fade-in-on-scroll">
+          <h3 class="card-title">图表9-10: 趋势与结构</h3>
+          <p class="card-text">
+            <strong>堆叠面积图</strong>展示电影与电视节目数量随时间的累积趋势；
+            <strong>树形图</strong>以矩形面积展示各国家内容数量的层级结构。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <img src="" alt="放大图片" id="lightbox-img">
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-logo">NETFLIX 数据分析</div>
+    <p>Netflix 影视作品数据分析案例报告</p>
+    <p>小组成员: 成员1 | 成员2</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

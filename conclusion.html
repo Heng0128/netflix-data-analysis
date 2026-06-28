@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>案例分析结论 - Netflix数据分析</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">NETFLIX <span>数据分析</span></div>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="analysis.html">需求分析</a></li>
+      <li><a href="code.html">代码</a></li>
+      <li><a href="visualization.html">可视化</a></li>
+      <li><a href="conclusion.html" class="active">结论</a></li>
+    </ul>
+  </nav>
+
+  <!-- Header -->
+  <section class="section" style="padding-top: 120px;">
+    <h1 class="section-title">案例分析结论</h1>
+    <p class="section-subtitle">基于数据分析的结果总结与商业建议</p>
+  </section>
+
+  <!-- Main Findings -->
+  <section class="section" id="findings">
+    <div class="container">
+      <h2 class="section-title" style="font-size: 24px;">主要发现</h2>
+
+      <div class="stats-grid mb-lg">
+        <div class="stat-card fade-in-on-scroll">
+          <div class="stat-number" style="font-size: 48px;">69.69%</div>
+          <div class="stat-label">电影内容占比</div>
+        </div>
+        <div class="stat-card fade-in-on-scroll">
+          <div class="stat-number" style="font-size: 48px;">36.4%</div>
+          <div class="stat-label">美国内容占比</div>
+        </div>
+        <div class="stat-card fade-in-on-scroll">
+          <div class="stat-number" style="font-size: 48px;">99.6</div>
+          <div class="stat-label">电影平均时长(分钟)</div>
+        </div>
+        <div class="stat-card fade-in-on-scroll">
+          <div class="stat-number" style="font-size: 48px;">2018</div>
+          <div class="stat-label">内容添加峰值年</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="conclusion-card fade-in-on-scroll">
+          <h3 class="conclusion-title">
+            <span>1</span> 内容结构分析
+          </h3>
+          <p class="conclusion-text">
+            Netflix平台电影内容占比69.69%，电视节目占比30.31%。
+            电影仍然是主要内容形式，但电视节目的比例正在逐步提升。
+            从年度趋势可以看出，2018年是内容添加的高峰期，之后有所回落。
+          </p>
+        </div>
+
+        <div class="conclusion-card fade-in-on-scroll">
+          <h3 class="conclusion-title">
+            <span>2</span> 地域分布特征
+          </h3>
+          <p class="conclusion-text">
+            美国是最大的内容生产国，占比36.4%。
+            其次是印度（11.5%）和英国（7.1%）。
+            这表明Netflix在国际化方面仍有很大空间，特别是对新兴市场的拓展。
+          </p>
+        </div>
+
+        <div class="conclusion-card fade-in-on-scroll">
+          <h3 class="conclusion-title">
+            <span>3</span> 评分分级分布
+          </h3>
+          <p class="conclusion-text">
+            TV-MA（适合成熟观众）是最多的分级类型，占36.4%。
+            其次是TV-14（适合14岁以上）和PG-13（适合13岁以上）。
+            这反映了Netflix内容整体偏向成年观众群体。
+          </p>
+        </div>
+
+        <div class="conclusion-card fade-in-on-scroll">
+          <h3 class="conclusion-title">
+            <span>4</span> 时长分布特征
+          </h3>
+          <p class="conclusion-text">
+            电影平均时长为99.6分钟，大多数电影时长在60-150分钟之间。
+            电视节目以1季内容为主，表明Netflix上的电视节目多为短剧集形式。
+            这符合流媒体用户的观看习惯。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Algorithm Results -->
+  <section class="section" id="algorithm">
+    <div class="container">
+      <h2 class="section-title" style="font-size: 24px;">随机森林算法结果</h2>
+
+      <div class="grid grid-3">
+        <div class="card fade-in-on-scroll" style="text-align: center; border-top: 4px solid #E50914;">
+          <div style="font-size: 48px; font-weight: 800; color: #E50914; margin-bottom: 8px;">
+            ~95%
+          </div>
+          <h3 class="card-title">模型准确率</h3>
+          <p class="card-text">
+            随机森林分类模型能够有效区分电影和电视节目，
+            使用release_year、year_added、month_added、rating等特征进行预测。
+          </p>
+        </div>
+
+        <div class="card fade-in-on-scroll" style="text-align: center; border-top: 4px solid #E50914;">
+          <div style="font-size: 48px; font-weight: 800; color: #E50914; margin-bottom: 8px;">
+            rating
+          </div>
+          <h3 class="card-title">最重要特征</h3>
+          <p class="card-text">
+            rating_encoded是预测内容类型最重要的特征，
+            表明不同类型的内容在分级分布上有明显差异。
+          </p>
+        </div>
+
+        <div class="card fade-in-on-scroll" style="text-align: center; border-top: 4px solid #E50914;">
+          <div style="font-size: 48px; font-weight: 800; color: #E50914; margin-bottom: 8px;">
+            100
+          </div>
+          <h3 class="card-title">决策树数量</h3>
+          <p class="card-text">
+            使用100棵决策树组成的随机森林，
+            通过集成学习提高模型的稳定性和准确率。
+          </p>
+        </div>
+      </div>
+
+      <div class="card fade-in-on-scroll mt-lg">
+        <h3 class="card-title mb-md">算法应用价值</h3>
+        <div class="grid grid-2">
+          <div>
+            <h4 style="color: #E50914; margin-bottom: 8px;">内容自动分类</h4>
+            <p class="card-text">
+              利用随机森林模型可以对新上传的内容进行自动分类，
+              减少人工标注的工作量，提高内容管理效率。
+            </p>
+          </div>
+          <div>
+            <h4 style="color: #E50914; margin-bottom: 8px;">推荐系统优化</h4>
+            <p class="card-text">
+              根据特征重要性分析结果，可以优化内容推荐算法，
+              将用户的观看偏好与内容特征进行精准匹配。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recommendations -->
+  <section class="section" id="recommendations">
+    <div class="container">
+      <h2 class="section-title" style="font-size: 24px;">结论与建议</h2>
+
+      <div class="grid grid-2">
+        <div class="card fade-in-on-scroll">
+          <h3 class="card-title" style="color: #E50914;">
+            内容策略建议
+          </h3>
+          <ul style="color: rgba(255,255,255,0.8); line-height: 2;">
+            <li>继续保持电影内容的优势，这是平台的主要内容形式</li>
+            <li>加大对电视节目的投入，发展短剧集形式的内容</li>
+            <li>关注内容分级多元化，满足不同年龄段观众需求</li>
+            <li>把握内容发布时机，年末通常是内容上线高峰期</li>
+          </ul>
+        </div>
+
+        <div class="card fade-in-on-scroll">
+          <h3 class="card-title" style="color: #E50914;">
+            市场拓展建议
+          </h3>
+          <ul style="color: rgba(255,255,255,0.8); line-height: 2;">
+            <li>继续深耕美国市场，保持内容领先优势</li>
+            <li>加大对印度、韩国等新兴市场的内容投入</li>
+            <li>根据不同地区偏好调整内容类型组合</li>
+            <li>发展本土化内容，吸引地区用户</li>
+          </ul>
+        </div>
+
+        <div class="card fade-in-on-scroll">
+          <h3 class="card-title" style="color: #E50914;">
+            算法应用建议
+          </h3>
+          <ul style="color: rgba(255,255,255,0.8); line-height: 2;">
+            <li>部署随机森林模型进行新内容自动分类</li>
+            <li>结合特征重要性优化推荐算法权重</li>
+            <li>持续收集用户行为数据，提升模型准确率</li>
+            <li>定期更新模型，适应内容变化趋势</li>
+          </ul>
+        </div>
+
+        <div class="card fade-in-on-scroll">
+          <h3 class="card-title" style="color: #E50914;">
+            内容采购建议
+          </h3>
+          <ul style="color: rgba(255,255,255,0.8); line-height: 2;">
+            <li>优先采购符合主流分级（TV-MA）的内容</li>
+            <li>关注高评分类电影的采购</li>
+            <li>发展多季电视节目的连续采购策略</li>
+            <li>根据地区特征差异化采购内容</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-logo">NETFLIX 数据分析</div>
+    <p>Netflix 影视作品数据分析案例报告</p>
+    <p>小组成员: 成员1 | 成员2</p>
+    <p style="margin-top: 16px;">
+      <a href="index.html" style="color: #E50914; margin: 0 8px;">返回首页</a> |
+      <a href="visualization.html" style="color: #E50914; margin: 0 8px;">查看可视化</a>
+    </p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
