@@ -240,15 +240,16 @@ export function computeChartData(): ChartData {
     .map(r => ({ x: r.release_year, y: r.duration_num, name: r.title }));
 
   const countries = ['United States', 'India', 'United Kingdom', 'Canada', 'France'];
+  const countryDurations = countries.map(c =>
+    records
+      .filter(r => r.primary_country === c && r.type === 'Movie' && r.duration_num > 0)
+      .map(r => r.duration_num)
+  );
   const matrix: number[][] = [];
   for (let i = 0; i < countries.length; i++) {
     const row: number[] = [];
     for (let j = 0; j < countries.length; j++) {
-      const c1Records = records.filter(r => r.primary_country === countries[i] && r.type === 'Movie' && r.duration_num > 0);
-      const c2Records = records.filter(r => r.primary_country === countries[j] && r.type === 'Movie' && r.duration_num > 0);
-      const vals1 = c1Records.map(r => r.duration_num);
-      const vals2 = c2Records.map(r => r.duration_num);
-      row.push(Number(pearson(vals1, vals2).toFixed(2)));
+      row.push(Number(pearson(countryDurations[i], countryDurations[j]).toFixed(2)));
     }
     matrix.push(row);
   }
