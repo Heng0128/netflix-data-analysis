@@ -1,25 +1,54 @@
 @import "tailwindcss";
 
+/* ============================================================
+   一、主题层：Netflix 品牌色 CSS 变量
+   ============================================================ */
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --primary: #E50914;
+  /* Netflix 品牌色 */
+  --primary: #E50914;            /* Netflix 红 */
   --primary-foreground: #ffffff;
+  --background: #0A0A0A;         /* 深黑背景 */
+  --foreground: #FFFFFF;
   --secondary: #141414;
   --secondary-foreground: #ffffff;
   --muted: #333333;
   --muted-foreground: #888888;
   --accent: #564d4d;
   --accent-foreground: #ffffff;
+
+  /* 半透明卡片 / 边框 */
+  --card: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.08);
+
+  /* 图表色板（5 色） */
+  --chart-1: #E50914;
+  --chart-2: #4A90D9;
+  --chart-3: #F5A623;
+  --chart-4: #7BC67E;
+  --chart-5: #BD10E0;
 }
 
+/* 将变量映射到 Tailwind，使其可用 bg-primary / text-foreground 等类名 */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-primary: var(--primary);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-nfl-red: #E50914;          /* 自定义 Tailwind 颜色 */
+  --color-nfl-dark: #B20710;
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --font-sans: 'Noto Sans SC', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
 }
 
+/* ============================================================
+   基础重置
+   ============================================================ */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -38,25 +67,126 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0a0a0a;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #444;
-}
-
 ::selection {
   background: rgba(229, 9, 20, 0.4);
   color: white;
+}
+
+/* ============================================================
+   二、组件层：玻璃拟态卡片系统（Glassmorphism）
+   ============================================================ */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);  /* Safari 兼容 */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-hover {
+  transition: all 0.3s ease;
+}
+
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(229, 9, 20, 0.3);   /* 悬停时显红色边 */
+  transform: translateY(-4px);            /* 向上浮起 */
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
+              0 0 0 1px rgba(229, 9, 20, 0.15);
+}
+
+/* ============================================================
+   三、背景层：电影级氛围渲染
+   ============================================================ */
+
+/* 1. 径向渐变背景（Hero 区）—— 模拟影院聚光灯 */
+.nfl-bg-radial {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,
+      rgba(229, 9, 20, 0.15), transparent 60%),        /* 顶部红光 */
+    radial-gradient(ellipse 60% 40% at 80% 80%,
+      rgba(229, 9, 20, 0.08), transparent 60%),        /* 右下弱光 */
+    radial-gradient(ellipse 60% 40% at 20% 60%,
+      rgba(74, 144, 217, 0.05), transparent 60%),      /* 左下蓝光 */
+    #0A0A0A;
+}
+
+/* 2. 动态网格背景 */
+@keyframes grid-move {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(40px); }
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(229, 9, 20, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(229, 9, 20, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: grid-move 8s linear infinite;
+}
+
+/* 3. N Logo 脉冲发光 */
+.nfl-n-glow {
+  text-shadow:
+    0 0 20px rgba(229, 9, 20, 0.6),
+    0 0 40px rgba(229, 9, 20, 0.4),
+    0 0 60px rgba(229, 9, 20, 0.2);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(229, 9, 20, 0.3); }
+  50%      { box-shadow: 0 0 40px rgba(229, 9, 20, 0.6); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+/* ============================================================
+   四、文字效果：闪光标题动画
+   ============================================================ */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 1)   25%,
+    rgba(229, 9, 20, 1)      50%,    /* 中间过 Netflix 红 */
+    rgba(255, 255, 255, 1)   75%,
+    rgba(255, 255, 255, 0.4) 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;  /* 关键：让文字透明显示背景 */
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+/* ============================================================
+   七、自定义滚动条（品牌色）
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(229, 9, 20, 0.4);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(229, 9, 20, 0.7);
+}
+
+/* Firefox 滚动条 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(229, 9, 20, 0.4) #0A0A0A;
 }
