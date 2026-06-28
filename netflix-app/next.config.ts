@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: 'export',
+  basePath: '/netflix-data-analysis',
+  assetPrefix: '/netflix-data-analysis/',
+  images: { unoptimized: true },
 };
 
 export default nextConfig;
