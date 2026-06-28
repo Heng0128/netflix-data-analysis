@@ -45,19 +45,19 @@ export function getBaseOption(): echarts.EChartsOption {
   };
 }
 
-export function getAxisStyle(): { xAxis: echarts.EChartsOption; yAxis: echarts.EChartsOption } {
+export function getAxisStyle() {
   return {
     xAxis: {
-      type: 'category',
+      type: 'category' as const,
       axisLine: { lineStyle: { color: '#333' } },
       axisLabel: { color: '#888' },
       splitLine: { show: false },
-    } as echarts.EChartsOption,
+    },
     yAxis: {
-      type: 'value',
+      type: 'value' as const,
       axisLine: { lineStyle: { color: '#333' } },
       axisLabel: { color: '#888' },
       splitLine: { lineStyle: { color: '#222' } },
-    } as echarts.EChartsOption,
+    },
   };
 }
