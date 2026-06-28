@@ -10,7 +10,7 @@ interface ChartProps {
 
 export default function Chart({ option, className = '' }: ChartProps) {
   const chartRef = useRef<HTMLDivElement>(null);
-  const chartInstance = useRef<echarts.ECharts>();
+  const chartInstance = useRef<echarts.ECharts | null>(null);
 
   useEffect(() => {
     if (!chartRef.current) return;

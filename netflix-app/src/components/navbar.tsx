@@ -38,27 +38,27 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled ? 'bg-black/90 backdrop-blur-md shadow-lg' : 'bg-transparent'
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      scrolled
+        ? 'bg-black/90 backdrop-blur-xl shadow-lg shadow-black/50 border-b border-white/5'
+        : 'bg-gradient-to-b from-black/60 to-transparent'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center text-white font-bold text-sm">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-red-600/30">
               N
             </div>
-            <span className="text-white font-semibold text-lg hidden sm:block">Netflix 分析</span>
+            <span className="text-white font-bold text-lg hidden sm:block tracking-tight">
+              Netflix <span className="text-red-500">分析</span>
+            </span>
           </div>
-          <div className="flex gap-1 sm:gap-2 overflow-x-auto">
+          <div className="flex gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none">
             {sections.map(s => (
               <button
                 key={s.id}
                 onClick={() => scrollTo(s.id)}
-                className={`px-2 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                  active === s.id
-                    ? 'bg-red-600 text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-white/10'
-                }`}
+                className={`nav-btn ${active === s.id ? 'nav-btn-active' : 'nav-btn-inactive'}`}
               >
                 {s.label}
               </button>

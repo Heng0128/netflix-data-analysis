@@ -29,14 +29,21 @@ export default function AnalysisSection({ stats }: Props) {
   ];
 
   return (
-    <section id="analysis" className="py-20 px-4">
+    <section id="analysis" className="py-24 px-4">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-white mb-12 text-center">关键发现</h2>
+        <h2 className="section-title reveal">关键发现</h2>
+        <p className="text-gray-400 text-center mt-4 mb-12 reveal">从数据中提炼的核心趋势与洞察</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {insights.map((insight, i) => (
-            <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-red-500/50 transition-colors">
-              <div className="text-4xl mb-4">{insight.icon}</div>
+            <div
+              key={i}
+              className="glass-card p-7 reveal group"
+              style={{ transitionDelay: `${i * 80}ms` }}
+            >
+              <div className="text-4xl mb-4 transition-transform duration-300 group-hover:scale-110">
+                {insight.icon}
+              </div>
               <h3 className="text-white text-xl font-semibold mb-3">{insight.title}</h3>
               <p className="text-gray-400 leading-relaxed">{insight.desc}</p>
             </div>

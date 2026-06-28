@@ -60,28 +60,31 @@ export default function CodeShowcase() {
   const [activeTab, setActiveTab] = useState('数据读取');
 
   return (
-    <section id="code" className="py-20 px-4">
+    <section id="code" className="py-24 px-4">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-white mb-8 text-center">代码示例</h2>
+        <h2 className="section-title reveal">代码示例</h2>
+        <p className="text-gray-400 text-center mt-4 mb-12 reveal">使用 Python + Pandas 进行数据分析的核心代码</p>
 
-        <div className="flex flex-wrap gap-2 mb-6 justify-center">
+        <div className="flex flex-wrap gap-2 mb-6 justify-center reveal">
           {Object.keys(CODE_SAMPLES).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeTab === tab
-                  ? 'bg-red-600 text-white'
-                  : 'bg-white/10 text-gray-400 hover:text-white'
-              }`}
+              className={`code-tab ${activeTab === tab ? 'code-tab-active' : 'code-tab-inactive'}`}
             >
               {tab}
             </button>
           ))}
         </div>
 
-        <div className="bg-[#1e1e1e] rounded-xl p-6 overflow-x-auto">
-          <pre className="text-sm font-mono">
+        <div className="reveal bg-[#1e1e1e] rounded-2xl p-6 overflow-x-auto border border-white/10 shadow-2xl shadow-black/50">
+          <div className="flex items-center gap-2 mb-4 pb-4 border-b border-white/5">
+            <span className="w-3 h-3 rounded-full bg-red-500/80"></span>
+            <span className="w-3 h-3 rounded-full bg-yellow-500/80"></span>
+            <span className="w-3 h-3 rounded-full bg-green-500/80"></span>
+            <span className="ml-2 text-gray-500 text-xs font-mono">analysis.py</span>
+          </div>
+          <pre className="text-sm font-mono leading-relaxed">
             <code dangerouslySetInnerHTML={{ __html: highlightPython(CODE_SAMPLES[activeTab]) }} />
           </pre>
         </div>

@@ -11,7 +11,7 @@ interface AnimatedNumberProps {
 
 export default function AnimatedNumber({ value, duration = 2000, suffix = '', prefix = '' }: AnimatedNumberProps) {
   const [display, setDisplay] = useState(0);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | null>(null);
   const hasAnimated = useRef(false);
   const [trigger, setTrigger] = useState(0);
 
