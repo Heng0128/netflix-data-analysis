@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   assetPrefix: isProd ? '/netflix-data-analysis/' : '',
   images: { unoptimized: true },
   // 允许沙箱预览域名访问 dev 资源（HMR 等）
-  allowedDevOrigins: ['127.0.0.1', 'localhost', '.trae.cn', '.agent-sandbox-bj-c1-gw.trae.cn'],
+  allowedDevOrigins: ['127.0.0.1', 'localhost', '.trae.cn', '.agent-sandbox-bj-c1-gw.trae.cn', '.remote-agent.svc.cluster.local'],
 };
 
 export default nextConfig;
