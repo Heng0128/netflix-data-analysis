@@ -18,7 +18,7 @@ export default function Home() {
       <AnalysisSection stats={stats} />
       <CodeShowcase />
       <VisualizationSection chartData={chartData} />
-      <ConclusionSection stats={stats} chartData={chartData} />
+      <ConclusionSection stats={stats} />
     </main>
   );
 }
