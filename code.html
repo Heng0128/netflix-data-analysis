@@ -24,7 +24,7 @@
   <!-- Header -->
   <section class="section" style="padding-top: 120px;">
     <h1 class="section-title">数据处理代码</h1>
-    <p class="section-subtitle">包含数据预处理与随机森林分类算法实现</p>
+    <p class="section-subtitle">包含数据预处理、随机森林算法与可视化完整代码</p>
   </section>
 
   <!-- Code Section -->
@@ -53,19 +53,21 @@
             <div class="code-content">
 <pre><code class="language-python">import pandas as pd
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
-# 读取数据
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 1000)
+
 df = pd.read_csv('netflix_titles.csv')
-
-# 1. 修复rating/duration字段错位问题
 df_clean = df.copy()
-df_clean.loc[(df_clean['rating'].astype(str).str.contains('min', na=False)) 
-             & (df_clean['duration'].isnull()), 'duration'] = df_clean['rating']
-df_clean.loc[(df_clean['rating'].astype(str).str.contains('min', na=False)) 
-             & (df_clean['duration'].notnull()), 'rating'] = np.nan
 
-# 2. 文本字段去除前后空格
-text_cols = ['director', 'cast', 'country', 'date_added', 'rating', 'duration']
+# 1. 修复rating/duration错位
+df_clean.loc[(df_clean['rating'].astype(str).str.contains('min', na=False)) & (df_clean['duration'].isnull()), 'duration'] = df_clean['rating']
+df_clean.loc[(df_clean['rating'].astype(str).str.contains('min', na=False)) & (df_clean['duration'].notnull()), 'rating'] = np.nan
+
+# 2. 文本去空格
+text_cols = ['director', 'cast', 'country', 'date_added', 'rating', 'duration', 'listed_in']
 for col in text_cols:
     df_clean[col] = df_clean[col].str.strip()
 
@@ -73,29 +75,26 @@ for col in text_cols:
 df_clean['director'].fillna('未知', inplace=True)
 df_clean['cast'].fillna('未知', inplace=True)
 df_clean['country'].fillna('未知', inplace=True)
-df_clean['country'] = df_clean['country'].apply(
-    lambda x: x[1:].strip() if isinstance(x, str) and x.startswith(',') else x
-)
+df_clean['country'] = df_clean['country'].apply(lambda x: x[1:].strip() if isinstance(x, str) and x.startswith(',') else x)
 df_clean.dropna(subset=['date_added'], inplace=True)
-df_clean['rating'].fillna(df_clean['rating'].mode()[0], inplace=True)
+rating_mode = df_clean['rating'].mode()[0]
+df_clean['rating'].fillna(rating_mode, inplace=True)
 df_clean.loc[(df_clean['duration'].isnull()) & (df_clean['type'] == 'Movie'), 'duration'] = '90 min'
 df_clean.loc[(df_clean['duration'].isnull()) & (df_clean['type'] == 'TV Show'), 'duration'] = '1 Season'
 
 # 4. 特征提取
-df_clean['duration_num'] = df_clean['duration'].apply(
-    lambda x: int(''.join(filter(str.isdigit, str(x)))) if pd.notna(x) else 0
-)
-df_clean['date_added_parsed'] = pd.to_datetime(
-    df_clean['date_added'].str.strip(), format='%B %d, %Y', errors='coerce'
-)
+df_clean['duration_num'] = df_clean['duration'].apply(lambda x: int(''.join(filter(str.isdigit, str(x)))) if pd.notna(x) else 0)
+df_clean['date_added_parsed'] = pd.to_datetime(df_clean['date_added'].str.strip(), format='%B %d, %Y', errors='coerce')
 df_clean['year_added'] = df_clean['date_added_parsed'].dt.year
 df_clean['month_added'] = df_clean['date_added_parsed'].dt.month
-df_clean['primary_country'] = df_clean['country'].apply(
-    lambda x: '未知' if x == '未知' or pd.isna(x) else str(x).split(',')[0].strip()
-)
+df_clean['primary_country'] = df_clean['country'].apply(lambda x: '未知' if x == '未知' or pd.isna(x) else str(x).split(',')[0].strip())
 
-# 5. 保存清洗后的数据
+# 5. 保存
 df_clean.to_csv('netflix_titles_cleaned.csv', index=False, encoding='utf-8-sig')
+
+movies = df_clean[df_clean['type'] == 'Movie']
+tv = df_clean[df_clean['type'] == 'TV Show']
+
 print(f"预处理完成！数据量: {len(df_clean)}, 缺失值: {df_clean.isnull().sum().sum()}")</code></pre>
             </div>
           </div>
@@ -104,19 +103,19 @@ print(f"预处理完成！数据量: {len(df_clean)}, 缺失值: {df_clean.isnul
           <div class="grid grid-2">
             <div class="card" style="padding: 16px;">
               <h5 style="color: #E50914; margin-bottom: 8px;">脏数据修复</h5>
-              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">修复3条rating/duration字段错位记录</p>
+              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">修复rating/duration字段错位记录，将误填到rating中的时长数据还原到duration字段</p>
+            </div>
+            <div class="card" style="padding: 16px;">
+              <h5 style="color: #E50914; margin-bottom: 8px;">文本去空格</h5>
+              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">对director、cast、country、date_added、rating、duration、listed_in等文本字段去除前后空格</p>
             </div>
             <div class="card" style="padding: 16px;">
               <h5 style="color: #E50914; margin-bottom: 8px;">缺失值处理</h5>
-              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">director/cast/country用"未知"填充，date_added删除缺失行</p>
-            </div>
-            <div class="card" style="padding: 16px;">
-              <h5 style="color: #E50914; margin-bottom: 8px;">异常值处理</h5>
-              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">修复country字段以逗号开头的问题</p>
+              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">director/cast/country用"未知"填充，date_added删除缺失行，rating用众数填充，duration按类型默认值填充</p>
             </div>
             <div class="card" style="padding: 16px;">
               <h5 style="color: #E50914; margin-bottom: 8px;">特征提取</h5>
-              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">提取duration_num, year_added, month_added, primary_country</p>
+              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">提取duration_num数值时长、year_added添加年份、month_added添加月份、primary_country主要国家</p>
             </div>
           </div>
         </div>
@@ -139,9 +138,13 @@ print(f"预处理完成！数据量: {len(df_clean)}, 缺失值: {df_clean.isnul
 <pre><code class="language-python">from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-# 1. 数据准备与编码
+print("=" * 60)
+print("随机森林分类 - 预测内容类型")
+print("=" * 60)
+
+# 数据准备
 le_rating = LabelEncoder()
 df_clean['rating_encoded'] = le_rating.fit_transform(df_clean['rating'])
 
@@ -151,38 +154,32 @@ df_clean['country_encoded'] = le_country.fit_transform(df_clean['primary_country
 le_type = LabelEncoder()
 df_clean['type_encoded'] = le_type.fit_transform(df_clean['type'])
 
-# 2. 特征选择（不使用duration_num，使分类更有挑战性）
-X = df_clean[['release_year', 'year_added', 'month_added', 
-              'rating_encoded', 'country_encoded']]
+# 使用release_year、year_added、month_added、rating_encoded作为特征（不使用duration_num）
+X = df_clean[['release_year', 'year_added', 'month_added', 'rating_encoded', 'country_encoded']]
 y = df_clean['type_encoded']
 
-# 3. 划分训练集和测试集
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+# 划分数据集
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 4. 构建并训练随机森林模型
-rf_model = RandomForestClassifier(
-    n_estimators=100,      # 100棵决策树
-    max_depth=10,          # 最大深度
-    min_samples_split=5,   # 最小分裂样本数
-    random_state=42
-)
+# 训练模型
+rf_model = RandomForestClassifier(n_estimators=100, max_depth=10, min_samples_split=5, random_state=42)
 rf_model.fit(X_train, y_train)
 
-# 5. 模型预测与评估
+# 评估
 y_pred = rf_model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred)
 
-print(f"模型准确率: {accuracy*100:.2f}%")
+print(f"准确率: {accuracy*100:.2f}%")
 print("\n分类报告:")
 print(classification_report(y_test, y_pred, target_names=['Movie', 'TV Show']))
 
-# 6. 特征重要性分析
+# 特征重要性
 feature_importance = pd.DataFrame({
     '特征': ['release_year', 'year_added', 'month_added', 'rating_encoded', 'country_encoded'],
     '重要性': rf_model.feature_importances_
 }).sort_values('重要性', ascending=False)
+
 print("\n特征重要性:")
 print(feature_importance)</code></pre>
             </div>
@@ -192,15 +189,15 @@ print(feature_importance)</code></pre>
           <div class="grid grid-3">
             <div class="card" style="padding: 16px; text-align: center;">
               <h5 style="color: #E50914;">监督学习</h5>
-              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">随机森林是经典的监督学习集成算法</p>
+              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">随机森林是经典的监督学习集成算法，通过标签数据训练模型</p>
             </div>
             <div class="card" style="padding: 16px; text-align: center;">
               <h5 style="color: #E50914;">多棵决策树</h5>
-              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">通过投票机制提高预测准确率</p>
+              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">100棵决策树投票机制，max_depth=10防止过拟合</p>
             </div>
             <div class="card" style="padding: 16px; text-align: center;">
               <h5 style="color: #E50914;">特征重要性</h5>
-              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">可解释性强，便于理解模型</p>
+              <p style="color: rgba(255,255,255,0.7); font-size: 14px;">可解释性强，输出各特征对分类的贡献度排序</p>
             </div>
           </div>
         </div>
@@ -209,9 +206,9 @@ print(feature_importance)</code></pre>
       <!-- Tab 3: Visualization Code -->
       <div class="tab-content" id="visual">
         <div class="card fade-in-on-scroll">
-          <h3 class="card-title mb-md">可视化代码示例</h3>
+          <h3 class="card-title mb-md">可视化代码</h3>
           <p class="card-text mb-md">
-            使用Matplotlib生成10种不同类型的可视化图表。
+            使用Matplotlib生成10种不同类型的可视化图表，包含饼图、环形图、折线图、条形图、直方图、词云图、散点图、热力图、雷达图和堆叠面积图。
           </p>
 
           <div class="code-block">
@@ -227,19 +224,77 @@ from wordcloud import WordCloud
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS']
 plt.rcParams['axes.unicode_minus'] = False
 
-# 图1: 饼图 - 内容类型分布
+# ===== 图1: 饼图 - 内容类型分布 =====
 fig, ax = plt.subplots(figsize=(8, 6))
 type_counts = df_clean['type'].value_counts()
 colors = ['#E50914', '#221F1F']
-ax.pie(type_counts.values, labels=type_counts.index, 
-       autopct='%1.1f%%', colors=colors, startangle=90, 
-       explode=(0.05, 0.05))
-ax.set_title('Netflix 内容类型分布', fontsize=16, fontweight='bold')
+wedges, texts, autotexts = ax.pie(type_counts.values, labels=type_counts.index,
+       autopct='%1.1f%%', colors=colors, startangle=90,
+       explode=(0.05, 0.05), shadow=True)
+for t in autotexts:
+    t.set_color('white')
+    t.set_fontweight('bold')
+ax.set_title('Netflix 内容类型分布', fontsize=16, fontweight='bold', pad=20)
 plt.tight_layout()
-plt.savefig('images/01_pie_type.png', dpi=300, bbox_inches='tight')
+plt.savefig('images/01_pie_type.png', dpi=300, bbox_inches='tight', facecolor='white')
 plt.show()
 
-# 图5: 词云图 - 类型标签词云
+# ===== 图2: 环形图 - Rating分布 =====
+fig, ax = plt.subplots(figsize=(10, 8))
+rating_counts = df_clean['rating'].value_counts().head(8)
+colors2 = ['#E50914', '#B20710', '#FF4D58', '#831116', '#221F1F',
+           '#444444', '#666666', '#888888']
+wedges, texts, autotexts = ax.pie(rating_counts.values, labels=rating_counts.index,
+       autopct='%1.1f%%', colors=colors2, startangle=90,
+       pctdistance=0.8, wedgeprops=dict(width=0.4))
+for t in autotexts:
+    t.set_fontsize(9)
+ax.set_title('Netflix Rating 分布 (Top 8)', fontsize=16, fontweight='bold', pad=20)
+plt.tight_layout()
+plt.savefig('images/02_donut_rating.png', dpi=300, bbox_inches='tight', facecolor='white')
+plt.show()
+
+# ===== 图3: 折线图 - 年度添加趋势 =====
+fig, ax = plt.subplots(figsize=(12, 6))
+yearly = df_clean.groupby('year_added').size()
+ax.plot(yearly.index, yearly.values, color='#E50914', linewidth=2.5, marker='o', markersize=6)
+ax.fill_between(yearly.index, yearly.values, alpha=0.15, color='#E50914')
+ax.set_xlabel('年份', fontsize=12)
+ax.set_ylabel('添加数量', fontsize=12)
+ax.set_title('Netflix 年度添加内容数量趋势', fontsize=16, fontweight='bold')
+ax.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('images/03_line_yearly.png', dpi=300, bbox_inches='tight', facecolor='white')
+plt.show()
+
+# ===== 图4: 条形图 - 国家分布 =====
+fig, ax = plt.subplots(figsize=(10, 8))
+country_counts = df_clean['primary_country'].value_counts().head(10)
+bars = ax.barh(range(len(country_counts)), country_counts.values, color='#E50914', height=0.6)
+ax.set_yticks(range(len(country_counts)))
+ax.set_yticklabels(country_counts.index, fontsize=11)
+ax.invert_yaxis()
+for bar, val in zip(bars, country_counts.values):
+    ax.text(val + 20, bar.get_y() + bar.get_height()/2, str(val), va='center', fontsize=10)
+ax.set_title('Netflix 内容国家分布 Top 10', fontsize=16, fontweight='bold')
+ax.set_xlabel('内容数量', fontsize=12)
+plt.tight_layout()
+plt.savefig('images/04_barh_country.png', dpi=300, bbox_inches='tight', facecolor='white')
+plt.show()
+
+# ===== 图5: 直方图 - 电影时长分布 =====
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.hist(movies['duration_num'], bins=30, color='#E50914', edgecolor='white', alpha=0.85)
+ax.axvline(movies['duration_num'].mean(), color='white', linestyle='--', linewidth=2, label=f'平均时长: {movies["duration_num"].mean():.0f}分钟')
+ax.set_xlabel('时长（分钟）', fontsize=12)
+ax.set_ylabel('数量', fontsize=12)
+ax.set_title('Netflix 电影时长分布', fontsize=16, fontweight='bold')
+ax.legend(fontsize=11)
+plt.tight_layout()
+plt.savefig('images/05_hist_duration.png', dpi=300, bbox_inches='tight', facecolor='white')
+plt.show()
+
+# ===== 图6: 词云图 - 类型标签词云 =====
 fig, ax = plt.subplots(figsize=(12, 8))
 genres_text = ' '.join(df_clean['listed_in'].dropna().astype(str).tolist())
 wordcloud = WordCloud(width=800, height=400, background_color='black',
@@ -248,17 +303,76 @@ ax.imshow(wordcloud, interpolation='bilinear')
 ax.axis('off')
 ax.set_title('Netflix 内容类型标签词云', fontsize=16, fontweight='bold')
 plt.tight_layout()
-plt.savefig('images/05_wordcloud_genres.png', dpi=300, bbox_inches='tight')
+plt.savefig('images/06_wordcloud_genres.png', dpi=300, bbox_inches='tight', facecolor='black')
 plt.show()
 
-# 图7: 热力图 - 相关性矩阵
+# ===== 图7: 散点图 - 年份与时长关系 =====
+fig, ax = plt.subplots(figsize=(12, 6))
+sample_movies = movies.sample(min(500, len(movies)), random_state=42)
+sample_tv = tv.sample(min(300, len(tv)), random_state=42)
+ax.scatter(sample_movies['release_year'], sample_movies['duration_num'],
+           alpha=0.4, s=20, color='#E50914', label='Movie')
+ax.scatter(sample_tv['release_year'], sample_tv['duration_num'],
+           alpha=0.4, s=20, color='#221F1F', label='TV Show')
+ax.set_xlabel('发布年份', fontsize=12)
+ax.set_ylabel('时长', fontsize=12)
+ax.set_title('Netflix 发布年份与时长关系', fontsize=16, fontweight='bold')
+ax.legend(fontsize=11)
+plt.tight_layout()
+plt.savefig('images/07_scatter_year_duration.png', dpi=300, bbox_inches='tight', facecolor='white')
+plt.show()
+
+# ===== 图8: 热力图 - 相关性矩阵 =====
 fig, ax = plt.subplots(figsize=(10, 8))
 corr_matrix = df_clean[['release_year', 'duration_num', 'year_added', 'month_added']].corr()
-sns.heatmap(corr_matrix, annot=True, fmt='.3f', cmap='Reds', 
-            center=0, square=True, linewidths=2)
+sns.heatmap(corr_matrix, annot=True, fmt='.3f', cmap='Reds',
+            center=0, square=True, linewidths=2, ax=ax)
 ax.set_title('Netflix 数值字段相关性热力图', fontsize=16, fontweight='bold')
 plt.tight_layout()
-plt.savefig('images/07_heatmap_correlation.png', dpi=300, bbox_inches='tight')
+plt.savefig('images/08_heatmap_correlation.png', dpi=300, bbox_inches='tight', facecolor='white')
+plt.show()
+
+# ===== 图9: 雷达图 - 国家内容特征对比 =====
+fig, ax = plt.subplots(figsize=(10, 8), subplot_kw=dict(projection='polar'))
+categories = ['电影占比', 'TV节目占比', '平均时长', '平均年份', 'TV-MA占比']
+top_countries = ['United States', 'India', 'United Kingdom', 'Japan']
+colors3 = ['#E50914', '#FF4D58', '#B20710', '#831116']
+
+for i, country in enumerate(top_countries):
+    c_data = df_clean[df_clean['primary_country'] == country]
+    values = [
+        len(c_data[c_data['type']=='Movie']) / len(c_data) * 100,
+        len(c_data[c_data['type']=='TV Show']) / len(c_data) * 100,
+        c_data['duration_num'].mean(),
+        c_data['release_year'].mean() - 2000,
+        len(c_data[c_data['rating']=='TV-MA']) / len(c_data) * 100
+    ]
+    values.append(values[0])
+    angles = np.linspace(0, 2 * np.pi, len(categories), endpoint=False).tolist()
+    angles.append(angles[0])
+    ax.plot(angles, values, 'o-', linewidth=2, label=country, color=colors3[i])
+    ax.fill(angles, values, alpha=0.1, color=colors3[i])
+
+ax.set_xticks(np.linspace(0, 2 * np.pi, len(categories), endpoint=False))
+ax.set_xticklabels(categories, fontsize=10)
+ax.set_title('主要国家内容特征对比', fontsize=16, fontweight='bold', pad=30)
+ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.0), fontsize=10)
+plt.tight_layout()
+plt.savefig('images/09_radar_country.png', dpi=300, bbox_inches='tight', facecolor='white')
+plt.show()
+
+# ===== 图10: 堆叠面积图 - 年度类型趋势 =====
+fig, ax = plt.subplots(figsize=(12, 6))
+yearly_type = df_clean.groupby(['year_added', 'type']).size().unstack(fill_value=0)
+if 'Movie' in yearly_type.columns and 'TV Show' in yearly_type.columns:
+    ax.stackplot(yearly_type.index, yearly_type['Movie'], yearly_type['TV Show'],
+                 labels=['Movie', 'TV Show'], colors=['#E50914', '#221F1F'], alpha=0.85)
+ax.set_xlabel('年份', fontsize=12)
+ax.set_ylabel('内容数量', fontsize=12)
+ax.set_title('Netflix 年度内容类型趋势（堆叠面积图）', fontsize=16, fontweight='bold')
+ax.legend(loc='upper left', fontsize=11)
+plt.tight_layout()
+plt.savefig('images/10_stacked_area_yearly.png', dpi=300, bbox_inches='tight', facecolor='white')
 plt.show()</code></pre>
             </div>
           </div>
@@ -267,33 +381,43 @@ plt.show()</code></pre>
           <div class="grid grid-5" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
             <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
               <div style="color: #E50914; font-weight: 600;">饼图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">内容类型分布</div>
             </div>
             <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
               <div style="color: #E50914; font-weight: 600;">环形图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">Rating分布</div>
             </div>
             <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
               <div style="color: #E50914; font-weight: 600;">折线图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">年度添加趋势</div>
+            </div>
+            <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
+              <div style="color: #E50914; font-weight: 600;">条形图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">国家分布</div>
             </div>
             <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
               <div style="color: #E50914; font-weight: 600;">直方图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">电影时长分布</div>
             </div>
             <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
               <div style="color: #E50914; font-weight: 600;">词云图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">类型标签词云</div>
             </div>
             <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
               <div style="color: #E50914; font-weight: 600;">散点图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">年份与时长关系</div>
             </div>
             <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
               <div style="color: #E50914; font-weight: 600;">热力图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">相关性矩阵</div>
             </div>
             <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
               <div style="color: #E50914; font-weight: 600;">雷达图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">国家特征对比</div>
             </div>
             <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
               <div style="color: #E50914; font-weight: 600;">堆叠面积图</div>
-            </div>
-            <div style="text-align: center; padding: 12px; background: var(--netflix-dark); border-radius: 8px;">
-              <div style="color: #E50914; font-weight: 600;">树形图</div>
+              <div style="color: rgba(255,255,255,0.5); font-size: 12px;">年度类型趋势</div>
             </div>
           </div>
         </div>

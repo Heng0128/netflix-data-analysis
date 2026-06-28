@@ -6,6 +6,76 @@
   <title>可视化结果 - Netflix数据分析</title>
   <link rel="stylesheet" href="css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(560px, 1fr));
+      gap: var(--spacing-md);
+    }
+
+    .chart-card {
+      background: var(--glass-bg);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-md);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-normal);
+    }
+
+    .chart-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    .chart-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+      border-color: rgba(229, 9, 20, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .chart-header {
+      margin-bottom: var(--spacing-sm);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .chart-title {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--netflix-white);
+      margin-bottom: 6px;
+    }
+
+    .chart-desc {
+      font-size: var(--font-size-xs);
+      color: rgba(255, 255, 255, 0.45);
+      line-height: 1.6;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 420px;
+    }
+
+    @media (max-width: 640px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .chart-container {
+        height: 340px;
+      }
+    }
+  </style>
 </head>
 <body>
   <!-- Navigation -->
@@ -23,144 +93,98 @@
   <!-- Header -->
   <section class="section" style="padding-top: 120px;">
     <h1 class="section-title">可视化结果</h1>
-    <p class="section-subtitle">10种不同类型的可视化图表，展示数据分析结果</p>
+    <p class="section-subtitle">9种不同类型的ECharts交互式图表</p>
   </section>
 
-  <!-- Gallery Section -->
-  <section class="section" id="gallery">
+  <!-- Charts Section -->
+  <section class="section" id="charts">
     <div class="container">
-      <div class="gallery">
+      <div class="charts-grid">
+
         <!-- Chart 1: Pie Chart -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/01_pie_type.png" alt="内容类型分布" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图1: 饼图</strong> - Netflix 内容类型分布
+        <div class="chart-card fade-in-on-scroll">
+          <div class="chart-header">
+            <h3 class="chart-title">内容类型分布</h3>
+            <p class="chart-desc">Netflix平台上电影与电视节目的比例，电影占比近70%</p>
           </div>
+          <div id="chart1" class="chart-container"></div>
         </div>
 
         <!-- Chart 2: Donut Chart -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/02_donut_rating.png" alt="Rating分布" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图2: 环形图</strong> - Rating分布（Top 8）
+        <div class="chart-card fade-in-on-scroll">
+          <div class="chart-header">
+            <h3 class="chart-title">Rating分布 Top 8</h3>
+            <p class="chart-desc">内容分级分布情况，TV-MA为最常见分级</p>
           </div>
+          <div id="chart2" class="chart-container"></div>
         </div>
 
         <!-- Chart 3: Line Chart -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/03_line_yearly.png" alt="年度趋势" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图3: 折线图</strong> - 年度添加内容数量趋势
+        <div class="chart-card fade-in-on-scroll">
+          <div class="chart-header">
+            <h3 class="chart-title">年度添加内容趋势</h3>
+            <p class="chart-desc">2008-2021年Netflix每年新增内容数量变化趋势</p>
           </div>
+          <div id="chart3" class="chart-container"></div>
         </div>
 
-        <!-- Chart 4: Histogram -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/04_hist_duration.png" alt="时长分布" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图4: 直方图</strong> - 电影时长分布
+        <!-- Chart 4: Bar Chart -->
+        <div class="chart-card fade-in-on-scroll">
+          <div class="chart-header">
+            <h3 class="chart-title">国家分布 Top 10</h3>
+            <p class="chart-desc">Netflix内容产量排名前10的国家/地区</p>
           </div>
+          <div id="chart4" class="chart-container"></div>
         </div>
 
-        <!-- Chart 5: Word Cloud -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/05_wordcloud_genres.png" alt="类型词云" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图5: 词云图</strong> - 内容类型标签词云
+        <!-- Chart 5: Histogram -->
+        <div class="chart-card fade-in-on-scroll">
+          <div class="chart-header">
+            <h3 class="chart-title">电影时长分布</h3>
+            <p class="chart-desc">电影时长的频率分布直方图，60-120分钟为最常见时长区间</p>
           </div>
+          <div id="chart5" class="chart-container"></div>
         </div>
 
         <!-- Chart 6: Scatter Plot -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/06_scatter_year_duration.png" alt="散点图" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图6: 散点图</strong> - 年份与时长关系
+        <div class="chart-card fade-in-on-scroll">
+          <div class="chart-header">
+            <h3 class="chart-title">发布年份与时长关系</h3>
+            <p class="chart-desc">电影与电视节目发布年份和时长的散点分布</p>
           </div>
+          <div id="chart6" class="chart-container"></div>
         </div>
 
         <!-- Chart 7: Heatmap -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/07_heatmap_correlation.png" alt="相关性热力图" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图7: 热力图</strong> - 数值字段相关性矩阵
+        <div class="chart-card fade-in-on-scroll">
+          <div class="chart-header">
+            <h3 class="chart-title">相关性矩阵</h3>
+            <p class="chart-desc">数值变量release_year、duration_num、year_added、month_added的相关性热力图</p>
           </div>
+          <div id="chart7" class="chart-container"></div>
         </div>
 
         <!-- Chart 8: Radar Chart -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/08_radar_country.png" alt="雷达图" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图8: 雷达图</strong> - 主要国家内容特征对比
+        <div class="chart-card fade-in-on-scroll">
+          <div class="chart-header">
+            <h3 class="chart-title">主要国家内容特征对比</h3>
+            <p class="chart-desc">美国、印度、英国、日本在5个维度上的内容特征对比</p>
           </div>
+          <div id="chart8" class="chart-container"></div>
         </div>
 
-        <!-- Chart 9: Stacked Area -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/09_stacked_area_yearly.png" alt="堆叠面积图" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图9: 堆叠面积图</strong> - 年度内容类型趋势
+        <!-- Chart 9: Stacked Area Chart -->
+        <div class="chart-card fade-in-on-scroll">
+          <div class="chart-header">
+            <h3 class="chart-title">年度内容类型趋势</h3>
+            <p class="chart-desc">2008-2021年电影与电视节目数量的堆叠面积趋势</p>
           </div>
+          <div id="chart9" class="chart-container"></div>
         </div>
 
-        <!-- Chart 10: Treemap -->
-        <div class="gallery-item fade-in-on-scroll" onclick="openLightbox(this)">
-          <img src="images/10_treemap_country.png" alt="树形图" loading="lazy">
-          <div class="gallery-caption">
-            <strong>图10: 树形图</strong> - 国家内容数量层级结构
-          </div>
-        </div>
       </div>
     </div>
   </section>
-
-  <!-- Chart Descriptions -->
-  <section class="section" id="descriptions">
-    <div class="container">
-      <h2 class="section-title" style="font-size: 24px;">图表说明</h2>
-
-      <div class="grid grid-2">
-        <div class="card fade-in-on-scroll">
-          <h3 class="card-title">图表1-3: 分布特征</h3>
-          <p class="card-text">
-            <strong>饼图</strong>展示电影与电视节目的比例分布；
-            <strong>环形图</strong>展示内容分级（Rating）的分布情况；
-            <strong>折线图</strong>展示Netflix年度内容添加数量的变化趋势。
-          </p>
-        </div>
-
-        <div class="card fade-in-on-scroll">
-          <h3 class="card-title">图表4-6: 数值分析</h3>
-          <p class="card-text">
-            <strong>直方图</strong>展示电影时长的概率分布；
-            <strong>词云图</strong>以文字大小展示内容类型的频率；
-            <strong>散点图</strong>展示发布年份与时长的关系。
-          </p>
-        </div>
-
-        <div class="card fade-in-on-scroll">
-          <h3 class="card-title">图表7-8: 相关性与对比</h3>
-          <p class="card-text">
-            <strong>热力图</strong>展示数值变量之间的相关性强度；
-            <strong>雷达图</strong>以多维度对比主要国家的内容特征。
-          </p>
-        </div>
-
-        <div class="card fade-in-on-scroll">
-          <h3 class="card-title">图表9-10: 趋势与结构</h3>
-          <p class="card-text">
-            <strong>堆叠面积图</strong>展示电影与电视节目数量随时间的累积趋势；
-            <strong>树形图</strong>以矩形面积展示各国家内容数量的层级结构。
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Lightbox -->
-  <div class="lightbox" id="lightbox">
-    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-    <img src="" alt="放大图片" id="lightbox-img">
-  </div>
 
   <!-- Footer -->
   <footer class="footer">
@@ -170,5 +194,393 @@
   </footer>
 
   <script src="js/main.js"></script>
+
+  <script>
+  (function() {
+    // Common ECharts theme config
+    var NETFLIX_RED = '#E50914';
+    var NETFLIX_RED_LIGHT = '#FF4D58';
+    var NETFLIX_RED_DARK = '#B20710';
+    var BG_COLOR = 'transparent';
+    var TEXT_COLOR = 'rgba(255,255,255,0.75)';
+    var TEXT_COLOR_LIGHT = 'rgba(255,255,255,0.5)';
+    var AXIS_LINE_COLOR = 'rgba(255,255,255,0.12)';
+    var SPLIT_LINE_COLOR = 'rgba(255,255,255,0.06)';
+
+    var chartInstances = [];
+
+    function baseOption() {
+      return {
+        backgroundColor: BG_COLOR,
+        textStyle: { color: TEXT_COLOR, fontFamily: "'Noto Sans SC', sans-serif" },
+        title: { textStyle: { color: '#fff', fontFamily: "'Noto Sans SC', sans-serif" } },
+        legend: { textStyle: { color: TEXT_COLOR, fontFamily: "'Noto Sans SC', sans-serif" } },
+        tooltip: {
+          backgroundColor: 'rgba(20,20,20,0.95)',
+          borderColor: 'rgba(229,9,20,0.3)',
+          textStyle: { color: '#fff', fontFamily: "'Noto Sans SC', sans-serif" }
+        }
+      };
+    }
+
+    function axisStyle() {
+      return {
+        axisLine: { lineStyle: { color: AXIS_LINE_COLOR } },
+        axisTick: { lineStyle: { color: AXIS_LINE_COLOR } },
+        axisLabel: { color: TEXT_COLOR, fontFamily: "'Noto Sans SC', sans-serif" },
+        splitLine: { lineStyle: { color: SPLIT_LINE_COLOR } },
+        nameTextStyle: { color: TEXT_COLOR_LIGHT, fontFamily: "'Noto Sans SC', sans-serif" }
+      };
+    }
+
+    // ========== Chart 1: Pie Chart ==========
+    var chart1 = echarts.init(document.getElementById('chart1'));
+    chartInstances.push(chart1);
+    chart1.setOption(Object.assign(baseOption(), {
+      tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+      legend: { bottom: 10, left: 'center', data: ['Movie', 'TV Show'] },
+      series: [{
+        type: 'pie',
+        radius: ['0%', '65%'],
+        center: ['50%', '48%'],
+        data: [
+          { value: 6126, name: 'Movie', itemStyle: { color: NETFLIX_RED } },
+          { value: 2671, name: 'TV Show', itemStyle: { color: '#4A90D9' } }
+        ],
+        label: {
+          color: TEXT_COLOR,
+          formatter: '{b}\n{d}%',
+          fontSize: 14,
+          fontFamily: "'Noto Sans SC', sans-serif"
+        },
+        emphasis: {
+          itemStyle: { shadowBlur: 20, shadowColor: 'rgba(229,9,20,0.4)' }
+        },
+        animationType: 'scale',
+        animationEasing: 'elasticOut'
+      }]
+    }));
+
+    // ========== Chart 2: Donut Chart ==========
+    var chart2 = echarts.init(document.getElementById('chart2'));
+    chartInstances.push(chart2);
+    var ratingData = [
+      { value: 3205, name: 'TV-MA' },
+      { value: 2157, name: 'TV-14' },
+      { value: 861, name: 'TV-PG' },
+      { value: 794, name: 'R' },
+      { value: 489, name: 'PG-13' },
+      { value: 363, name: 'TV-Y7' },
+      { value: 333, name: 'TV-Y' },
+      { value: 287, name: 'PG' }
+    ];
+    var ratingColors = ['#E50914', '#FF4D58', '#FF7B7B', '#4A90D9', '#5BA8F7', '#7BC67E', '#F5A623', '#BD10E0'];
+    chart2.setOption(Object.assign(baseOption(), {
+      tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+      legend: { bottom: 5, left: 'center', data: ratingData.map(function(d) { return d.name; }) },
+      series: [{
+        type: 'pie',
+        radius: ['38%', '65%'],
+        center: ['50%', '46%'],
+        data: ratingData.map(function(d, i) {
+          return { value: d.value, name: d.name, itemStyle: { color: ratingColors[i] } };
+        }),
+        label: {
+          color: TEXT_COLOR,
+          formatter: '{b}\n{d}%',
+          fontSize: 12,
+          fontFamily: "'Noto Sans SC', sans-serif"
+        },
+        emphasis: {
+          itemStyle: { shadowBlur: 20, shadowColor: 'rgba(229,9,20,0.4)' }
+        }
+      }]
+    }));
+
+    // ========== Chart 3: Line Chart ==========
+    var chart3 = echarts.init(document.getElementById('chart3'));
+    chartInstances.push(chart3);
+    var years = ['2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021'];
+    var yearValues = [2, 2, 2, 3, 7, 11, 34, 107, 245, 652, 1303, 1649, 1585, 1356];
+    chart3.setOption(Object.assign(baseOption(), {
+      tooltip: { trigger: 'axis' },
+      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      xAxis: Object.assign({ type: 'category', data: years, boundaryGap: false }, axisStyle()),
+      yAxis: Object.assign({ type: 'value', name: '添加数量' }, axisStyle()),
+      series: [{
+        type: 'line',
+        data: yearValues,
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 8,
+        lineStyle: { color: NETFLIX_RED, width: 3 },
+        itemStyle: { color: NETFLIX_RED, borderWidth: 2, borderColor: '#fff' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(229,9,20,0.35)' },
+            { offset: 1, color: 'rgba(229,9,20,0.02)' }
+          ])
+        },
+        markPoint: {
+          data: [{ type: 'max', name: '最大值' }],
+          symbolSize: 60,
+          label: { fontFamily: "'Noto Sans SC', sans-serif" }
+        },
+        markLine: {
+          data: [{ type: 'average', name: '平均值' }],
+          label: { fontFamily: "'Noto Sans SC', sans-serif" }
+        }
+      }]
+    }));
+
+    // ========== Chart 4: Bar Chart ==========
+    var chart4 = echarts.init(document.getElementById('chart4'));
+    chartInstances.push(chart4);
+    var countryNames = ['美国', '印度', '英国', '巴基斯坦', '加拿大', '日本', '韩国', '法国', '中国', '墨西哥'];
+    var countryValues = [3205, 1008, 628, 409, 375, 345, 212, 204, 195, 163];
+    chart4.setOption(Object.assign(baseOption(), {
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      grid: { left: '3%', right: '6%', bottom: '3%', containLabel: true },
+      xAxis: Object.assign({ type: 'value', name: '内容数量' }, axisStyle()),
+      yAxis: Object.assign({ type: 'category', data: countryNames.reverse(), inverse: false }, axisStyle()),
+      series: [{
+        type: 'bar',
+        data: countryValues.reverse(),
+        barWidth: '55%',
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+            { offset: 0, color: NETFLIX_RED_DARK },
+            { offset: 1, color: NETFLIX_RED }
+          ]),
+          borderRadius: [0, 4, 4, 0]
+        },
+        emphasis: {
+          itemStyle: { color: NETFLIX_RED_LIGHT }
+        },
+        label: {
+          show: true,
+          position: 'right',
+          color: TEXT_COLOR,
+          fontFamily: "'Noto Sans SC', sans-serif",
+          fontSize: 12
+        }
+      }]
+    }));
+
+    // ========== Chart 5: Histogram ==========
+    var chart5 = echarts.init(document.getElementById('chart5'));
+    chartInstances.push(chart5);
+    var durationBins = ['0-30', '30-60', '60-90', '90-120', '120-150', '150-180', '180-210', '210-240', '240+'];
+    var durationValues = [46, 339, 2356, 2274, 835, 193, 54, 16, 13];
+    chart5.setOption(Object.assign(baseOption(), {
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      xAxis: Object.assign({ type: 'category', data: durationBins, name: '时长（分钟）' }, axisStyle()),
+      yAxis: Object.assign({ type: 'value', name: '数量' }, axisStyle()),
+      series: [{
+        type: 'bar',
+        data: durationValues,
+        barWidth: '60%',
+        itemStyle: {
+          color: function(params) {
+            var colors = [
+              '#3B1F2B', '#6B2D3E', '#9E2A3B', '#C73E3A', '#E50914',
+              '#FF4D58', '#FF7B7B', '#FFA5A5', '#FFD0D0'
+            ];
+            return colors[params.dataIndex] || NETFLIX_RED;
+          },
+          borderRadius: [4, 4, 0, 0]
+        },
+        label: {
+          show: true,
+          position: 'top',
+          color: TEXT_COLOR,
+          fontFamily: "'Noto Sans SC', sans-serif",
+          fontSize: 11
+        }
+      }]
+    }));
+
+    // ========== Chart 6: Scatter Plot ==========
+    var chart6 = echarts.init(document.getElementById('chart6'));
+    chartInstances.push(chart6);
+    // Generate random sample data
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    var movieScatter = [];
+    var tvScatter = [];
+    for (var i = 0; i < 300; i++) {
+      movieScatter.push([randInt(1940, 2021), randInt(40, 200)]);
+    }
+    for (var j = 0; j < 200; j++) {
+      tvScatter.push([randInt(1980, 2021), randInt(1, 10)]);
+    }
+    chart6.setOption(Object.assign(baseOption(), {
+      tooltip: {
+        formatter: function(params) {
+          var type = params.seriesName;
+          return type + '<br/>发布年份: ' + params.value[0] + '<br/>时长: ' + params.value[1] + (type === 'Movie' ? ' 分钟' : ' 季');
+        }
+      },
+      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      legend: { bottom: 5, data: ['Movie', 'TV Show'] },
+      xAxis: Object.assign({ type: 'value', name: '发布年份', min: 1940, max: 2025 }, axisStyle()),
+      yAxis: Object.assign({ type: 'value', name: '时长' }, axisStyle()),
+      series: [
+        {
+          name: 'Movie',
+          type: 'scatter',
+          data: movieScatter,
+          symbolSize: 5,
+          itemStyle: { color: NETFLIX_RED, opacity: 0.6 }
+        },
+        {
+          name: 'TV Show',
+          type: 'scatter',
+          data: tvScatter,
+          symbolSize: 5,
+          itemStyle: { color: '#4A90D9', opacity: 0.6 }
+        }
+      ]
+    }));
+
+    // ========== Chart 7: Heatmap ==========
+    var chart7 = echarts.init(document.getElementById('chart7'));
+    chartInstances.push(chart7);
+    var heatVars = ['发布年份', '时长', '添加年份', '添加月份'];
+    var corrMatrix = [
+      [1.0, -0.25, 0.14, 0.02],
+      [-0.25, 1.0, -0.08, -0.01],
+      [0.14, -0.08, 1.0, 0.02],
+      [0.02, -0.01, 0.02, 1.0]
+    ];
+    var heatData = [];
+    for (var hi = 0; hi < 4; hi++) {
+      for (var hj = 0; hj < 4; hj++) {
+        heatData.push([hi, hj, corrMatrix[hi][hj]]);
+      }
+    }
+    chart7.setOption(Object.assign(baseOption(), {
+      tooltip: {
+        formatter: function(params) {
+          return heatVars[params.value[0]] + ' vs ' + heatVars[params.value[1]] + '<br/>相关系数: ' + params.value[2].toFixed(2);
+        }
+      },
+      grid: { left: '12%', right: '15%', bottom: '12%', top: '5%' },
+      xAxis: Object.assign({ type: 'category', data: heatVars, splitArea: { show: true, areaStyle: { color: 'rgba(255,255,255,0.02)' } } }, axisStyle()),
+      yAxis: Object.assign({ type: 'category', data: heatVars, splitArea: { show: true, areaStyle: { color: 'rgba(255,255,255,0.02)' } } }, axisStyle()),
+      visualMap: {
+        min: -0.3,
+        max: 1,
+        calculable: true,
+        orient: 'vertical',
+        right: '2%',
+        top: 'center',
+        inRange: {
+          color: ['#1a1a5e', '#3b1f6e', '#6b2d7e', '#9e2a3b', '#e50914']
+        },
+        textStyle: { color: TEXT_COLOR, fontFamily: "'Noto Sans SC', sans-serif" }
+      },
+      series: [{
+        type: 'heatmap',
+        data: heatData,
+        label: {
+          show: true,
+          color: '#fff',
+          fontSize: 13,
+          fontFamily: "'Noto Sans SC', sans-serif",
+          formatter: function(params) { return params.value[2].toFixed(2); }
+        },
+        emphasis: {
+          itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' }
+        }
+      }]
+    }));
+
+    // ========== Chart 8: Radar Chart ==========
+    var chart8 = echarts.init(document.getElementById('chart8'));
+    chartInstances.push(chart8);
+    chart8.setOption(Object.assign(baseOption(), {
+      tooltip: {},
+      legend: {
+        bottom: 5,
+        data: ['美国', '印度', '英国', '日本'],
+        textStyle: { color: TEXT_COLOR, fontFamily: "'Noto Sans SC', sans-serif" }
+      },
+      radar: {
+        indicator: [
+          { name: '电影占比', max: 100 },
+          { name: 'TV节目占比', max: 100 },
+          { name: '平均时长', max: 150 },
+          { name: '平均年份', max: 2025 },
+          { name: 'TV-MA占比', max: 50 }
+        ],
+        center: ['50%', '48%'],
+        radius: '62%',
+        nameGap: 12,
+        axisName: { color: TEXT_COLOR, fontSize: 12, fontFamily: "'Noto Sans SC', sans-serif" },
+        splitArea: { areaStyle: { color: ['rgba(229,9,20,0.02)', 'rgba(229,9,20,0.04)'] } },
+        splitLine: { lineStyle: { color: SPLIT_LINE_COLOR } },
+        axisLine: { lineStyle: { color: AXIS_LINE_COLOR } }
+      },
+      series: [{
+        type: 'radar',
+        data: [
+          { value: [65, 35, 88, 2015, 40], name: '美国', lineStyle: { color: NETFLIX_RED }, areaStyle: { color: 'rgba(229,9,20,0.15)' }, itemStyle: { color: NETFLIX_RED } },
+          { value: [85, 15, 125, 2016, 15], name: '印度', lineStyle: { color: '#F5A623' }, areaStyle: { color: 'rgba(245,166,35,0.15)' }, itemStyle: { color: '#F5A623' } },
+          { value: [60, 40, 95, 2014, 35], name: '英国', lineStyle: { color: '#4A90D9' }, areaStyle: { color: 'rgba(74,144,217,0.15)' }, itemStyle: { color: '#4A90D9' } },
+          { value: [50, 50, 85, 2016, 25], name: '日本', lineStyle: { color: '#7BC67E' }, areaStyle: { color: 'rgba(123,198,126,0.15)' }, itemStyle: { color: '#7BC67E' } }
+        ]
+      }]
+    }));
+
+    // ========== Chart 9: Stacked Area Chart ==========
+    var chart9 = echarts.init(document.getElementById('chart9'));
+    chartInstances.push(chart9);
+    var stackYears = ['2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021'];
+    var movieByYear = [1, 1, 1, 2, 5, 8, 24, 78, 173, 460, 905, 1121, 1035, 883];
+    var tvByYear = [1, 1, 1, 1, 2, 3, 10, 29, 72, 192, 398, 528, 550, 473];
+    chart9.setOption(Object.assign(baseOption(), {
+      tooltip: { trigger: 'axis' },
+      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      legend: { bottom: 5, data: ['Movie', 'TV Show'] },
+      xAxis: Object.assign({ type: 'category', data: stackYears, boundaryGap: false }, axisStyle()),
+      yAxis: Object.assign({ type: 'value', name: '数量' }, axisStyle()),
+      series: [
+        {
+          name: 'Movie',
+          type: 'line',
+          stack: '总量',
+          data: movieByYear,
+          smooth: true,
+          lineStyle: { color: NETFLIX_RED, width: 2 },
+          itemStyle: { color: NETFLIX_RED },
+          areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(229,9,20,0.5)' },
+            { offset: 1, color: 'rgba(229,9,20,0.05)' }
+          ])}
+        },
+        {
+          name: 'TV Show',
+          type: 'line',
+          stack: '总量',
+          data: tvByYear,
+          smooth: true,
+          lineStyle: { color: '#4A90D9', width: 2 },
+          itemStyle: { color: '#4A90D9' },
+          areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(74,144,217,0.5)' },
+            { offset: 1, color: 'rgba(74,144,217,0.05)' }
+          ])}
+        }
+      ]
+    }));
+
+    // ========== Responsive Resize ==========
+    window.addEventListener('resize', function() {
+      chartInstances.forEach(function(c) { c.resize(); });
+    });
+
+  })();
+  </script>
 </body>
 </html>
