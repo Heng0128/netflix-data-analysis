@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import Chart, { getBaseOption, getAxisStyle } from './charts';
+import PageHeader from '@/components/page-header';
 import type { ChartData } from '@/lib/netflix-data';
 import * as echarts from 'echarts';
 
@@ -141,56 +142,39 @@ export default function VisualizationSection({ chartData }: Props) {
     };
   }, [chartData.treemapData, baseOption]);
 
+  const charts = [
+    { title: '内容类型分布', option: pieOption },
+    { title: '评分分布', option: donutOption },
+    { title: '年度趋势', option: lineOption },
+    { title: '电影时长分布', option: histogramOption },
+    { title: '年份与时长关系', option: scatterOption },
+    { title: '国家相关性热力图', option: heatmapOption },
+    { title: '主要内容国家', option: radarOption },
+    { title: '堆叠面积图', option: stackedAreaOption },
+    { title: '国家内容占比', option: treemapOption },
+  ];
+
   return (
-    <section id="visualization" className="py-20 px-4 bg-gradient-to-b from-black via-gray-950 to-black">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-white mb-12 text-center">数据可视化</h2>
+    <section className="nfl-bg-radial min-h-screen pt-28 pb-20 px-4 relative overflow-hidden">
+      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto">
+        <PageHeader
+          eyebrow="Visualization"
+          title="数据可视化"
+          subtitle="9 张图表全景展示 Netflix 内容生态"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-white text-lg font-medium mb-4">内容类型分布</h3>
-            <Chart option={pieOption} className="h-64" />
-          </div>
-
-          <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-white text-lg font-medium mb-4">评分分布</h3>
-            <Chart option={donutOption} className="h-64" />
-          </div>
-
-          <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-white text-lg font-medium mb-4">年度趋势</h3>
-            <Chart option={lineOption} className="h-64" />
-          </div>
-
-          <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-white text-lg font-medium mb-4">电影时长分布</h3>
-            <Chart option={histogramOption} className="h-64" />
-          </div>
-
-          <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-white text-lg font-medium mb-4">年份与时长关系</h3>
-            <Chart option={scatterOption} className="h-64" />
-          </div>
-
-          <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-white text-lg font-medium mb-4">国家相关性热力图</h3>
-            <Chart option={heatmapOption} className="h-64" />
-          </div>
-
-          <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-white text-lg font-medium mb-4">主要内容国家</h3>
-            <Chart option={radarOption} className="h-64" />
-          </div>
-
-          <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-white text-lg font-medium mb-4">堆叠面积图</h3>
-            <Chart option={stackedAreaOption} className="h-64" />
-          </div>
-
-          <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-white text-lg font-medium mb-4">国家内容占比</h3>
-            <Chart option={treemapOption} className="h-64" />
-          </div>
+          {charts.map((c) => (
+            <div key={c.title} className="glass-card glass-card-hover rounded-2xl p-5">
+              <h3 className="text-white text-base font-medium mb-4 flex items-center gap-2">
+                <span className="w-1 h-4 rounded-full bg-[#E50914]" />
+                {c.title}
+              </h3>
+              <Chart option={c.option} className="h-72" />
+            </div>
+          ))}
         </div>
       </div>
     </section>
