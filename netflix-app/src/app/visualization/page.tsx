@@ -9,7 +9,7 @@ export default function VisualizationPage() {
   const { chartData } = getAllData();
 
   return (
-    <main className="pt-16">
+    <main>
       <VisualizationSection chartData={chartData} />
     </main>
   );

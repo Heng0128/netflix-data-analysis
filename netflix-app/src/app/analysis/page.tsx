@@ -9,7 +9,7 @@ export default function AnalysisPage() {
   const { stats } = getAllData();
 
   return (
-    <main className="pt-16">
+    <main>
       <AnalysisSection stats={stats} />
     </main>
   );

@@ -9,7 +9,7 @@ export default function ConclusionPage() {
   const { stats } = getAllData();
 
   return (
-    <main className="pt-16">
+    <main>
       <ConclusionSection stats={stats} />
     </main>
   );

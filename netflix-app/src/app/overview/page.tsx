@@ -9,7 +9,7 @@ export default function OverviewPage() {
   const { stats } = getAllData();
 
   return (
-    <main className="pt-16">
+    <main>
       <OverviewSection stats={stats} />
     </main>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import PageHeader from '@/components/page-header';
 
 const CODE_SAMPLES: Record<string, string> = {
   '数据读取': `import pandas as pd
@@ -21,14 +22,15 @@ print(type_counts)
 import matplotlib.pyplot as plt
 
 df = pd.read_csv('netflix_titles.csv')
-yearly = df.groupby(['year_added', 'type']).size()
-.unstack(fill_value=0)
+yearly = df.groupby(['year_added', 'type']).size()\\
+           .unstack(fill_value=0)
 yearly.plot(kind='line', figsize=(12, 6))
 plt.title('Netflix Content by Year')
 plt.show()`,
 
   '时长分析': `import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 movies = df[df['type'] == 'Movie']
 sns.histplot(data=movies, x='duration_num', bins=30)
@@ -36,7 +38,7 @@ plt.title('Movie Duration Distribution')
 plt.show()`,
 };
 
-const KEYWORDS = ['import', 'from', 'def', 'class', 'return', 'if', 'else', 'for', 'in', 'print', 'pd', 'pd.read_csv', 'groupby', 'value_counts', 'plot', 'show', 'data', 'df'];
+const KEYWORDS = ['import', 'from', 'def', 'class', 'return', 'if', 'else', 'for', 'in', 'print', 'pd', 'groupby', 'value_counts', 'plot', 'show', 'data', 'df'];
 
 function highlightPython(code: string): string {
   const lines = code.split('\n');
@@ -60,19 +62,26 @@ export default function CodeShowcase() {
   const [activeTab, setActiveTab] = useState('数据读取');
 
   return (
-    <section id="code" className="py-20 px-4">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-white mb-8 text-center">代码示例</h2>
+    <section className="nfl-bg-radial min-h-screen pt-28 pb-20 px-4 relative overflow-hidden">
+      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
 
+      <div className="relative max-w-4xl mx-auto">
+        <PageHeader
+          eyebrow="Code"
+          title="代码实现"
+          subtitle="Python + Pandas 数据分析核心片段"
+        />
+
+        {/* Tab 切换 */}
         <div className="flex flex-wrap gap-2 mb-6 justify-center">
           {Object.keys(CODE_SAMPLES).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab
-                  ? 'bg-red-600 text-white'
-                  : 'bg-white/10 text-gray-400 hover:text-white'
+                  ? 'bg-[#E50914] text-white shadow-[0_4px_20px_rgba(229,9,20,0.4)]'
+                  : 'glass-card text-gray-400 hover:text-white'
               }`}
             >
               {tab}
@@ -80,8 +89,15 @@ export default function CodeShowcase() {
           ))}
         </div>
 
-        <div className="bg-[#1e1e1e] rounded-xl p-6 overflow-x-auto">
-          <pre className="text-sm font-mono">
+        {/* 代码块 */}
+        <div className="glass-card rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+            <span className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+            <span className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+            <span className="w-3 h-3 rounded-full bg-[#27c93f]" />
+            <span className="ml-2 text-gray-500 text-xs font-mono">analysis.py</span>
+          </div>
+          <pre className="p-6 overflow-x-auto text-sm font-mono leading-relaxed bg-[#0d0d0d]">
             <code dangerouslySetInnerHTML={{ __html: highlightPython(CODE_SAMPLES[activeTab]) }} />
           </pre>
         </div>

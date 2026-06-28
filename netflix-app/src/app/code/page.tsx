@@ -6,7 +6,7 @@ export const metadata = {
 
 export default function CodePage() {
   return (
-    <main className="pt-16">
+    <main>
       <CodeShowcase />
     </main>
   );
