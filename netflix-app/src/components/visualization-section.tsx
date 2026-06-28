@@ -15,9 +15,9 @@ export default function VisualizationSection({ chartData }: Props) {
   const baseOption = getBaseOption();
   const axisStyle = getAxisStyle();
 
-  const pieOption = useMemo(() => ({
+  const pieOption = useMemo<echarts.EChartsOption>(() => ({
     ...baseOption,
-    tooltip: { ...baseOption.tooltip, trigger: 'item' },
+    tooltip: { ...baseOption.tooltip, trigger: 'item' as const },
     series: [{
       type: 'pie',
       radius: ['40%', '70%'],
@@ -31,9 +31,9 @@ export default function VisualizationSection({ chartData }: Props) {
     }],
   }), [chartData.typeDistribution]);
 
-  const donutOption = useMemo(() => ({
+  const donutOption = useMemo<echarts.EChartsOption>(() => ({
     ...baseOption,
-    tooltip: { ...baseOption.tooltip, trigger: 'item' },
+    tooltip: { ...baseOption.tooltip, trigger: 'item' as const },
     series: [{
       type: 'pie',
       radius: ['50%', '70%'],
@@ -48,7 +48,7 @@ export default function VisualizationSection({ chartData }: Props) {
     }],
   }), [chartData.ratingDistribution]);
 
-  const lineOption = useMemo(() => ({
+  const lineOption = useMemo<echarts.EChartsOption>(() => ({
     ...baseOption,
     ...axisStyle,
     xAxis: { ...axisStyle.xAxis, type: 'category', data: chartData.yearlyTrends.map(d => d.year) },
@@ -60,7 +60,7 @@ export default function VisualizationSection({ chartData }: Props) {
     legend: { textStyle: { color: '#fff' } },
   }), [chartData.yearlyTrends, axisStyle]);
 
-  const histogramOption = useMemo(() => ({
+  const histogramOption = useMemo<echarts.EChartsOption>(() => ({
     ...baseOption,
     ...axisStyle,
     xAxis: { ...axisStyle.xAxis, type: 'category', data: chartData.durationHistogram.map(d => d.range) },
@@ -73,7 +73,7 @@ export default function VisualizationSection({ chartData }: Props) {
     }],
   }), [chartData.durationHistogram, axisStyle]);
 
-  const scatterOption = useMemo(() => ({
+  const scatterOption = useMemo<echarts.EChartsOption>(() => ({
     ...baseOption,
     xAxis: { type: 'value', name: 'Year', nameTextStyle: { color: '#888' }, axisLine: { lineStyle: { color: '#333' } }, axisLabel: { color: '#888' }, splitLine: { lineStyle: { color: '#222' } } },
     yAxis: { type: 'value', name: 'Duration (min)', nameTextStyle: { color: '#888' }, axisLine: { lineStyle: { color: '#333' } }, axisLabel: { color: '#888' }, splitLine: { lineStyle: { color: '#222' } } },
@@ -83,21 +83,25 @@ export default function VisualizationSection({ chartData }: Props) {
       data: chartData.scatterData.map(d => [d.x, d.y]),
       itemStyle: { color: 'rgba(229,9,20,0.6)' },
     }],
-    tooltip: { ...baseOption.tooltip, trigger: 'item', formatter: (p: { data: number[] }) => `${p.data[0]} - ${p.data[1]} min` },
+    tooltip: { ...baseOption.tooltip, trigger: 'item' as const, formatter: (p: echarts.TooltipComponentFormatterCallbackParams) => {
+      const params = Array.isArray(p) ? p[0] : p;
+      const [x, y] = (params.data as number[]) ?? [];
+      return `${x} - ${y} min`;
+    } },
   }), [chartData.scatterData, baseOption]);
 
-  const heatmapOption = useMemo(() => {
+  const heatmapOption = useMemo<echarts.EChartsOption>(() => {
     const countries = ['United States', 'India', 'United Kingdom', 'Canada', 'France'];
     return {
       ...baseOption,
       xAxis: { type: 'category', data: countries, axisLine: { lineStyle: { color: '#333' } }, axisLabel: { color: '#888', rotate: 30 } },
       yAxis: { type: 'category', data: countries, axisLine: { lineStyle: { color: '#333' } }, axisLabel: { color: '#888' } },
       visualMap: { min: -1, max: 1, calculable: true, textStyle: { color: '#fff' }, inRange: { color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026'] } },
-      series: [{ type: 'heatmap', data: chartData.correlationMatrix.map((row, i) => row.map((v, j) => [j, i, v])), emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } } }],
+      series: [{ type: 'heatmap', data: chartData.correlationMatrix.flatMap((row, i) => row.map((v, j) => [j, i, v] as [number, number, number])), emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } } }],
     };
   }, [chartData.correlationMatrix, baseOption]);
 
-  const radarOption = useMemo(() => ({
+  const radarOption = useMemo<echarts.EChartsOption>(() => ({
     ...baseOption,
     radar: {
       indicator: chartData.radarData.map(d => ({ name: d.country, max: Math.max(...chartData.radarData.map(x => x.value)) * 1.2 })),
@@ -112,7 +116,7 @@ export default function VisualizationSection({ chartData }: Props) {
     }],
   }), [chartData.radarData, baseOption]);
 
-  const stackedAreaOption = useMemo(() => ({
+  const stackedAreaOption = useMemo<echarts.EChartsOption>(() => ({
     ...baseOption,
     ...axisStyle,
     xAxis: { ...axisStyle.xAxis, type: 'category', data: chartData.stackedAreaData.map(d => d.year) },
@@ -124,7 +128,7 @@ export default function VisualizationSection({ chartData }: Props) {
     legend: { textStyle: { color: '#fff' } },
   }), [chartData.stackedAreaData, axisStyle]);
 
-  const treemapOption = useMemo(() => {
+  const treemapOption = useMemo<echarts.EChartsOption>(() => {
     const treemapColors = ['#E50914', '#B81D24', '#831a1a', '#564d4d', '#3d3d3d', '#2a2a2a'];
     return {
       ...baseOption,

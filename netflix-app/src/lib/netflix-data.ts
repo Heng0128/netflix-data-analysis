@@ -1,10 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-import type { NetflixRecord } from '@/lib/netflix-data';
-import type { NetflixStats } from '@/lib/netflix-data';
-import type { ChartData } from '@/lib/netflix-data';
-
 export interface NetflixRecord {
   show_id: string;
   type: 'Movie' | 'TV Show';
@@ -106,7 +102,7 @@ export function getNetflixRecords(): NetflixRecord[] {
       record[headers[j]] = row[j] || '';
     }
 
-    records.push(record as NetflixRecord);
+    records.push(record as unknown as NetflixRecord);
   }
 
   cachedRecords = records;
