@@ -10,14 +10,14 @@
   <style>
     .charts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(560px, 1fr));
-      gap: var(--spacing-md);
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
     }
 
     .chart-card {
       background: var(--glass-bg);
-      border-radius: var(--radius-xl);
-      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+      padding: 16px;
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -37,42 +37,59 @@
     }
 
     .chart-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       box-shadow: var(--shadow-card-hover);
       border-color: rgba(229, 9, 20, 0.15);
       background: rgba(255, 255, 255, 0.05);
     }
 
     .chart-header {
-      margin-bottom: var(--spacing-sm);
-      padding-bottom: var(--spacing-sm);
+      margin-bottom: 10px;
+      padding-bottom: 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .chart-title {
-      font-size: var(--font-size-lg);
+      font-size: 15px;
       font-weight: 600;
       color: var(--netflix-white);
-      margin-bottom: 6px;
+      margin-bottom: 3px;
     }
 
     .chart-desc {
-      font-size: var(--font-size-xs);
-      color: rgba(255, 255, 255, 0.45);
-      line-height: 1.6;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      line-height: 1.5;
     }
 
     .chart-container {
       width: 100%;
-      height: 420px;
+      height: 320px;
     }
 
-    @media (max-width: 640px) {
+    /* Full-width charts for wide ones */
+    .chart-card.wide {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 1200px) {
+      .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .chart-card.wide {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 768px) {
       .charts-grid {
         grid-template-columns: 1fr;
       }
+      .chart-card.wide {
+        grid-column: span 1;
+      }
       .chart-container {
-        height: 340px;
+        height: 300px;
       }
     }
   </style>
@@ -120,7 +137,7 @@
         </div>
 
         <!-- Chart 3: Line Chart -->
-        <div class="chart-card fade-in-on-scroll">
+        <div class="chart-card wide fade-in-on-scroll">
           <div class="chart-header">
             <h3 class="chart-title">年度添加内容趋势</h3>
             <p class="chart-desc">2008-2021年Netflix每年新增内容数量变化趋势</p>
@@ -147,7 +164,7 @@
         </div>
 
         <!-- Chart 6: Scatter Plot -->
-        <div class="chart-card fade-in-on-scroll">
+        <div class="chart-card wide fade-in-on-scroll">
           <div class="chart-header">
             <h3 class="chart-title">发布年份与时长关系</h3>
             <p class="chart-desc">电影与电视节目发布年份和时长的散点分布</p>
@@ -174,7 +191,7 @@
         </div>
 
         <!-- Chart 9: Stacked Area Chart -->
-        <div class="chart-card fade-in-on-scroll">
+        <div class="chart-card wide fade-in-on-scroll">
           <div class="chart-header">
             <h3 class="chart-title">年度内容类型趋势</h3>
             <p class="chart-desc">2008-2021年电影与电视节目数量的堆叠面积趋势</p>
