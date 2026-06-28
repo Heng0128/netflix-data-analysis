@@ -2,7 +2,14 @@
 
 /* ==================== CSS Variables ==================== */
 :root {
-  /* Netflix Colors */
+  /* Netflix 品牌色 */
+  --primary: #E50914;            /* Netflix 红 */
+  --background: #0A0A0A;         /* 深黑背景 */
+  --foreground: #FFFFFF;
+  --card: rgba(255, 255, 255, 0.04);  /* 半透明卡片 */
+  --border: rgba(255, 255, 255, 0.08);
+
+  /* Netflix Colors (兼容旧版) */
   --netflix-red: #E50914;
   --netflix-red-dark: #B20710;
   --netflix-red-light: #FF4D58;
@@ -14,6 +21,13 @@
   --netflix-bg: #0A0A0A;
   --netflix-surface: #1A1A2E;
   --netflix-card: #16213E;
+
+  /* 图表色板（5 色） */
+  --chart-1: #E50914;
+  --chart-2: #4A90D9;
+  --chart-3: #F5A623;
+  --chart-4: #7BC67E;
+  --chart-5: #BD10E0;
 
   /* Glass */
   --glass-bg: rgba(255, 255, 255, 0.03);
@@ -60,25 +74,118 @@
   --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ==================== Tailwind Theme Mapping ==================== */
+@theme inline {
+  --color-primary: var(--primary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-nfl-red: #E50914;
+  --color-nfl-red-dark: #B20710;
+  --color-nfl-red-light: #FF4D58;
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
 /* ==================== Scrollbar ==================== */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--netflix-bg);
+  background: #0A0A0A;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--netflix-gray);
-  border-radius: 4px;
+  background: rgba(229, 9, 20, 0.4);
+  border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--netflix-red);
+  background: rgba(229, 9, 20, 0.7);
 }
 
 /* ==================== Selection ==================== */
 ::selection {
   background: rgba(229, 9, 20, 0.4);
   color: var(--netflix-white);
+}
+
+/* ==================== Glassmorphism Cards ==================== */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);  /* Safari 兼容 */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-hover {
+  transition: all 0.3s ease;
+}
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(229, 9, 20, 0.3);   /* 悬停时显红色边 */
+  transform: translateY(-4px);            /* 向上浮起 */
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4),
+              0 0 0 1px rgba(229,9,20,0.15);
+}
+
+/* ==================== Background Effects ==================== */
+/* 径向渐变背景（Hero 区） */
+.nfl-bg-radial {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,
+      rgba(229, 9, 20, 0.15), transparent 60%),        /* 顶部红光 */
+    radial-gradient(ellipse 60% 40% at 80% 80%,
+      rgba(229, 9, 20, 0.08), transparent 60%),        /* 右下弱光 */
+    radial-gradient(ellipse 60% 40% at 20% 60%,
+      rgba(74, 144, 217, 0.05), transparent 60%),      /* 左下蓝光 */
+    #0A0A0A;
+}
+
+/* 动态网格背景 */
+@keyframes grid-move {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(40px); }
+}
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(229,9,20,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(229,9,20,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: grid-move 8s linear infinite;
+}
+
+/* N Logo 脉冲发光 */
+.nfl-n-glow {
+  text-shadow:
+    0 0 20px rgba(229,9,20,0.6),
+    0 0 40px rgba(229,9,20,0.4),
+    0 0 60px rgba(229,9,20,0.2);
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(229,9,20,0.3); }
+  50%      { box-shadow: 0 0 40px rgba(229,9,20,0.6); }
+}
+
+/* 闪光标题动画 */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.shimmer-text {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.4) 0%,
+    rgba(255,255,255,1)   25%,
+    rgba(229,9,20,1)      50%,    /* 中间过 Netflix 红 */
+    rgba(255,255,255,1)   75%,
+    rgba(255,255,255,0.4) 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;  /* 关键：让文字透明显示背景 */
+  animation: shimmer 6s linear infinite;
 }
 
 /* ==================== Reset & Base ==================== */
@@ -216,9 +323,13 @@ img {
   right: -10%;
   bottom: -20%;
   background:
-    radial-gradient(ellipse 600px 400px at 25% 40%, rgba(229, 9, 20, 0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 350px at 75% 60%, rgba(229, 9, 20, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 800px 600px at 50% 50%, rgba(22, 33, 62, 0.5) 0%, transparent 70%);
+    radial-gradient(ellipse 80% 60% at 50% 0%,
+      rgba(229, 9, 20, 0.15), transparent 60%),        /* 顶部红光 */
+    radial-gradient(ellipse 60% 40% at 80% 80%,
+      rgba(229, 9, 20, 0.08), transparent 60%),        /* 右下弱光 */
+    radial-gradient(ellipse 60% 40% at 20% 60%,
+      rgba(74, 144, 217, 0.05), transparent 60%),      /* 左下蓝光 */
+    #0A0A0A;
   pointer-events: none;
   animation: heroGlow 8s ease-in-out infinite alternate;
 }
@@ -235,9 +346,13 @@ img {
   left: 0;
   right: 0;
   bottom: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-image:
+    linear-gradient(rgba(229,9,20,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(229,9,20,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: grid-move 8s linear infinite;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.3;
 }
 
 .hero-content {
@@ -252,11 +367,17 @@ img {
   font-weight: 800;
   margin-bottom: var(--spacing-md);
   letter-spacing: -1px;
-  background: linear-gradient(135deg, #FFFFFF 0%, #FF6B6B 40%, #E50914 100%);
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.4) 0%,
+    rgba(255,255,255,1)   25%,
+    rgba(229,9,20,1)      50%,
+    rgba(255,255,255,1)   75%,
+    rgba(255,255,255,0.4) 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: fadeInUp 1s ease;
+  animation: shimmer 6s linear infinite, fadeInUp 1s ease;
   filter: drop-shadow(0 2px 10px rgba(229, 9, 20, 0.2));
 }
 
