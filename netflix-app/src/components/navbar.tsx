@@ -25,13 +25,10 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 路由切换后关闭移动端菜单
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
+
+  const closeMobileMenu = () => setMobileOpen(false);
 
   return (
     <nav
@@ -94,6 +91,7 @@ export default function Navbar() {
               <li key={r.href}>
                 <Link
                   href={r.href}
+                  onClick={closeMobileMenu}
                   className={`block px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                     isActive(r.href)
                       ? 'bg-[#E50914] text-white'

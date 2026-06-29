@@ -1,13 +1,12 @@
-interface Props {
+import { memo } from 'react';
+
+interface PageHeaderProps {
   eyebrow: string;
   title: string;
   subtitle?: string;
 }
 
-/**
- * 子页面统一标题区：眉标 + 主标题 + 红色装饰下划线
- */
-export default function PageHeader({ eyebrow, title, subtitle }: Props) {
+function PageHeaderComponent({ eyebrow, title, subtitle }: PageHeaderProps) {
   return (
     <div className="text-center mb-14">
       <div className="inline-block px-3 py-1 mb-4 rounded-full glass-card text-xs tracking-widest uppercase text-[#E50914]">
@@ -25,3 +24,6 @@ export default function PageHeader({ eyebrow, title, subtitle }: Props) {
     </div>
   );
 }
+
+export const PageHeader = memo(PageHeaderComponent);
+export default PageHeader;

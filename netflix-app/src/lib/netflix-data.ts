@@ -44,7 +44,29 @@ export interface ChartData {
   treemapData: { name: string; value: number }[];
 }
 
+const CORRELATION_COUNTRIES = ['United States', 'India', 'United Kingdom', 'Canada', 'France'];
+const TOP_N_COUNTRIES = 5;
+const TOP_N_RATINGS = 10;
+const TOP_N_GENRES = 30;
+const YEAR_RANGE_START = 2008;
+const YEAR_RANGE_END = 2021;
+const SCATTER_SAMPLE_SIZE = 500;
+const SCATTER_MIN_YEAR = 2000;
+
+const DURATION_RANGES = [
+  { range: '0-30', min: 0, max: 30 },
+  { range: '31-60', min: 31, max: 60 },
+  { range: '61-90', min: 61, max: 90 },
+  { range: '91-120', min: 91, max: 120 },
+  { range: '121-150', min: 121, max: 150 },
+  { range: '151+', min: 151, max: Infinity },
+] as const;
+
+const NUMERIC_FIELDS = new Set(['release_year', 'duration_num', 'year_added', 'month_added']);
+
 let cachedRecords: NetflixRecord[] | null = null;
+let cachedStats: NetflixStats | null = null;
+let cachedChartData: ChartData | null = null;
 
 function parseCSV(text: string): string[][] {
   const rows: string[][] = [];
@@ -75,6 +97,7 @@ function parseCSV(text: string): string[][] {
       currentField += char;
     }
   }
+
   if (currentField || currentRow.length > 0) {
     currentRow.push(currentField.trim());
     rows.push(currentRow);
@@ -91,7 +114,6 @@ export function getNetflixRecords(): NetflixRecord[] {
   const rows = parseCSV(csvText);
 
   const headers = rows[0];
-  const numericFields = new Set(['release_year', 'duration_num', 'year_added', 'month_added']);
   const records: NetflixRecord[] = [];
 
   for (let i = 1; i < rows.length; i++) {
@@ -100,12 +122,14 @@ export function getNetflixRecords(): NetflixRecord[] {
 
     for (let j = 0; j < headers.length; j++) {
       const header = headers[j];
-      let value: unknown = row[j] ?? '';
-      if (numericFields.has(header)) {
-        const num = Number(value);
-        value = Number.isFinite(num) ? num : 0;
+      const rawValue = row[j] ?? '';
+
+      if (NUMERIC_FIELDS.has(header)) {
+        const num = Number(rawValue);
+        record[header] = Number.isFinite(num) ? num : 0;
+      } else {
+        record[header] = rawValue;
       }
-      record[header] = value;
     }
 
     records.push(record as unknown as NetflixRecord);
@@ -115,39 +139,59 @@ export function getNetflixRecords(): NetflixRecord[] {
   return records;
 }
 
+function countBy<T extends object>(items: T[], key: keyof T): Record<string, number> {
+  const counts: Record<string, number> = {};
+  items.forEach((item) => {
+    const value = item[key];
+    if (value) {
+      const k = String(value);
+      counts[k] = (counts[k] || 0) + 1;
+    }
+  });
+  return counts;
+}
+
+function topEntries(counts: Record<string, number>, n: number): { name: string; value: number }[] {
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([name, value]) => ({ name, value }));
+}
+
 export function computeStats(): NetflixStats {
+  if (cachedStats) return cachedStats;
+
   const records = getNetflixRecords();
 
   const total = records.length;
-  const movieCount = records.filter(r => r.type === 'Movie').length;
-  const tvCount = records.filter(r => r.type === 'TV Show').length;
+  const movieCount = records.filter((r) => r.type === 'Movie').length;
+  const tvCount = records.filter((r) => r.type === 'TV Show').length;
   const moviePercent = Math.round((movieCount / total) * 100);
 
-  const movies = records.filter(r => r.type === 'Movie' && r.duration_num > 0);
-  const avgDuration = movies.length > 0
-    ? Math.round(movies.reduce((sum, r) => sum + r.duration_num, 0) / movies.length)
-    : 0;
+  const movies = records.filter((r) => r.type === 'Movie' && r.duration_num > 0);
+  const avgDuration =
+    movies.length > 0
+      ? Math.round(movies.reduce((sum, r) => sum + r.duration_num, 0) / movies.length)
+      : 0;
 
-  const yearCounts: Record<number, number> = {};
-  records.forEach(r => {
-    if (r.release_year) {
-      yearCounts[r.release_year] = (yearCounts[r.release_year] || 0) + 1;
-    }
-  });
-  const peakYear = Object.entries(yearCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 2019;
+  const yearCounts = countBy(records, 'release_year');
+  const peakYear = Number(
+    Object.entries(yearCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 2019,
+  );
 
   const countryCounts: Record<string, number> = {};
-  records.forEach(r => {
+  records.forEach((r) => {
     if (r.primary_country && r.primary_country !== '未知') {
       countryCounts[r.primary_country] = (countryCounts[r.primary_country] || 0) + 1;
     }
   });
   const topCountries = Object.entries(countryCounts)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
+    .slice(0, TOP_N_COUNTRIES)
     .map(([country, count]) => ({ country, count }));
 
-  return { total, movieCount, tvCount, moviePercent, avgDuration, peakYear: Number(peakYear), topCountries };
+  cachedStats = { total, movieCount, tvCount, moviePercent, avgDuration, peakYear, topCountries };
+  return cachedStats;
 }
 
 function pearson(arr1: number[], arr2: number[]): number {
@@ -159,6 +203,7 @@ function pearson(arr1: number[], arr2: number[]): number {
   let sum1Sq = 0;
   let sum2Sq = 0;
   let pSum = 0;
+
   for (let i = 0; i < n; i++) {
     const x = arr1[i];
     const y = arr2[i];
@@ -175,100 +220,135 @@ function pearson(arr1: number[], arr2: number[]): number {
   return den === 0 ? 0 : num / den;
 }
 
-export function computeChartData(): ChartData {
-  const records = getNetflixRecords();
-
-  const typeDistribution = [
-    { name: 'Movie', value: records.filter(r => r.type === 'Movie').length },
-    { name: 'TV Show', value: records.filter(r => r.type === 'TV Show').length },
+function computeTypeDistribution(records: NetflixRecord[]) {
+  return [
+    { name: 'Movie', value: records.filter((r) => r.type === 'Movie').length },
+    { name: 'TV Show', value: records.filter((r) => r.type === 'TV Show').length },
   ];
+}
 
-  const ratingCounts: Record<string, number> = {};
-  records.forEach(r => {
-    if (r.rating) ratingCounts[r.rating] = (ratingCounts[r.rating] || 0) + 1;
-  });
-  const ratingDistribution = Object.entries(ratingCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10)
-    .map(([name, value]) => ({ name, value }));
+function computeRatingDistribution(records: NetflixRecord[]) {
+  const ratingCounts = countBy(records, 'rating');
+  return topEntries(ratingCounts, TOP_N_RATINGS);
+}
 
+function computeYearlyTrends(records: NetflixRecord[]) {
   const yearTypeCounts: Record<number, { movies: number; tvShows: number }> = {};
-  records.forEach(r => {
+
+  records.forEach((r) => {
     const year = r.year_added || r.release_year;
     if (year) {
       if (!yearTypeCounts[year]) yearTypeCounts[year] = { movies: 0, tvShows: 0 };
-      if (r.type === 'Movie') yearTypeCounts[year].movies++;
-      else yearTypeCounts[year].tvShows++;
+      if (r.type === 'Movie') {
+        yearTypeCounts[year].movies++;
+      } else {
+        yearTypeCounts[year].tvShows++;
+      }
     }
   });
-  const yearlyTrends = Object.entries(yearTypeCounts)
-    .filter(([year]) => Number(year) >= 2008 && Number(year) <= 2021)
+
+  return Object.entries(yearTypeCounts)
+    .filter(([year]) => Number(year) >= YEAR_RANGE_START && Number(year) <= YEAR_RANGE_END)
     .sort((a, b) => Number(a[0]) - Number(b[0]))
-    .map(([year, data]) => ({ year: Number(year), movies: data.movies, tvShows: data.tvShows }));
+    .map(([year, data]) => ({
+      year: Number(year),
+      movies: data.movies,
+      tvShows: data.tvShows,
+    }));
+}
 
-  const durationRanges = [
-    { range: '0-30', min: 0, max: 30, count: 0 },
-    { range: '31-60', min: 31, max: 60, count: 0 },
-    { range: '61-90', min: 61, max: 90, count: 0 },
-    { range: '91-120', min: 91, max: 120, count: 0 },
-    { range: '121-150', min: 121, max: 150, count: 0 },
-    { range: '151+', min: 151, max: Infinity, count: 0 },
-  ];
-  records.filter(r => r.type === 'Movie' && r.duration_num > 0).forEach(r => {
-    const bucket = durationRanges.find(d => r.duration_num >= d.min && r.duration_num <= d.max);
-    if (bucket) bucket.count++;
-  });
-  const durationHistogram = durationRanges.map(d => ({ range: d.range, count: d.count }));
+function computeDurationHistogram(records: NetflixRecord[]) {
+  const buckets = DURATION_RANGES.map((d) => ({ ...d, count: 0 }));
 
+  records
+    .filter((r) => r.type === 'Movie' && r.duration_num > 0)
+    .forEach((r) => {
+      const bucket = buckets.find(
+        (d) => r.duration_num >= d.min && r.duration_num <= d.max,
+      );
+      if (bucket) bucket.count++;
+    });
+
+  return buckets.map((d) => ({ range: d.range, count: d.count }));
+}
+
+function computeGenreWordCloud(records: NetflixRecord[]) {
   const genreCounts: Record<string, number> = {};
-  records.forEach(r => {
+
+  records.forEach((r) => {
     if (r.listed_in) {
-      r.listed_in.split(',').forEach(g => {
+      r.listed_in.split(',').forEach((g) => {
         const genre = g.trim();
         genreCounts[genre] = (genreCounts[genre] || 0) + 1;
       });
     }
   });
-  const genreWordCloud = Object.entries(genreCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 30)
-    .map(([name, value]) => ({ name, value }));
 
-  const scatterData = records
-    .filter(r => r.type === 'Movie' && r.duration_num > 0 && r.release_year >= 2000)
-    .slice(0, 500)
-    .map(r => ({ x: r.release_year, y: r.duration_num, name: r.title }));
+  return topEntries(genreCounts, TOP_N_GENRES);
+}
 
-  const countries = ['United States', 'India', 'United Kingdom', 'Canada', 'France'];
+function computeScatterData(records: NetflixRecord[]) {
+  return records
+    .filter(
+      (r) =>
+        r.type === 'Movie' && r.duration_num > 0 && r.release_year >= SCATTER_MIN_YEAR,
+    )
+    .slice(0, SCATTER_SAMPLE_SIZE)
+    .map((r) => ({ x: r.release_year, y: r.duration_num, name: r.title }));
+}
+
+function computeCorrelationMatrix(records: NetflixRecord[]) {
   const matrix: number[][] = [];
-  for (let i = 0; i < countries.length; i++) {
+
+  for (let i = 0; i < CORRELATION_COUNTRIES.length; i++) {
     const row: number[] = [];
-    for (let j = 0; j < countries.length; j++) {
-      const c1Records = records.filter(r => r.primary_country === countries[i] && r.type === 'Movie' && r.duration_num > 0);
-      const c2Records = records.filter(r => r.primary_country === countries[j] && r.type === 'Movie' && r.duration_num > 0);
-      const vals1 = c1Records.map(r => r.duration_num);
-      const vals2 = c2Records.map(r => r.duration_num);
+    for (let j = 0; j < CORRELATION_COUNTRIES.length; j++) {
+      const c1Records = records.filter(
+        (r) => r.primary_country === CORRELATION_COUNTRIES[i] && r.type === 'Movie' && r.duration_num > 0,
+      );
+      const c2Records = records.filter(
+        (r) => r.primary_country === CORRELATION_COUNTRIES[j] && r.type === 'Movie' && r.duration_num > 0,
+      );
+      const vals1 = c1Records.map((r) => r.duration_num);
+      const vals2 = c2Records.map((r) => r.duration_num);
       row.push(Number(pearson(vals1, vals2).toFixed(2)));
     }
     matrix.push(row);
   }
-  const correlationMatrix = matrix;
 
-  const topCountriesForRadar = Object.entries(
-    records.reduce((acc, r) => {
-      if (r.primary_country && r.primary_country !== '未知') {
-        acc[r.primary_country] = (acc[r.primary_country] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>)
-  ).sort((a, b) => b[1] - a[1]).slice(0, 6);
-  const radarData = topCountriesForRadar.map(([country, count]) => ({ country, value: count }));
+  return matrix;
+}
 
+function computeTopCountries(records: NetflixRecord[], n: number) {
+  const countryCounts: Record<string, number> = {};
+  records.forEach((r) => {
+    if (r.primary_country && r.primary_country !== '未知') {
+      countryCounts[r.primary_country] = (countryCounts[r.primary_country] || 0) + 1;
+    }
+  });
+  return Object.entries(countryCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([country, count]) => ({ country, value: count }));
+}
+
+export function computeChartData(): ChartData {
+  if (cachedChartData) return cachedChartData;
+
+  const records = getNetflixRecords();
+
+  const typeDistribution = computeTypeDistribution(records);
+  const ratingDistribution = computeRatingDistribution(records);
+  const yearlyTrends = computeYearlyTrends(records);
+  const durationHistogram = computeDurationHistogram(records);
+  const genreWordCloud = computeGenreWordCloud(records);
+  const scatterData = computeScatterData(records);
+  const correlationMatrix = computeCorrelationMatrix(records);
+  const radarData = computeTopCountries(records, 6);
   const stackedAreaData = yearlyTrends;
+  const treemapData = radarData.map((d) => ({ name: d.country, value: d.value }));
 
-  const treemapData = topCountriesForRadar.map(([name, value]) => ({ name, value }));
-
-  return {
+  cachedChartData = {
     typeDistribution,
     ratingDistribution,
     yearlyTrends,
@@ -280,6 +360,8 @@ export function computeChartData(): ChartData {
     stackedAreaData,
     treemapData,
   };
+
+  return cachedChartData;
 }
 
 export function getAllData() {
