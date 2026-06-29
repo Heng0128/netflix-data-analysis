@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo, useCallback } from 'react';
 
 interface AnimatedNumberProps {
   value: number;
@@ -9,35 +9,21 @@ interface AnimatedNumberProps {
   prefix?: string;
 }
 
-export default function AnimatedNumber({ value, duration = 2000, suffix = '', prefix = '' }: AnimatedNumberProps) {
+let idCounter = 0;
+
+function AnimatedNumberComponent({
+  value,
+  duration = 2000,
+  suffix = '',
+  prefix = '',
+}: AnimatedNumberProps) {
   const [display, setDisplay] = useState(0);
   const rafRef = useRef<number | undefined>(undefined);
   const hasAnimated = useRef(false);
-  const [trigger, setTrigger] = useState(0);
+  const elementRef = useRef<HTMLSpanElement>(null);
+  const [elementId] = useState(() => `number-${++idCounter}`);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-          setTrigger(t => t + 1);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    const el = document.getElementById(`number-${value}-${suffix}`);
-    if (el) observer.observe(el);
-
-    return () => {
-      observer.disconnect();
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [value, suffix]);
-
-  useEffect(() => {
-    if (trigger === 0) return;
-
+  const startAnimation = useCallback(() => {
     let startTime: number | undefined;
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
@@ -50,15 +36,37 @@ export default function AnimatedNumber({ value, duration = 2000, suffix = '', pr
       }
     };
     rafRef.current = requestAnimationFrame(animate);
+  }, [value, duration]);
+
+  useEffect(() => {
+    if (!elementRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+          startAnimation();
+        }
+      },
+      { threshold: 0.3 },
+    );
+
+    observer.observe(elementRef.current);
 
     return () => {
+      observer.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [trigger, value, duration]);
+  }, [startAnimation]);
 
   return (
-    <span id={`number-${value}-${suffix}`}>
-      {prefix}{display.toLocaleString()}{suffix}
+    <span ref={elementRef} id={elementId}>
+      {prefix}
+      {display.toLocaleString()}
+      {suffix}
     </span>
   );
 }
+
+export const AnimatedNumber = memo(AnimatedNumberComponent);
+export default AnimatedNumber;

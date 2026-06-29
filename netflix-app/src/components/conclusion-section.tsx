@@ -237,7 +237,7 @@ export default function ConclusionSection({ stats }: Props) {
           <div className="text-4xl mb-4">🎯</div>
           <h3 className="text-white text-xl font-semibold mb-3">核心结论</h3>
           <p className="text-gray-400 leading-relaxed max-w-2xl mx-auto">
-            Netflix 内容生态呈现"电影主导、剧集增长、美国领先、全球多元"的特征。
+            Netflix 内容生态呈现&ldquo;电影主导、剧集增长、美国领先、全球多元&rdquo;的特征。
             通过随机森林模型，我们以{' '}
             <span className="text-[#E50914] font-semibold">77%</span> 的准确率
             验证了内容类型的可预测性，为后续推荐系统与采购决策提供了量化依据。
