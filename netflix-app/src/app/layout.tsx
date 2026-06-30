@@ -1,75 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "highlight.js/styles/atom-one-dark.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  metadataBase: new URL("https://netflix-analysis.example.com"),
-  title: {
-    default: "Netflix 数据分析 | 流媒体内容深度可视化",
-    template: "%s | Netflix 数据分析",
-  },
-  description:
-    "基于 8,807 条真实数据集的 Netflix 流媒体内容深度分析与可视化。探索电影与剧集分布、全球内容趋势、随机森林分类模型等数据科学项目成果。",
-  keywords: [
-    "Netflix",
-    "数据分析",
-    "数据可视化",
-    "ECharts",
-    "Next.js",
-    "随机森林",
-    "机器学习",
-    "数据科学",
-    "流媒体",
-  ],
-  authors: [{ name: "Data Science Team" }],
-  creator: "Data Science Team",
-  openGraph: {
-    type: "website",
-    locale: "zh_CN",
-    url: "https://netflix-analysis.example.com",
-    siteName: "Netflix 数据分析",
-    title: "Netflix 数据分析 | 流媒体内容深度可视化",
-    description:
-      "基于 8,807 条真实数据集的 Netflix 流媒体内容深度分析与可视化。",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Netflix 数据分析项目",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Netflix 数据分析 | 流媒体内容深度可视化",
-    description:
-      "基于 8,807 条真实数据集的 Netflix 流媒体内容深度分析与可视化。",
-    images: ["/og-image.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
+  title: "Netflix 电影和电视节目数据分析",
+  description: "基于 8,809 条 Netflix 内容数据的深度探索 · 数据预处理 + 9 维可视化分析",
 };
 
 export const viewport: Viewport = {
@@ -84,13 +21,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="zh-CN"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-[#0A0A0A] text-white">
+    <html lang="zh-CN">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700;900&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        />
+      </head>
+      <body>
         <Navbar />
-        <div className="flex-1 flex flex-col">{children}</div>
+        <main className="page-enter">{children}</main>
         <Footer />
       </body>
     </html>
