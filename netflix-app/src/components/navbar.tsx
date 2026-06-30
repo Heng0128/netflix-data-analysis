@@ -1,109 +1,82 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-const routes = [
-  { href: '/', label: '首页' },
-  { href: '/overview', label: '概览' },
-  { href: '/analysis', label: '分析' },
-  { href: '/code', label: '代码' },
-  { href: '/visualization', label: '可视化' },
-  { href: '/conclusion', label: '结论' },
+const navItems = [
+  { href: "/", label: "首页" },
+  { href: "/overview", label: "需求分析" },
+  { href: "/code", label: "预处理与代码" },
+  { href: "/visualization", label: "可视化与发现" },
+  { href: "/conclusion", label: "机器学习与建议" },
 ];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    handleScroll();
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
-
-  const closeMobileMenu = () => setMobileOpen(false);
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-black/90 backdrop-blur-md shadow-lg shadow-black/30' : 'bg-transparent'
-      }`}
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "14px 32px",
+        background: "rgba(10,10,10,0.85)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+      }}
     >
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-[#E50914] rounded flex items-center justify-center text-white font-bold text-sm transition-transform group-hover:scale-110 pulse-glow">
-              N
-            </div>
-            <span className="text-white font-semibold text-lg hidden sm:block">
-              Netflix <span className="text-[#E50914]">分析</span>
-            </span>
-          </Link>
-
-          {/* 桌面导航 */}
-          <ul className="hidden md:flex gap-1">
-            {routes.map((r) => (
-              <li key={r.href}>
-                <Link
-                  href={r.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                    isActive(r.href)
-                      ? 'bg-[#E50914] text-white shadow-[0_4px_20px_rgba(229,9,20,0.4)]'
-                      : 'text-gray-400 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {r.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {/* 移动端汉堡按钮 */}
-          <button
-            className="md:hidden text-white p-2 rounded hover:bg-white/10 transition"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label="菜单"
-          >
-            {mobileOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
-        </div>
-
-        {/* 移动端下拉菜单 */}
-        {mobileOpen && (
-          <ul className="md:hidden mt-4 flex flex-col gap-1 glass-card rounded-xl p-2">
-            {routes.map((r) => (
-              <li key={r.href}>
-                <Link
-                  href={r.href}
-                  onClick={closeMobileMenu}
-                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                    isActive(r.href)
-                      ? 'bg-[#E50914] text-white'
-                      : 'text-gray-300 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {r.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+      <Link href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "inherit" }}>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "32px",
+            height: "32px",
+            background: "linear-gradient(135deg,#E50914,#B20710)",
+            color: "#fff",
+            fontWeight: 900,
+            fontSize: "16px",
+            borderRadius: "7px",
+            boxShadow: "0 0 14px rgba(229,9,20,.4)",
+          }}
+        >
+          N
+        </span>
+        <span style={{ fontSize: "15px", fontWeight: 700, letterSpacing: "-.3px" }}>
+          Netflix 数据分析
+        </span>
+      </Link>
+      <div style={{ display: "flex", gap: "24px", fontSize: "13px" }}>
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                color: isActive ? "#E50914" : "rgba(255,255,255,.6)",
+                textDecoration: "none",
+                transition: "color .2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.color = "#E50914";
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.6)";
+                }
+              }}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
