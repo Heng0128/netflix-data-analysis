@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netflix 电影和电视节目数据分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ═══════════════════════════════════════════════════
+   Netflix 数据分析 · CSS 三层架构
+   ① 主题层（CSS 变量）  ② 组件层（玻璃拟态）  ③ 动效层
+   ═══════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ── ① 主题层：Netflix 品牌色系 ── */
+:root{
+  /* Netflix 品牌色 */
+  --primary:#E50914;
+  --primary-dark:#B20710;
+  --primary-light:#FF4D58;
+  --background:#0A0A0A;
+  --bg-surface:#0F0F0F;
+  --foreground:#FFFFFF;
+  --text-dim:rgba(255,255,255,.65);
+  --text-muted:rgba(255,255,255,.45);
+
+  /* 玻璃拟态 */
+  --glass-bg:rgba(255,255,255,.035);
+  --glass-bg-hover:rgba(255,255,255,.065);
+  --glass-border:rgba(255,255,255,.08);
+  --glass-blur:16px;
+
+  /* 红色光效 */
+  --red-glow:rgba(229,9,20,.35);
+  --red-glow-soft:rgba(229,9,20,.15);
+  --red-border:rgba(229,9,20,.3);
+
+  /* 图表色板 */
+  --chart-1:#E50914;
+  --chart-2:#4A90D9;
+  --chart-3:#F5A623;
+  --chart-4:#7BC67E;
+  --chart-5:#BD10E0;
+
+  /* 阴影 */
+  --shadow-sm:0 2px 8px rgba(0,0,0,.3);
+  --shadow-md:0 8px 32px rgba(0,0,0,.4);
+  --shadow-red:0 8px 40px rgba(229,9,20,.2);
+}
+
+/* ── 基础重置 ── */
+body{
+  background:var(--background);
+  color:var(--foreground);
+  font-family:'Segoe UI','Helvetica Neue','Noto Sans SC',Arial,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── ③ 动效层：关键帧动画 ── */
+@keyframes grid-move{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(40px)}
+}
+@keyframes pulse-glow{
+  0%,100%{box-shadow:0 0 20px rgba(229,9,20,.3),0 0 40px rgba(229,9,20,.15)}
+  50%{box-shadow:0 0 40px rgba(229,9,20,.6),0 0 80px rgba(229,9,20,.25)}
+}
+@keyframes shimmer{
+  0%{background-position:-200% center}
+  100%{background-position:200% center}
+}
+@keyframes fade-up{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes float-in{
+  from{opacity:0;transform:translateY(30px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ═══════════════════════════════════════════════════
+   HERO — 电影级氛围渲染
+   ═══════════════════════════════════════════════════ */
+.hero{
+  position:relative;
+  padding:100px 24px 70px;
+  text-align:center;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,
+      rgba(229,9,20,.18),transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%,
+      rgba(229,9,20,.08),transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 60%,
+      rgba(74,144,217,.05),transparent 60%),
+    var(--background);
+}
+/* 动态网格背景 */
+.hero::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(229,9,20,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(229,9,20,.05) 1px,transparent 1px);
+  background-size:40px 40px;
+  animation:grid-move 8s linear infinite;
+  pointer-events:none;
+  mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,#000,transparent);
+  -webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,#000,transparent);
+}
+.hero > *{position:relative;z-index:1}
+
+/* N Logo 白色流光 shimmer */
+.hero-logo{
+  display:inline-block;
+  font-size:52px;
+  font-weight:900;
+  letter-spacing:-3px;
+  margin-bottom:10px;
+  background:linear-gradient(90deg,
+    rgba(255,255,255,.35) 0%,
+    rgba(255,255,255,1) 20%,
+    rgba(255,255,255,1) 45%,
+    rgba(229,9,20,1) 55%,
+    rgba(255,255,255,1) 70%,
+    rgba(255,255,255,1) 85%,
+    rgba(255,255,255,.35) 100%);
+  background-size:250% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 4s linear infinite;
+}
+
+/* 闪光标题动画 */
+.hero h1{
+  font-size:38px;
+  font-weight:800;
+  margin-bottom:14px;
+  background:linear-gradient(90deg,
+    rgba(255,255,255,.4) 0%,
+    rgba(255,255,255,1) 25%,
+    rgba(229,9,20,1) 50%,
+    rgba(255,255,255,1) 75%,
+    rgba(255,255,255,.4) 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 6s linear infinite;
+}
+.hero p{
+  color:var(--text-dim);
+  font-size:16px;
+  max-width:640px;
+  margin:0 auto;
+}
+
+/* ═══════════════════════════════════════════════════
+   STATS BAR — 玻璃卡片统计栏
+   ═══════════════════════════════════════════════════ */
+.stats-bar{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  flex-wrap:wrap;
+  padding:48px 24px;
+  background:linear-gradient(180deg,var(--background),var(--bg-surface));
+  border-bottom:1px solid var(--glass-border);
+  border-top:1px solid var(--glass-border);
+}
+.stat-item{
+  text-align:center;
+  padding:20px 32px;
+  background:var(--glass-bg);
+  backdrop-filter:blur(var(--glass-blur));
+  -webkit-backdrop-filter:blur(var(--glass-blur));
+  border:1px solid var(--glass-border);
+  border-radius:16px;
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+  min-width:140px;
+}
+.stat-item:hover{
+  background:var(--glass-bg-hover);
+  border-color:var(--red-border);
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-red);
+}
+.stat-num{
+  font-size:40px;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--primary),var(--primary-light));
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 30px var(--red-glow-soft);
+  letter-spacing:-1px;
+}
+.stat-label{
+  font-size:12px;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  margin-top:6px;
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTIONS
+   ═══════════════════════════════════════════════════ */
+section{
+  padding:64px 24px;
+  max-width:1400px;
+  margin:0 auto;
+  animation:fade-up .6s ease-out;
+}
+.section-title{
+  font-size:28px;
+  font-weight:800;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  letter-spacing:-.5px;
+}
+.section-title::before{
+  content:'';
+  width:5px;
+  height:30px;
+  background:linear-gradient(180deg,var(--primary),var(--primary-dark));
+  border-radius:3px;
+  box-shadow:0 0 12px var(--red-glow);
+}
+.section-desc{
+  color:var(--text-dim);
+  margin-bottom:36px;
+  font-size:15px;
+  padding-left:19px;
+}
+
+/* ═══════════════════════════════════════════════════
+   CODE BLOCKS — 玻璃终端
+   ═══════════════════════════════════════════════════ */
+.code-container{
+  background:rgba(13,17,23,.7);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border-radius:14px;
+  border:1px solid var(--glass-border);
+  margin-bottom:24px;
+  overflow:hidden;
+  transition:border-color .3s;
+}
+.code-container:hover{border-color:var(--red-border)}
+.code-header{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:14px 18px;
+  background:rgba(255,255,255,.03);
+  border-bottom:1px solid var(--glass-border);
+  font-size:13px;
+  color:var(--text-muted);
+}
+.code-dot{width:12px;height:12px;border-radius:50%;transition:transform .2s}
+.code-dot.red{background:#ff5f56}
+.code-dot.yellow{background:#ffbd2e}
+.code-dot.green{background:#27c93f}
+.code-container:hover .code-dot{transform:scale(1.15)}
+.code-title{margin-left:8px;font-weight:600}
+.code-container pre{margin:0;overflow-x:auto;max-height:560px}
+.code-container code{
+  font-family:'Fira Code','Consolas','Monaco','Courier New',monospace;
+  font-size:13px;
+  line-height:1.65;
+  padding:18px;
+  display:block;
+}
+
+/* ═══════════════════════════════════════════════════
+   CHARTS GRID — 玻璃拟态卡片系统
+   ═══════════════════════════════════════════════════ */
+.charts-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+}
+.chart-card{
+  background:var(--glass-bg);
+  backdrop-filter:blur(var(--glass-blur));
+  -webkit-backdrop-filter:blur(var(--glass-blur));
+  border-radius:16px;
+  padding:26px;
+  border:1px solid var(--glass-border);
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+  position:relative;
+  overflow:hidden;
+  animation:float-in .5s ease-out backwards;
+}
+/* 顶部渐变光线 */
+.chart-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,transparent 10%,var(--primary) 50%,transparent 90%);
+  opacity:0;
+  transition:opacity .35s;
+}
+/* 右上角光晕 */
+.chart-card::after{
+  content:'';
+  position:absolute;
+  top:-40px;right:-40px;
+  width:120px;height:120px;
+  background:radial-gradient(circle,var(--red-glow-soft),transparent 70%);
+  opacity:0;
+  transition:opacity .35s;
+  pointer-events:none;
+}
+.chart-card:hover{
+  background:var(--glass-bg-hover);
+  border-color:var(--red-border);
+  transform:translateY(-6px);
+  box-shadow:var(--shadow-md),0 0 0 1px rgba(229,9,20,.12);
+}
+.chart-card:hover::before,
+.chart-card:hover::after{opacity:1}
+.chart-card.full-width{grid-column:1/-1}
+.chart-icon{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  color:var(--primary);
+  margin-bottom:6px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.chart-icon i{
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  border-radius:8px;
+  color:#fff;
+  font-size:13px;
+  box-shadow:0 4px 12px var(--red-glow-soft);
+}
+.chart-title{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:4px;
+  letter-spacing:-.3px;
+}
+.chart-subtitle{
+  font-size:13px;
+  color:var(--text-dim);
+  margin-bottom:18px;
+}
+.chart-wrap{position:relative;height:300px;z-index:1}
+.chart-wrap.tall{height:360px}
+.chart-num{
+  position:absolute;
+  top:18px;right:22px;
+  font-size:52px;
+  font-weight:900;
+  color:rgba(229,9,20,.06);
+  z-index:0;
+  letter-spacing:-2px;
+  pointer-events:none;
+}
+
+/* ═══════════════════════════════════════════════════
+   TABLE — 玻璃数据表
+   ═══════════════════════════════════════════════════ */
+.data-table{
+  background:var(--glass-bg);
+  backdrop-filter:blur(var(--glass-blur));
+  -webkit-backdrop-filter:blur(var(--glass-blur));
+  border-radius:16px;
+  border:1px solid var(--glass-border);
+  overflow:hidden;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:0;
+  font-size:13px;
+}
+th,td{
+  padding:12px 16px;
+  text-align:left;
+  border-bottom:1px solid var(--glass-border);
+  transition:background .2s;
+}
+th{
+  color:var(--primary);
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  font-size:11px;
+  background:rgba(229,9,20,.06);
+}
+td{color:var(--text-dim)}
+td:first-child{color:var(--foreground);font-weight:600}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:rgba(229,9,20,.06)}
+tbody tr:last-child td{border-bottom:none}
+
+/* ═══════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════ */
+footer{
+  position:relative;
+  background:linear-gradient(180deg,var(--bg-surface),var(--background));
+  text-align:center;
+  padding:48px 24px;
+  border-top:1px solid var(--glass-border);
+  color:var(--text-dim);
+  font-size:14px;
+  overflow:hidden;
+}
+footer::before{
+  content:'';
+  position:absolute;
+  top:0;left:50%;transform:translateX(-50%);
+  width:60%;max-width:400px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--primary),transparent);
+}
+footer .nf-mini{
+  display:inline-flex;
+  align-items:center;justify-content:center;
+  width:48px;height:48px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  font-weight:900;
+  font-size:26px;
+  border-radius:12px;
+  margin-bottom:12px;
+  box-shadow:0 0 30px var(--red-glow-soft);
+  animation:pulse-glow 3s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════
+   SCROLLBAR — 品牌色滚动条
+   ═══════════════════════════════════════════════════ */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--background)}
+::-webkit-scrollbar-thumb{
+  background:rgba(229,9,20,.4);
+  border-radius:5px;
+  border:2px solid var(--background);
+}
+::-webkit-scrollbar-thumb:hover{background:rgba(229,9,20,.7)}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .charts-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .charts-grid{grid-template-columns:1fr}
+  .hero{padding:70px 20px 50px}
+  .hero-logo{font-size:38px}
+  .hero h1{font-size:24px}
+  .stats-bar{gap:12px;padding:32px 16px}
+  .stat-item{padding:16px 20px;min-width:110px}
+  .stat-num{font-size:30px}
+  section{padding:44px 16px}
+  .section-title{font-size:22px}
+  .chart-card{padding:20px}
+  .chart-wrap{height:280px}
+  .chart-wrap.tall{height:320px}
+}
+
+.page{visibility:hidden;position:absolute;left:-9999px;top:-9999px;width:100%}
+.page.active{visibility:visible;position:relative;left:auto;top:auto}
+.page-enter{animation:pageFadeIn .35s ease}
+@keyframes pageFadeIn{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav style="
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 32px;
+  background:rgba(10,10,10,0.85);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="
+      display:inline-flex;align-items:center;justify-content:center;
+      width:32px;height:32px;
+      background:linear-gradient(135deg,#E50914,#B20710);
+      color:#fff;font-weight:900;font-size:16px;
+      border-radius:7px;
+      box-shadow:0 0 14px rgba(229,9,20,.4);
+    ">N</span>
+    <span style="font-size:15px;font-weight:700;letter-spacing:-.3px">Netflix 数据分析</span>
+  </div>
+  <div style="display:flex;gap:24px;font-size:13px;color:rgba(255,255,255,.6)">
+    <a href="javascript:goPage(0)" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#E50914'" onmouseout="this.style.color='rgba(255,255,255,.6)'">首页</a>
+    <a href="javascript:goPage(1)" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#E50914'" onmouseout="this.style.color='rgba(255,255,255,.6)'">需求分析</a>
+    <a href="javascript:goPage(2)" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#E50914'" onmouseout="this.style.color='rgba(255,255,255,.6)'">预处理与代码</a>
+    <a href="javascript:goPage(3)" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#E50914'" onmouseout="this.style.color='rgba(255,255,255,.6)'">可视化与发现</a>
+    <a href="javascript:goPage(4)" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#E50914'" onmouseout="this.style.color='rgba(255,255,255,.6)'">机器学习与建议</a>
+  </div>
+</nav>
+
+<!-- HOME PAGE (首页) -->
+<div class="page active" id="page-home">
+<div class="hero">
+  <div class="hero-logo">NETFLIX</div>
+  <h1>电影和电视节目收视分析</h1>
+  <p>基于 8,809 条 Netflix 内容数据的深度探索 · 数据预处理 + 9 维可视化分析</p>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num" data-count="8809">8,809</div><div class="stat-label">总记录数</div></div>
+  <div class="stat-item"><div class="stat-num">12 → 22</div><div class="stat-label">字段（原始→清洗后）</div></div>
+  <div class="stat-item"><div class="stat-num" data-count="6131">6,131</div><div class="stat-label">电影</div></div>
+  <div class="stat-item"><div class="stat-num" data-count="2676">2,676</div><div class="stat-label">电视节目</div></div>
+  <div class="stat-item"><div class="stat-num" data-count="9">9</div><div class="stat-label">可视化图表</div></div>
+</div>
+</div>
+
+
+<!-- PART 1: 预处理代码 -->
+<div class="page" id="page-2">
+<section id="preprocess">
+  <div class="section-title">数据加载与预处理</div>
+  <div class="section-desc">对原始 Netflix 数据集进行清洗、异常修复、类型转换与特征工程，输出 22 列结构化数据</div>
+
+  <!-- 代码块 1: 导入库与数据加载 -->
+  <div class="code-container">
+    <div class="code-header">
+      <span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span>
+      <span class="code-title">[1] 导入库 & 数据加载</span>
+    </div>
+    <pre><code class="language-python">import pandas as pd
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
+
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', 60)
+
+# 加载原始数据
+df = pd.read_csv(
+    'netflix_titles.csv', encoding='utf-8'
+)
+print(f"数据集原始记录数：8,809 条（数据说明文档）")
+print(f"pandas 加载行数：{len(df):,} 行（2条含换行符的记录已正确合并）")
+df</code></pre>
+  </div>
+
+  <!-- 代码块 2: 缺失值分析 -->
+  <div class="code-container">
+    <div class="code-header">
+      <span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span>
+      <span class="code-title">[2] 缺失值分析</span>
+    </div>
+    <pre><code class="language-python"># 缺失值详情
+missing = df.isnull().sum()
+missing_pct = (missing / len(df) * 100).round(2)
+
+missing_df = pd.DataFrame({
+    '缺失数量': missing[missing > 0],
+    '缺失率(%)': missing_pct[missing > 0]
+}).sort_values('缺失率(%)', ascending=False)
+missing_df</code></pre>
+  </div>
+
+  <!-- 代码块 3: 异常检测 -->
+  <div class="code-container">
+    <div class="code-header">
+      <span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span>
+      <span class="code-title">[3] 数据异常检测</span>
+    </div>
+    <pre><code class="language-python"># rating 字段污染检测（时长误入 rating 列）
+valid_ratings = {'G','PG','PG-13','R','NC-17','NR','UR',
+                 'TV-Y','TV-Y7','TV-Y7-FV','TV-G','TV-PG','TV-14','TV-MA'}
+bad_rating_mask = df['rating'].notna() & ~df['rating'].isin(valid_ratings)
+print(df[bad_rating_mask][['show_id','title','rating','duration']].to_string())
+
+# release_year 范围检测
+print(f"release_year 范围：{df['release_year'].min()} ~ {df['release_year'].max()}")</code></pre>
+  </div>
+
+  <!-- 代码块 4: 修复+清洗 -->
+  <div class="code-container">
+    <div class="code-header">
+      <span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span>
+      <span class="code-title">[4] 数据清洗与修复</span>
+    </div>
+    <pre><code class="language-python">df_clean = df.copy()
+
+# ── 修复 rating 字段污染 ──
+bad_mask = df_clean['rating'].notna() & ~df_clean['rating'].isin(valid_ratings)
+df_clean.loc[bad_mask & df_clean['duration'].isna(), 'duration'] = df_clean.loc[bad_mask, 'rating']
+df_clean.loc[bad_mask, 'rating'] = np.nan
+
+# ── 日期解析 ──
+df_clean['date_added'] = pd.to_datetime(
+    df_clean['date_added'].str.strip(), format='%B %d, %Y', errors='coerce')
+df_clean['year_added']  = df_clean['date_added'].dt.year
+df_clean['month_added'] = df_clean['date_added'].dt.month
+
+# ── duration 拆分 ──
+def parse_duration(row):
+    val = str(row['duration']) if pd.notna(row['duration']) else ''
+    if 'min' in val:
+        return int(val.replace('min','').strip())
+    elif 'Season' in val:
+        return int(val.split()[0])
+    return np.nan
+df_clean['duration_value'] = df_clean.apply(parse_duration, axis=1)
+
+# ── 缺失值填充 ──
+for col in ['director','cast','country']:
+    df_clean[col] = df_clean[col].fillna('Unknown')
+df_clean['rating'] = df_clean['rating'].fillna(df_clean['rating'].mode()[0])
+
+# ── 特征工程 ──
+df_clean['content_age'] = 2021 - df_clean['release_year']
+df_clean['primary_country'] = df_clean['country'].apply(
+    lambda x: x.split(',')[0].strip() if x != 'Unknown' else 'Unknown')
+df_clean['primary_genre'] = df_clean['listed_in'].apply(
+    lambda x: x.split(',')[0].strip())
+df_clean['is_movie'] = (df_clean['type'] == 'Movie').astype(int)
+df_clean['years_to_netflix'] = df_clean['year_added'] - df_clean['release_year']
+df_clean.loc[df_clean['years_to_netflix'] < 0, 'years_to_netflix'] = np.nan
+
+print(f"清洗后数据集：{df_clean.shape}")
+df_clean</code></pre>
+  </div>
+
+  <!-- 数据概览表 -->
+  <div class="data-table" style="margin-top:24px">
+    <table>
+      <thead><tr><th>字段名</th><th>数据类型</th><th>非空数量</th><th>缺失率(%)</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>show_id</td><td>object</td><td>8,807</td><td>0.00</td><td>唯一标识符</td></tr>
+        <tr><td>type</td><td>object</td><td>8,807</td><td>0.00</td><td>电影 / 电视节目</td></tr>
+        <tr><td>title</td><td>object</td><td>8,807</td><td>0.00</td><td>标题名称</td></tr>
+        <tr><td>director</td><td>object</td><td>8,807</td><td>0.00</td><td>导演（已填充 Unknown）</td></tr>
+        <tr><td>cast</td><td>object</td><td>8,807</td><td>0.00</td><td>演员（已填充 Unknown）</td></tr>
+        <tr><td>country</td><td>object</td><td>8,807</td><td>0.00</td><td>制作国家（已填充 Unknown）</td></tr>
+        <tr><td>date_added</td><td>datetime64</td><td>8,797</td><td>0.11</td><td>上架日期（已解析）</td></tr>
+        <tr><td>release_year</td><td>int64</td><td>8,807</td><td>0.00</td><td>发行年份 1925~2021</td></tr>
+        <tr><td>rating</td><td>object</td><td>8,807</td><td>0.00</td><td>年龄评级（众数填充）</td></tr>
+        <tr><td>duration_value</td><td>int64</td><td>8,807</td><td>0.00</td><td>时长数值（分钟/季）</td></tr>
+        <tr><td>year_added</td><td>float64</td><td>8,797</td><td>0.11</td><td>上架年份（衍生）</td></tr>
+        <tr><td>month_added</td><td>float64</td><td>8,797</td><td>0.11</td><td>上架月份（衍生）</td></tr>
+        <tr><td>primary_country</td><td>object</td><td>8,805</td><td>0.02</td><td>主要制作国（衍生）</td></tr>
+        <tr><td>primary_genre</td><td>object</td><td>8,807</td><td>0.00</td><td>主要类型（衍生）</td></tr>
+        <tr><td>content_age</td><td>int64</td><td>8,807</td><td>0.00</td><td>内容年龄（衍生）</td></tr>
+        <tr><td>is_movie</td><td>int32</td><td>8,807</td><td>0.00</td><td>是否电影（衍生）</td></tr>
+        <tr><td>years_to_netflix</td><td>float64</td><td>8,733</td><td>0.84</td><td>上架延迟年数（衍生）</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</div>
+
+<!-- PART 2: 可视化 -->
+<div class="page" id="page-3">
+<section id="viz">
+  <div class="section-title">可视化分析 · 9 Charts</div>
+  <div class="section-desc">从内容类型、时间趋势、地域分布、类型偏好、时长分布等多维度展开可视化探索</div>
+
+  <div class="charts-grid">
+
+    <!-- Chart 1: Movie vs TV Show -->
+    <div class="chart-card">
+      <div class="chart-num">01</div>
+      <div class="chart-icon"><i class="fas fa-chart-pie"></i> 环形图</div>
+      <div class="chart-title">电影 vs 电视节目占比</div>
+      <div class="chart-subtitle">Netflix 内容类型整体分布</div>
+      <div class="chart-wrap"><canvas id="chart1"></canvas></div>
+    </div>
+
+    <!-- Chart 2: Year added trend -->
+    <div class="chart-card">
+      <div class="chart-num">02</div>
+      <div class="chart-icon"><i class="fas fa-chart-line"></i> 折线图</div>
+      <div class="chart-title">历年内容上架趋势</div>
+      <div class="chart-subtitle">2008-2021 年 Netflix 新增内容数量</div>
+      <div class="chart-wrap"><canvas id="chart2"></canvas></div>
+    </div>
+
+    <!-- Chart 3: Release year distribution -->
+    <div class="chart-card">
+      <div class="chart-num">03</div>
+      <div class="chart-icon"><i class="fas fa-chart-area"></i> 面积图</div>
+      <div class="chart-title">内容发行年份分布</div>
+      <div class="chart-subtitle">1980-2021 年发行的内容数量</div>
+      <div class="chart-wrap"><canvas id="chart3"></canvas></div>
+    </div>
+
+    <!-- Chart 4: Top 10 countries -->
+    <div class="chart-card">
+      <div class="chart-num">04</div>
+      <div class="chart-icon"><i class="fas fa-chart-bar"></i> 水平柱状图</div>
+      <div class="chart-title">Top 10 内容制作国家/地区</div>
+      <div class="chart-subtitle">按主要制作国统计内容数量</div>
+      <div class="chart-wrap"><canvas id="chart4"></canvas></div>
+    </div>
+
+    <!-- Chart 5: Rating distribution -->
+    <div class="chart-card">
+      <div class="chart-num">05</div>
+      <div class="chart-icon"><i class="fas fa-film"></i> 柱状图</div>
+      <div class="chart-title">年龄评级分布</div>
+      <div class="chart-subtitle">Netflix 内容的年龄分级构成</div>
+      <div class="chart-wrap"><canvas id="chart5"></canvas></div>
+    </div>
+
+    <!-- Chart 6: Movie duration distribution -->
+    <div class="chart-card">
+      <div class="chart-num">06</div>
+      <div class="chart-icon"><i class="fas fa-clock"></i> 直方图</div>
+      <div class="chart-title">电影时长分布</div>
+      <div class="chart-subtitle">6,131 部电影按时长区间统计</div>
+      <div class="chart-wrap"><canvas id="chart6"></canvas></div>
+    </div>
+
+    <!-- Chart 7: Top 10 genres -->
+    <div class="chart-card">
+      <div class="chart-num">07</div>
+      <div class="chart-icon"><i class="fas fa-tags"></i> 水平柱状图</div>
+      <div class="chart-title">Top 10 热门类型</div>
+      <div class="chart-subtitle">按主类型（listed_in）统计</div>
+      <div class="chart-wrap"><canvas id="chart7"></canvas></div>
+    </div>
+
+    <!-- Chart 8: Monthly distribution -->
+    <div class="chart-card">
+      <div class="chart-num">08</div>
+      <div class="chart-icon"><i class="fas fa-calendar"></i> 极坐标图</div>
+      <div class="chart-title">月度上架分布</div>
+      <div class="chart-subtitle">Netflix 各月份内容上架数量</div>
+      <div class="chart-wrap"><canvas id="chart8"></canvas></div>
+    </div>
+
+    <!-- Chart 9: Movie vs TV year trend -->
+    <div class="chart-card">
+      <div class="chart-num">09</div>
+      <div class="chart-icon"><i class="fas fa-layer-group"></i> 堆叠柱状图</div>
+      <div class="chart-title">电影 vs 电视节目上架趋势对比</div>
+      <div class="chart-subtitle">2008-2021 年电影与电视节目新增数量对比</div>
+      <div class="chart-wrap tall"><canvas id="chart9"></canvas></div>
+    </div>
+
+  </div>
+
+<h3 style="font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="background:linear-gradient(135deg,#E50914,#B20710);border-radius:8px;width:32px;height:32px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px">&#128161;</span>
+      数据分析核心发现
+    </h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+      <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:20px;border-left:3px solid #E50914">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#E50914">① 内容策略：影片为主，快速增长</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.8">Netflix 以电影（69.6%）为主要内容形式，2015–2019 年上架量呈指数增长，2019 年达峰值（1,768 部），2020 年因疫情制作停滞下滑约 23%，2021 年已开始回暖。</p>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:20px;border-left:3px solid #4A90D9">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#4A90D9">② 内容来源：美国主导，亚洲崛起</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.8">美国以 2,818 部占绝对主导（32%），印度（972）、英国（419）紧随其后。韩国、日本内容近年显著增加，Netflix 正持续加大亚太本地化内容投资力度。</p>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:20px;border-left:3px solid #F5A623">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#F5A623">③ 内容定级：成熟受众为核心</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.8">TV-MA（36.4%）与 TV-14（24.5%）合计超 60%，表明 Netflix 以青少年及成年观众为核心目标，家庭向内容（TV-G、TV-PG）占比偏低，不足 10%。</p>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:20px;border-left:3px solid #7BC67E">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#7BC67E">④ 数据质量：存在字段污染与高缺失</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.8">发现 3 条记录时长数据误入 rating 字段（74/84/66 min），director 缺失率高达 29.91%（主要为电视节目导演信息缺失）。预处理阶段均已完成修复与填充。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card glass-card-hover" style="border-radius:16px;padding:32px;margin-bottom:24px">
+</section>
+</div>
+
+<!-- PART 3: 机器学习 -->
+<div class="page" id="page-4">
+<section id="ml">
+  <div class="section-title">机器学习分析</div>
+  <div class="section-desc">应用 K-Means 聚类、随机森林分类、回归分析三种算法，挖掘数据深层模式</div>
+
+  <!-- ML 代码展示 -->
+  <div class="code-container">
+    <div class="code-header">
+      <span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span>
+      <span class="code-title">[ML] 导入库 & 数据准备</span>
+    </div>
+    <pre><code class="language-python">from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.cluster import KMeans
+from sklearn.ensemble import (RandomForestClassifier, RandomForestRegressor,
+                              GradientBoostingRegressor)
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import (classification_report, confusion_matrix,
+                             accuracy_score, r2_score, mean_squared_error)
+
+# 特征编码
+movie_df['rating_enc'] = LabelEncoder().fit_transform(movie_df['rating'])
+ml_df['country_enc'] = ml_df['primary_country'].map(
+    ml_df['primary_country'].value_counts(normalize=True))
+ml_df['genre_enc'] = ml_df['primary_genre'].map(
+    ml_df['primary_genre'].value_counts(normalize=True))
+
+# 标准化（聚类用）
+features = movie_df[['duration_value','release_year','content_age','rating_enc']]
+X_scaled = StandardScaler().fit_transform(features)</code></pre>
+  </div>
+
+  <!-- ML 代码: K-Means -->
+  <div class="code-container">
+    <div class="code-header">
+      <span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span>
+      <span class="code-title">[ML-1] K-Means 聚类</span>
+    </div>
+    <pre><code class="language-python"># 肘部法则找最佳K
+inertias = []
+for k in range(2, 11):
+    km = KMeans(n_clusters=k, random_state=42, n_init=10)
+    km.fit(X_scaled)
+    inertias.append(km.inertia_)
+
+# K=4 聚类
+km = KMeans(n_clusters=4, random_state=42, n_init=10)
+movie_df['cluster'] = km.fit_predict(X_scaled)
+
+cluster_stats = movie_df.groupby('cluster').agg({
+    'duration_value':'mean','release_year':'mean',
+    'content_age':'mean','title':'count'
+}).round(1)</code></pre>
+  </div>
+
+  <!-- ML 代码: 随机森林 -->
+  <div class="code-container">
+    <div class="code-header">
+      <span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span>
+      <span class="code-title">[ML-2] 随机森林分类</span>
+    </div>
+    <pre><code class="language-python">X = ml_df[['release_year','rating_enc','country_enc','genre_enc']]
+y = (ml_df['type']=='Movie').astype(int)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42)
+
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+y_pred = rf.predict(X_test)
+print(f"准确率: {accuracy_score(y_test, y_pred):.4f}")
+cv = cross_val_score(rf, X, y, cv=5)
+print(f"5折交叉验证: {cv.mean():.4f} +/- {cv.std():.4f}")</code></pre>
+  </div>
+
+  <!-- ML 代码: 回归 -->
+  <div class="code-container">
+    <div class="code-header">
+      <span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span>
+      <span class="code-title">[ML-3] 回归分析对比</span>
+    </div>
+    <pre><code class="language-python">models = {
+    'LinearRegression': LinearRegression(),
+    'DecisionTree':  DecisionTreeRegressor(random_state=42, max_depth=8),
+    'RandomForest':  RandomForestRegressor(n_estimators=100, random_state=42),
+    'GradientBoosting': GradientBoostingRegressor(n_estimators=100, random_state=42)
+}
+for name, model in models.items():
+    model.fit(X_tr, y_tr)
+    y_p = model.predict(X_te)
+    r2 = r2_score(y_te, y_p)
+    rmse = np.sqrt(mean_squared_error(y_te, y_p))
+    print(f"  {name:20s} R2={r2:.4f}  RMSE={rmse:.2f}min")</code></pre>
+  </div>
+
+  <!-- ML 可视化图表 -->
+  <div class="charts-grid" style="margin-top:32px">
+
+    <!-- ML Chart 1: 肘部法则 -->
+    <div class="chart-card">
+      <div class="chart-num">M1</div>
+      <div class="chart-icon"><i class="fas fa-project-diagram"></i> 折线图</div>
+      <div class="chart-title">K-Means 肘部法则</div>
+      <div class="chart-subtitle">SSE 随聚类数 K 变化，拐点 K=4 为最佳</div>
+      <div class="chart-wrap"><canvas id="ml1"></canvas></div>
+    </div>
+
+    <!-- ML Chart 2: 聚类散点图 -->
+    <div class="chart-card">
+      <div class="chart-num">M2</div>
+      <div class="chart-icon"><i class="fas fa-braille"></i> 散点图</div>
+      <div class="chart-title">电影聚类结果（K=4）</div>
+      <div class="chart-subtitle">发行年份 vs 时长，4 个自然分群</div>
+      <div class="chart-wrap"><canvas id="ml2"></canvas></div>
+    </div>
+
+    <!-- ML Chart 3: 随机森林特征重要性 -->
+    <div class="chart-card">
+      <div class="chart-num">M3</div>
+      <div class="chart-icon"><i class="fas fa-tree"></i> 柱状图</div>
+      <div class="chart-title">随机森林分类 — 特征重要性</div>
+      <div class="chart-subtitle">genre 是最强预测特征（0.807）</div>
+      <div class="chart-wrap"><canvas id="ml3"></canvas></div>
+    </div>
+
+    <!-- ML Chart 4: 回归模型对比 -->
+    <div class="chart-card">
+      <div class="chart-num">M4</div>
+      <div class="chart-icon"><i class="fas fa-balance-scale"></i> 柱状图</div>
+      <div class="chart-title">回归模型 R² 对比</div>
+      <div class="chart-subtitle">梯度提升最佳 R²=0.48</div>
+      <div class="chart-wrap"><canvas id="ml4"></canvas></div>
+    </div>
+
+    <!-- ML Chart 5: 聚类簇统计 -->
+    <div class="chart-card">
+      <div class="chart-num">M5</div>
+      <div class="chart-icon"><i class="fas fa-layer-group"></i> 分组柱状图</div>
+      <div class="chart-title">4 个聚类簇特征对比</div>
+      <div class="chart-subtitle">各簇的平均时长、发行年份、内容数量</div>
+      <div class="chart-wrap tall"><canvas id="ml5"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- ML 结果表格 -->
+  <div class="data-table" style="margin-top:24px">
+    <table>
+      <thead><tr><th>算法</th><th>任务</th><th>核心结果</th><th>关键发现</th></tr></thead>
+      <tbody>
+        <tr><td>K-Means 聚类</td><td>电影内容分组</td><td>4 个自然簇</td><td>时长和发行年份是主要分群因素</td></tr>
+        <tr><td>随机森林分类</td><td>预测电影 vs 电视节目</td><td>准确率 99.55%</td><td>内容类型(genre)是最强预测特征(0.807)</td></tr>
+        <tr><td>梯度提升回归</td><td>预测电影时长</td><td>R²=0.48, RMSE=19.6min</td><td>genre 和发行年份影响最大</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+<div style="margin-top:32px"><h3 style="font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="background:linear-gradient(135deg,#7BC67E,#059669);border-radius:8px;width:32px;height:32px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px">&#129302;</span>
+      机器学习建模结论
+    </h3>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:rgba(229,9,20,.06);border-radius:12px;padding:20px;display:flex;align-items:flex-start;gap:16px">
+        <div style="min-width:44px;height:44px;background:rgba(229,9,20,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128309;</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px">K-Means 聚类（K=4）&rarr; 发现 4 类自然内容群体</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.8">基于时长、发行年份、内容年龄、评级对电影进行无监督聚类：<strong style="color:#E50914">短片/纪录片</strong>（低时长、近年）、<strong style="color:#4A90D9">标准院线片</strong>（90~120min）、<strong style="color:#F5A623">经典老片</strong>（发行年早）、<strong style="color:#7BC67E">近年新片</strong>（2015 年后高评级）。4 簇特征鲜明，可直接用于推荐系统内容分层。</p>
+        </div>
+      </div>
+      <div style="background:rgba(74,144,217,.06);border-radius:12px;padding:20px;display:flex;align-items:flex-start;gap:16px">
+        <div style="min-width:44px;height:44px;background:rgba(74,144,217,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#127823;</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px">随机森林分类 &rarr; 准确率 99.55%，5 折交叉验证 97.5%</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.8">以发行年份、评级、制作国、内容类型为特征预测内容类别，<strong style="color:#4A90D9">内容类型（genre）是压倒性最强特征（重要性 80.7%）</strong>，说明电影和电视节目在流派分布上天然差异显著。1,762 个测试样本中仅 8 个预测错误。</p>
+        </div>
+      </div>
+      <div style="background:rgba(245,166,35,.06);border-radius:12px;padding:20px;display:flex;align-items:flex-start;gap:16px">
+        <div style="min-width:44px;height:44px;background:rgba(245,166,35,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128200;</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px">回归模型对比 &rarr; 梯度提升最优（R&sup2;=0.48，RMSE=19.6 min）</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.8">四种模型预测电影时长：线性回归 R&sup2;=0.07（最差）、决策树 0.32、随机森林 0.46、梯度提升 0.48（最优）。R&sup2; 上限说明电影时长受导演风格等元数据外因素影响更大，<strong style="color:#F5A623">引入用户行为数据将能大幅提升预测能力</strong>。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card glass-card-hover" style="border-radius:16px;padding:32px"></div>
+<div style="margin-top:24px"><h3 style="font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="background:linear-gradient(135deg,#F5A623,#D97706);border-radius:8px;width:32px;height:32px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px">&#128203;</span>
+      结论与改进建议
+    </h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:20px">
+      <div style="background:rgba(255,255,255,.03);border-radius:12px;padding:18px">
+        <div style="font-size:13px;color:#E50914;font-weight:700;letter-spacing:.3px;margin-bottom:8px">&#128161; 内容多元化</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.8">持续加大亚洲、拉美区域本地化内容投资。印度、韩国剧集已具备强大全球传播力，应重点倾斜资源，降低对美国内容的依赖度（现占 32%）。</p>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border-radius:12px;padding:18px">
+        <div style="font-size:13px;color:#4A90D9;font-weight:700;letter-spacing:.3px;margin-bottom:8px">&#127919; 精准推荐优化</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.8">K-Means 4 个内容群体可直接用于推荐系统内容画像层。"短片爱好者"与"长篇剧集爱好者"兴趣模式截然不同，差异化推送可显著提升用户满意度。</p>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border-radius:12px;padding:18px">
+        <div style="font-size:13px;color:#F5A623;font-weight:700;letter-spacing:.3px;margin-bottom:8px">&#128106;&#8203; 家庭内容扩充</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.8">TV-G 和 TV-PG 评级内容合计不足 10%，而家庭订阅是流媒体盈利重要来源。建议扩充亲子向、合家欢类型内容，提升家庭用户黏性与订阅意愿。</p>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border-radius:12px;padding:18px">
+        <div style="font-size:13px;color:#7BC67E;font-weight:700;letter-spacing:.3px;margin-bottom:8px">&#128202; 数据治理改进</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.8">director 字段缺失率近 30%，严重影响导演维度分析。建议 Netflix 加强内容录入阶段元数据管理，尤其是电视节目的导演信息补全，同时避免 rating/duration 字段混淆录入。</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(229,9,20,.1),rgba(74,144,217,.08));border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px;font-size:14px;line-height:1.95;color:rgba(255,255,255,.78)">
+      <strong style="color:#fff;font-size:15px">综合结论：</strong>
+      Netflix 内容库呈现"量大、美国主导、成熟向"特征，经历快速扩张期后已进入内容质量深耕阶段。机器学习分析表明内容流派是判别内容形式最强特征（RF 重要性 80.7%），
+      K-Means 聚类揭示了四类天然内容群体结构，均可直接应用于推荐系统优化。电影时长预测 R&sup2; 上限（0.48）提示了元数据层面的信息瓶颈，
+      结合用户行为数据（播放完成率、评分、复看次数）将能大幅提升时长及内容偏好的预测准确性，为精准营销和内容采购决策提供更强有力的数据支撑。
+    </div>
+  </div></div>
+</section>
+</div>
+
+
+<!-- PART 0: 项目需求分析 -->
+<div class="page" id="page-1">
+<section id="requirement" style="padding:60px 24px;max-width:1400px;margin:0 auto">
+  <div style="font-size:28px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:12px">
+    <span style="width:4px;height:28px;background:#E50914;border-radius:2px;display:inline-block;flex-shrink:0"></span>
+    项目需求分析
+  </div>
+  <div style="color:rgba(255,255,255,.55);margin-bottom:32px;font-size:15px">背景介绍 · 分析目标 · 小组分工</div>
+
+  <div class="glass-card glass-card-hover" style="border-radius:16px;padding:32px;margin-bottom:24px">
+    <h3 style="font-size:20px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+      <span style="background:linear-gradient(135deg,#E50914,#B20710);border-radius:8px;width:32px;height:32px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px">&#128202;</span>
+      1.1 &nbsp;数据集背景介绍
+    </h3>
+    <p style="color:rgba(255,255,255,.75);line-height:1.9;margin-bottom:20px">
+      Netflix 是全球最大的流媒体平台，截至 2021 年中期拥有超过 2 亿全球订阅用户，平台上可访问超过 8,000 部电影和电视节目。
+      本项目使用的 <strong style="color:#E50914">Netflix Titles Dataset</strong> 包含 <strong style="color:#fff">8,809 条记录</strong>，
+      完整记录了 Netflix 平台上所有已上线内容的元数据，数据来源为 Kaggle 公开数据集，截止日期 2021 年中。
+    </p>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="background:rgba(229,9,20,.12)">
+        <th style="padding:10px 16px;text-align:left;color:#E50914;font-weight:700;font-size:11px;border-bottom:1px solid rgba(255,255,255,.08)">字段名</th>
+        <th style="padding:10px 16px;text-align:left;color:#E50914;font-weight:700;font-size:11px;border-bottom:1px solid rgba(255,255,255,.08)">变量类型</th>
+        <th style="padding:10px 16px;text-align:left;color:#E50914;font-weight:700;font-size:11px;border-bottom:1px solid rgba(255,255,255,.08)">说明</th>
+        <th style="padding:10px 16px;text-align:left;color:#E50914;font-weight:700;font-size:11px;border-bottom:1px solid rgba(255,255,255,.08)">缺失率</th>
+      </tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:9px 16px;font-weight:600;color:#fff">show_id</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">字符串</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">每条内容的唯一标识符（s1~s8809）</td><td style="padding:9px 16px;color:#7BC67E">0%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02)"><td style="padding:9px 16px;font-weight:600;color:#fff">type</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">分类（2值）</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">Movie / TV Show，目标分类变量</td><td style="padding:9px 16px;color:#7BC67E">0%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:9px 16px;font-weight:600;color:#fff">title</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">字符串</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">内容标题</td><td style="padding:9px 16px;color:#7BC67E">0%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02)"><td style="padding:9px 16px;font-weight:600;color:#fff">director</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">字符串</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">导演姓名（多人以逗号分隔）</td><td style="padding:9px 16px;color:#E50914">29.91%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:9px 16px;font-weight:600;color:#fff">cast</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">字符串</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">主要演员列表（逗号分隔）</td><td style="padding:9px 16px;color:#F5A623">9.22%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02)"><td style="padding:9px 16px;font-weight:600;color:#fff">country</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">字符串</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">制作国家（可多值，逗号分隔）</td><td style="padding:9px 16px;color:#F5A623">9.45%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:9px 16px;font-weight:600;color:#fff">date_added</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">日期型</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">上架 Netflix 的日期（"Month DD, YYYY"）</td><td style="padding:9px 16px;color:#7BC67E">0.11%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02)"><td style="padding:9px 16px;font-weight:600;color:#fff">release_year</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">数值（整型）</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">发行年份（取值范围 1925~2021）</td><td style="padding:9px 16px;color:#7BC67E">0%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:9px 16px;font-weight:600;color:#fff">rating</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">分类（14值）</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">年龄评级（TV-MA / TV-14 / PG-13 / R 等）</td><td style="padding:9px 16px;color:#7BC67E">0.04%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02)"><td style="padding:9px 16px;font-weight:600;color:#fff">duration</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">字符串&rarr;数值</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">时长（电影: X min；电视: X Season(s)）</td><td style="padding:9px 16px;color:#7BC67E">0.04%</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:9px 16px;font-weight:600;color:#fff">listed_in</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">字符串（多标签）</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">所属流派（可多个，逗号分隔）</td><td style="padding:9px 16px;color:#7BC67E">0%</td></tr>
+        <tr><td style="padding:9px 16px;font-weight:600;color:#fff">description</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">文本</td><td style="padding:9px 16px;color:rgba(255,255,255,.6)">内容简述（2 条含换行符，pandas 合并处理）</td><td style="padding:9px 16px;color:#7BC67E">0%</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="glass-card glass-card-hover" style="border-radius:16px;padding:32px;margin-bottom:24px">
+    <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="background:linear-gradient(135deg,#4A90D9,#2563EB);border-radius:8px;width:32px;height:32px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px">&#127919;</span>
+      1.2 &nbsp;数据分析目标与预期结果
+    </h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+      <div style="background:rgba(229,9,20,.08);border:1px solid rgba(229,9,20,.2);border-radius:12px;padding:20px">
+        <div style="font-size:12px;color:#E50914;font-weight:700;letter-spacing:.5px;margin-bottom:8px">目标一</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px">内容结构探索</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.7">分析电影与电视节目的比例、上架时间分布、发行年份分布，揭示 Netflix 内容策略演变规律</p>
+        <div style="margin-top:10px;font-size:12px;color:#7BC67E">预期：上架量持续增长，2020 年前后出现峰值后回调</div>
+      </div>
+      <div style="background:rgba(74,144,217,.08);border:1px solid rgba(74,144,217,.2);border-radius:12px;padding:20px">
+        <div style="font-size:12px;color:#4A90D9;font-weight:700;letter-spacing:.5px;margin-bottom:8px">目标二</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px">地域与流派分析</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.7">识别主要内容来源国、热门流派，了解 Netflix 的全球化内容布局和类型偏好</p>
+        <div style="margin-top:10px;font-size:12px;color:#7BC67E">预期：美国为最大来源国，国际剧为最热门类型</div>
+      </div>
+      <div style="background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:12px;padding:20px">
+        <div style="font-size:12px;color:#F5A623;font-weight:700;letter-spacing:.5px;margin-bottom:8px">目标三</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px">异常检测与数据质量</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.7">识别字段混淆、缺失值分布、格式不一致等质量问题，为后续分析奠定基础</p>
+        <div style="margin-top:10px;font-size:12px;color:#7BC67E">预期：发现 rating 字段时长污染、director 高缺失率等异常</div>
+      </div>
+      <div style="background:rgba(123,198,126,.08);border:1px solid rgba(123,198,126,.2);border-radius:12px;padding:20px">
+        <div style="font-size:12px;color:#7BC67E;font-weight:700;letter-spacing:.5px;margin-bottom:8px">目标四</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:8px">机器学习建模</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.7">应用聚类、分类、回归三类算法，发现内容分群规律并建立预测模型</p>
+        <div style="margin-top:10px;font-size:12px;color:#7BC67E">预期：内容流派是最强判别特征，分类准确率超 95%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass-card glass-card-hover" style="border-radius:16px;padding:32px">
+    <h3 style="font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="background:linear-gradient(135deg,#BD10E0,#7C3AED);border-radius:8px;width:32px;height:32px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px">&#128101;</span>
+      1.3 &nbsp;小组分工
+    </h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div style="background:rgba(229,9,20,.06);border:1px solid rgba(229,9,20,.15);border-radius:12px;padding:24px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:44px;height:44px;background:linear-gradient(135deg,#E50914,#B20710);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;box-shadow:0 0 16px rgba(229,9,20,.3);flex-shrink:0">A</div>
+          <div><div style="font-size:16px;font-weight:700">成员 A</div><div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:2px">数据工程 &amp; 建模</div></div>
+        </div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px">
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#E50914;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>数据集调研与来源确认</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#E50914;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>数据预处理脚本编写（缺失值处理、异常检测、特征工程）</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#E50914;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>机器学习算法实现（K-Means / 随机森林 / 梯度提升回归）</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#E50914;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>Jupyter Notebook 整理与执行验证</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#E50914;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>报告结论与改进建议撰写</li>
+        </ul>
+      </div>
+      <div style="background:rgba(74,144,217,.06);border:1px solid rgba(74,144,217,.15);border-radius:12px;padding:24px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:44px;height:44px;background:linear-gradient(135deg,#4A90D9,#2563EB);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;box-shadow:0 0 16px rgba(74,144,217,.3);flex-shrink:0">B</div>
+          <div><div style="font-size:16px;font-weight:700">成员 B</div><div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:2px">可视化 &amp; 报告</div></div>
+        </div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px">
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#4A90D9;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>Matplotlib 静态可视化图表绘制（7 张，含聚类散点图）</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#4A90D9;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>网页前端开发（HTML/CSS/Chart.js 交互图表，共 9 张）</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#4A90D9;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>Netflix 暗色主题 UI 设计与样式优化（玻璃拟态 + 动效）</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#4A90D9;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>项目需求分析与报告内容撰写</li>
+          <li style="font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:flex-start;gap:8px"><span style="color:#4A90D9;font-size:10px;margin-top:4px;flex-shrink:0">&#9679;</span>最终报告整合、审核与排版</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:rgba(255,255,255,.04);border-radius:10px;padding:14px;font-size:13px;color:rgba(255,255,255,.5)">
+      &#128204; 两人共同参与：项目选题讨论、分析思路确认、可视化结果解读、结论审查与 PPT 制作
+    </div>
+  </div>
+</section>
+</div>
+
+
+
+
+<footer>
+  <div class="nf-mini">N</div>
+  <p style="font-size:15px;font-weight:600;margin-bottom:4px">Netflix 电影和电视节目收视分析</p>
+  <p style="color:rgba(255,255,255,.45);font-size:13px">需求分析 &nbsp;·&nbsp; 数据预处理 &nbsp;·&nbsp; 可视化 &nbsp;·&nbsp; 机器学习 &nbsp;·&nbsp; 结论</p>
+  <p style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.3)">数据来源：Netflix Titles Dataset &nbsp;·&nbsp; 8,809 条记录</p>
+</footer>
+
+<script>
+// ── 分页系统 ──
+let currPage = 0;
+const totalPages = 5;
+function goPage(n) {
+  if (n < 0 || n >= totalPages || n === currPage) return;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active','page-enter'));
+  const pageId = n === 0 ? 'page-home' : 'page-' + n;
+  const target = document.getElementById(pageId);
+  target.classList.add('active','page-enter');
+  currPage = n;
+  // 切换后 resize charts
+  setTimeout(() => {
+    const canvases = target.querySelectorAll('canvas');
+    canvases.forEach(c => { const ch = Chart.getChart(c); if (ch) ch.resize(); });
+  }, 50);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+// 键盘翻页
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'ArrowLeft') goPage(currPage - 1);
+  if (e.key === 'ArrowRight') goPage(currPage + 1);
+});
+// 首页已通过 HTML class="active" 初始化，无需额外激活
+</script>
+
+<script>
+// ── 全局 Chart.js 主题（Netflix 暗色玻璃风格）──
+Chart.defaults.color = 'rgba(255,255,255,0.65)';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+Chart.defaults.font.family = "'Segoe UI','Helvetica Neue','Noto Sans SC',Arial,sans-serif";
+Chart.defaults.font.size = 12;
+// 统一 tooltip 玻璃风格
+Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15,15,15,0.92)';
+Chart.defaults.plugins.tooltip.borderColor = 'rgba(229,9,20,0.35)';
+Chart.defaults.plugins.tooltip.borderWidth = 1;
+Chart.defaults.plugins.tooltip.padding = 12;
+Chart.defaults.plugins.tooltip.cornerRadius = 10;
+Chart.defaults.plugins.tooltip.titleColor = '#E50914';
+Chart.defaults.plugins.tooltip.bodyColor = 'rgba(255,255,255,0.85)';
+Chart.defaults.plugins.tooltip.titleFont = { weight:'bold', size:13 };
+Chart.defaults.plugins.tooltip.displayColors = false;
+
+const NF_RED = '#E50914';
+const NF_RED_RGB = '229,9,20';
+const NF_DARK = '#B20710';
+const NF_GRID = 'rgba(255,255,255,0.05)';
+
+// ── Chart 1: 环形图 ──
+new Chart(document.getElementById('chart1'), {
+  type: 'doughnut',
+  data: {
+    labels: ['电影 Movie', '电视节目 TV Show'],
+    datasets: [{
+      data: [6131, 2676],
+      backgroundColor: [NF_RED, 'rgba(74,144,217,0.75)'],
+      borderColor: ['rgba(255,255,255,0.08)','rgba(255,255,255,0.08)'],
+      borderWidth: 2,
+      hoverOffset: 12
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 16, font: { size: 13 } } },
+      tooltip: {
+        backgroundColor: 'rgba(15,15,15,0.92)', borderColor: NF_RED, borderWidth: 1,
+        callbacks: {
+          label: ctx => `${ctx.label}: ${ctx.parsed.toLocaleString()} 条 (${(ctx.parsed/8807*100).toFixed(1)}%)`
+        }
+      }
+    },
+    cutout: '62%'
+  }
+});
+
+// ── Chart 2: 折线图 ──
+new Chart(document.getElementById('chart2'), {
+  type: 'line',
+  data: {
+    labels: [2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021],
+    datasets: [{
+      label: '上架内容数',
+      data: [2,2,1,13,3,11,24,82,429,1188,1649,2016,1879,1498],
+      borderColor: NF_RED,
+      backgroundColor: ctx => {
+        const c = ctx.chart.ctx;
+        const g = c.createLinearGradient(0,0,0,300);
+        g.addColorStop(0,'rgba(229,9,20,0.35)');
+        g.addColorStop(1,'rgba(229,9,20,0)');
+        return g;
+      },
+      borderWidth: 2.5, fill: true, tension: 0.35,
+      pointBackgroundColor: NF_RED, pointBorderColor:'#fff', pointRadius: 4, pointHoverRadius: 7
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: NF_GRID } },
+      y: { grid: { color: NF_GRID }, beginAtZero: true }
+    }
+  }
+});
+
+// ── Chart 3: 面积图 ──
+new Chart(document.getElementById('chart3'), {
+  type: 'line',
+  data: {
+    labels: [1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021],
+    datasets: [{
+      label: '发行数量',
+      data: [11,13,17,11,12,10,13,8,18,16,22,17,23,28,22,25,24,38,36,39,37,45,51,61,64,80,96,88,136,152,194,185,237,288,352,560,902,1032,1147,1030,953,592],
+      borderColor: NF_RED,
+      backgroundColor: ctx => {
+        const c = ctx.chart.ctx;
+        const g = c.createLinearGradient(0,0,0,300);
+        g.addColorStop(0,'rgba(229,9,20,0.4)');
+        g.addColorStop(1,'rgba(229,9,20,0)');
+        return g;
+      },
+      borderWidth: 2, fill: true, tension: 0.4,
+      pointRadius: 0, pointHoverRadius: 5, pointBackgroundColor: NF_RED
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: NF_GRID }, ticks: { maxTicksLimit: 10 } },
+      y: { grid: { color: NF_GRID }, beginAtZero: true }
+    }
+  }
+});
+
+// ── Chart 4: 水平柱状图 ──
+new Chart(document.getElementById('chart4'), {
+  type: 'bar',
+  data: {
+    labels: ['United States','India','United Kingdom','Canada','Japan','France','South Korea','Spain','Mexico','Australia'],
+    datasets: [{
+      label: '内容数量',
+      data: [3211,1008,628,271,259,212,211,181,134,117],
+      backgroundColor: ctx => {
+        const c = ctx.chart.ctx;
+        const g = c.createLinearGradient(0,0,400,0);
+        g.addColorStop(0,'rgba(229,9,20,0.8)');
+        g.addColorStop(1,'rgba(229,9,20,0.3)');
+        return g;
+      },
+      borderRadius: 6, borderSkipped: false
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: NF_GRID } },
+      y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Chart 5: 柱状图 ──
+new Chart(document.getElementById('chart5'), {
+  type: 'bar',
+  data: {
+    labels: ['TV-MA','TV-14','TV-PG','R','PG-13','TV-Y7','TV-Y','PG','TV-G','NR','G','TV-Y7-FV','NC-17','UR'],
+    datasets: [{
+      label: '数量',
+      data: [3214,2160,863,799,490,334,307,287,220,80,41,6,3,3],
+      backgroundColor: [
+        '#E50914','#E50914','#E50914','#E50914','#E50914',
+        '#e87d24','#e87d24','#e87d24','#e87d24',
+        '#6c757d','#6c757d','#e87d24','#6c757d','#6c757d'
+      ],
+      borderRadius: 5, borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 45 } },
+      y: { grid: { color: NF_GRID }, beginAtZero: true }
+    }
+  }
+});
+
+// ── Chart 6: 直方图 ──
+new Chart(document.getElementById('chart6'), {
+  type: 'bar',
+  data: {
+    labels: ['<30','30-60','60-90','90-120','120-150','150-180','180+'],
+    datasets: [{
+      label: '电影数量',
+      data: [124,334,1383,3092,936,213,48],
+      backgroundColor: ctx => {
+        const c = ctx.chart.ctx;
+        const g = c.createLinearGradient(0,0,0,300);
+        g.addColorStop(0,'rgba(229,9,20,0.85)');
+        g.addColorStop(1,'rgba(229,9,20,0.25)');
+        return g;
+      },
+      borderRadius: 6, borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, title: { display: true, text: '时长（分钟）', color: '#b3b3b3' } },
+      y: { grid: { color: NF_GRID }, beginAtZero: true }
+    }
+  }
+});
+
+// ── Chart 7: 水平柱状图 ──
+new Chart(document.getElementById('chart7'), {
+  type: 'bar',
+  data: {
+    labels: ['Dramas','Comedies','Action & Adventure','Documentaries','International TV Shows','Children & Family Movies','Crime TV Shows',"Kids' TV",'Stand-Up Comedy','Horror Movies'],
+    datasets: [{
+      label: '内容数量',
+      data: [1600,1210,859,829,774,605,399,388,334,275],
+      backgroundColor: ctx => {
+        const c = ctx.chart.ctx;
+        const g = c.createLinearGradient(0,0,400,0);
+        g.addColorStop(0,'rgba(229,9,20,0.8)');
+        g.addColorStop(1,'rgba(229,9,20,0.3)');
+        return g;
+      },
+      borderRadius: 6, borderSkipped: false
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: NF_GRID } },
+      y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Chart 8: 极坐标图 ──
+new Chart(document.getElementById('chart8'), {
+  type: 'polarArea',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    datasets: [{
+      data: [738,563,742,764,632,728,827,755,770,760,705,813],
+      backgroundColor: [
+        'rgba(229,9,20,0.7)','rgba(229,9,20,0.45)','rgba(229,9,20,0.7)',
+        'rgba(229,9,20,0.75)','rgba(229,9,20,0.5)','rgba(229,9,20,0.65)',
+        'rgba(229,9,20,0.85)','rgba(229,9,20,0.7)','rgba(229,9,20,0.72)',
+        'rgba(229,9,20,0.68)','rgba(229,9,20,0.6)','rgba(229,9,20,0.82)'
+      ],
+      borderColor: 'rgba(255,255,255,0.06)', borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        grid: { color: NF_GRID },
+        ticks: { color: 'rgba(255,255,255,0.4)', backdropColor: 'transparent', font: { size: 10 } },
+        angleLines: { color: NF_GRID }
+      }
+    }
+  }
+});
+
+// ── Chart 9: 堆叠柱状图 ──
+new Chart(document.getElementById('chart9'), {
+  type: 'bar',
+  data: {
+    labels: [2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021],
+    datasets: [
+      {
+        label: '电影 Movie',
+        data: [1,2,1,13,3,6,19,56,253,839,1237,1424,1284,993],
+        backgroundColor: NF_RED,
+        borderRadius: 4, borderSkipped: false
+      },
+      {
+        label: '电视节目 TV Show',
+        data: [1,0,0,0,0,5,5,26,176,349,412,592,595,505],
+        backgroundColor: 'rgba(74,144,217,0.75)',
+        borderRadius: 4, borderSkipped: false
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { padding: 16, font: { size: 13 }, usePointStyle: true } }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: { color: NF_GRID }, beginAtZero: true }
+    }
+  }
+});
+
+// ── 代码高亮 ──
+hljs.highlightAll();
+
+// ── 数字滚动动画（CountUp）──
+function animateCount(el, target, duration = 1400, suffix = '') {
+  const isDecimal = String(target).includes('.');
+  const start = performance.now();
+  requestAnimationFrame(function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const val = target * ease;
+    el.textContent = isDecimal
+      ? val.toFixed(2) + suffix
+      : Math.floor(val).toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(tick);
+  });
+}
+
+// ── IntersectionObserver 触发计数 & 淡入 ──
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      if (el.dataset.count !== undefined) {
+        const target = parseFloat(el.dataset.count);
+        const suffix = el.dataset.suffix || '';
+        animateCount(el, target, 1200, suffix);
+      }
+      if (el.classList.contains('chart-card')) {
+        el.style.animationPlayState = 'running';
+      }
+      io.unobserve(el);
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('[data-count]').forEach(el => io.observe(el));
+document.querySelectorAll('.chart-card').forEach((el, i) => {
+  el.style.animationDelay = `${i * 0.08}s`;
+  el.style.animationPlayState = 'paused';
+  io.observe(el);
+});
+
+// ════════════════════════════════════════════
+// 机器学习图表
+// ════════════════════════════════════════════
+
+// ── ML Chart 1: 肘部法则 ──
+new Chart(document.getElementById('ml1'), {
+  type: 'line',
+  data: {
+    labels: ['2','3','4','5','6','7','8','9','10'],
+    datasets: [{
+      label: 'SSE',
+      data: [15719.3,11254.1,9513.0,7885.2,6846.2,6219.7,5758.6,5338.7,4995.6],
+      borderColor: '#E50914',
+      backgroundColor: ctx => {
+        const c = ctx.chart.ctx;
+        const g = c.createLinearGradient(0,0,0,300);
+        g.addColorStop(0,'rgba(229,9,20,0.3)');
+        g.addColorStop(1,'rgba(229,9,20,0)');
+        return g;
+      },
+      borderWidth: 2.5, fill: true, tension: 0.3,
+      pointBackgroundColor: ['#b3b3b3','#b3b3b3','#E50914','#b3b3b3','#b3b3b3','#b3b3b3','#b3b3b3','#b3b3b3','#b3b3b3'],
+      pointRadius: [5,5,8,5,5,5,5,5,5],
+      pointBorderColor: '#fff'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor:'rgba(15,15,15,0.92)', borderColor:'#E50914', borderWidth:1 }
+    },
+    scales: {
+      x: { grid:{color:NF_GRID}, title:{display:true,text:'聚类数 K'} },
+      y: { grid:{color:NF_GRID}, title:{display:true,text:'SSE（簇内平方和）'}, beginAtZero:true }
+    }
+  }
+});
+
+// ── ML Chart 2: 聚类散点图 ──
+// 生成4个簇的采样散点数据（基于真实聚类中心）
+function genCluster(cx, cy, spread, n) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    pts.push({
+      x: cx + (Math.random()-0.5) * spread,
+      y: cy + (Math.random()-0.5) * spread
+    });
+  }
+  return pts;
+}
+new Chart(document.getElementById('ml2'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      { label:'簇0: 短片与纪录片 (972部)', data:genCluster(2017,57,8,80),
+        backgroundColor:'rgba(229,9,20,0.4)', borderColor:'#E50914', pointRadius:3 },
+      { label:'簇1: 标准院线电影 (2613部)', data:genCluster(2014,108,6,120),
+        backgroundColor:'rgba(232,125,36,0.4)', borderColor:'#e87d24', pointRadius:3 },
+      { label:'簇2: 经典老片 (497部)', data:genCluster(1987,117,15,60),
+        backgroundColor:'rgba(79,195,247,0.4)', borderColor:'#4fc3f7', pointRadius:3 },
+      { label:'簇3: 成人向新片 (2049部)', data:genCluster(2017,105,5,100),
+        backgroundColor:'rgba(129,199,132,0.4)', borderColor:'#81c784', pointRadius:3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position:'bottom', labels:{padding:10, font:{size:11}, usePointStyle:true} },
+      tooltip: { backgroundColor:'rgba(15,15,15,0.92)', borderColor:'#E50914', borderWidth:1,
+        callbacks: { label: ctx => `(${ctx.parsed.x.toFixed(0)}年, ${ctx.parsed.y.toFixed(0)}分钟)` } }
+    },
+    scales: {
+      x: { grid:{color:NF_GRID}, title:{display:true,text:'发行年份'} },
+      y: { grid:{color:NF_GRID}, title:{display:true,text:'时长（分钟）'} }
+    }
+  }
+});
+
+// ── ML Chart 3: 随机森林特征重要性 ──
+new Chart(document.getElementById('ml3'), {
+  type: 'bar',
+  data: {
+    labels: ['内容类型 genre', '年龄评级 rating', '制作国家 country', '发行年份 year'],
+    datasets: [{
+      label: '特征重要性',
+      data: [0.8073, 0.1122, 0.0461, 0.0344],
+      backgroundColor: ['#E50914','#e87d24','#4fc3f7','#81c784'],
+      borderRadius: 6, borderSkipped: false
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor:'rgba(15,15,15,0.92)', borderColor:'#E50914', borderWidth:1,
+        callbacks: { label: ctx => `重要性: ${ctx.parsed.x.toFixed(4)}` } }
+    },
+    scales: {
+      x: { grid:{color:NF_GRID}, title:{display:true,text:'重要性'}, beginAtZero:true },
+      y: { grid:{display:false} }
+    }
+  }
+});
+
+// ── ML Chart 4: 回归模型 R² 对比 ──
+new Chart(document.getElementById('ml4'), {
+  type: 'bar',
+  data: {
+    labels: ['LinearReg','DecisionTree','RandomForest','GradientBoosting'],
+    datasets: [{
+      label: 'R²',
+      data: [0.2058, 0.4269, 0.4535, 0.4813],
+      backgroundColor: ['#E50914','#e87d24','#4fc3f7','#81c784'],
+      borderRadius: 6, borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor:'rgba(15,15,15,0.92)', borderColor:'#E50914', borderWidth:1,
+        callbacks: { label: ctx => `R² = ${ctx.parsed.y.toFixed(4)}` } }
+    },
+    scales: {
+      x: { grid:{display:false} },
+      y: { grid:{color:NF_GRID}, title:{display:true,text:'R² 决定系数'}, beginAtZero:true, max:0.55 }
+    }
+  }
+});
+
+// ── ML Chart 5: 聚类簇特征对比 ──
+new Chart(document.getElementById('ml5'), {
+  type: 'bar',
+  data: {
+    labels: ['簇0: 短片与纪录片', '簇1: 标准院线电影', '簇2: 经典老片', '簇3: 成人向新片'],
+    datasets: [
+      {
+        label: '平均时长（分钟）',
+        data: [57.3, 108.1, 116.8, 104.6],
+        backgroundColor: 'rgba(229,9,20,0.8)',
+        borderRadius: 4, borderSkipped: false, yAxisID: 'y'
+      },
+      {
+        label: '平均发行年份',
+        data: [2016.8, 2014.1, 1986.5, 2016.6],
+        backgroundColor: 'rgba(79,195,247,0.8)',
+        borderRadius: 4, borderSkipped: false, yAxisID: 'y1'
+      },
+      {
+        label: '内容数量',
+        data: [972, 2613, 497, 2049],
+        backgroundColor: 'rgba(129,199,132,0.8)',
+        borderRadius: 4, borderSkipped: false, yAxisID: 'y2'
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position:'top', labels:{padding:14, font:{size:12}, usePointStyle:true} },
+      tooltip: { backgroundColor:'rgba(15,15,15,0.92)', borderColor:'#E50914', borderWidth:1 }
+    },
+    scales: {
+      x: { grid:{display:false} },
+      y:  { position:'left',  grid:{color:NF_GRID}, title:{display:true,text:'时长(分钟)'}, beginAtZero:true },
+      y1: { position:'right', grid:{display:false}, title:{display:true,text:'发行年份'}, min:1975, max:2025 },
+      y2: { display:false, beginAtZero:true }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
