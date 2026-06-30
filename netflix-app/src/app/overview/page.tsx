@@ -67,7 +67,7 @@ export default function OverviewPage() {
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,.05)" }}>
                 <td style={{ padding: "9px 16px", fontWeight: 600, color: "#fff" }}>date_added</td>
                 <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>日期型</td>
-                <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>上架 Netflix 的日期（"Month DD, YYYY"）</td>
+                <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>上架 Netflix 的日期（&quot;Month DD, YYYY&quot;）</td>
                 <td style={{ padding: "9px 16px", color: "#7BC67E" }}>0.11%</td>
               </tr>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,.05)", background: "rgba(255,255,255,.02)" }}>

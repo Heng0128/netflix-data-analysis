@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   Chart,
   ArcElement,
@@ -70,15 +70,8 @@ const chartData = [
 export default function VisualizationPage() {
   const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
   const chartsRef = useRef<Chart[]>([]);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
     const charts: Chart[] = [];
 
     const c1 = canvasRefs.current[0];
@@ -106,7 +99,7 @@ export default function VisualizationPage() {
               },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => `${ctx.label}: ${ctx.parsed.toLocaleString()} 部 (${(ctx.parsed / 8807 * 100).toFixed(1)}%)`,
+                  label: (ctx) => `${ctx.label}: ${ctx.parsed!.toLocaleString()} 部 (${(ctx.parsed! / 8807 * 100).toFixed(1)}%)`,
                 },
               },
             },
@@ -368,7 +361,6 @@ export default function VisualizationPage() {
 
     const c9 = canvasRefs.current[8];
     if (c9) {
-      const ctx = c9.getContext('2d')!;
       charts.push(
         new Chart(c9, {
           type: 'bar',
@@ -414,7 +406,7 @@ export default function VisualizationPage() {
     return () => {
       charts.forEach(c => c.destroy());
     };
-  }, [mounted]);
+  }, []);
 
   return (
     <section id="visualization" style={{ padding: '64px 24px', maxWidth: '1400px', margin: '0 auto' }}>

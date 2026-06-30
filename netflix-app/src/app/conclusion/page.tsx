@@ -254,7 +254,7 @@ export default function MLAnalysisPage() {
               },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => `(${ctx.parsed.x.toFixed(0)}年, ${ctx.parsed.y.toFixed(0)}分钟)`,
+                  label: (ctx) => `(${ctx.parsed.x!.toFixed(0)}年, ${ctx.parsed.y!.toFixed(0)}分钟)`,
                 },
               },
             },
@@ -275,7 +275,6 @@ export default function MLAnalysisPage() {
 
     const m3 = chartRefs.current[2];
     if (m3) {
-      const ctx = m3.getContext('2d')!;
       charts.push(
         new Chart(m3, {
           type: 'bar',
@@ -299,7 +298,7 @@ export default function MLAnalysisPage() {
               legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => `重要性: ${ctx.parsed.x.toFixed(4)}`,
+                  label: (ctx) => `重要性: ${ctx.parsed.x!.toFixed(4)}`,
                 },
               },
             },
@@ -342,7 +341,7 @@ export default function MLAnalysisPage() {
               legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => `R² = ${ctx.parsed.y.toFixed(4)}`,
+                  label: (ctx) => `R² = ${ctx.parsed.y!.toFixed(4)}`,
                 },
               },
             },
@@ -450,7 +449,7 @@ export default function MLAnalysisPage() {
             <span className="code-dot green"></span>
             <span className="code-title">{block.title}</span>
           </div>
-          <pre ref={(el) => (codeRefs.current[index] = el)}>
+          <pre ref={(el) => { codeRefs.current[index] = el; }}>
             <code className="language-python">{block.code}</code>
           </pre>
         </div>
