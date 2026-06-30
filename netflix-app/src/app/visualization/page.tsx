@@ -106,7 +106,7 @@ export default function VisualizationPage() {
               },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => `${ctx.label}: ${ctx.parsed.toLocaleString()} 部 (${(ctx.parsed / 8807 * 100).toFixed(1)}%)`,
+                  label: (ctx) => `${ctx.label}: ${ctx.parsed!.toLocaleString()} 部 (${(ctx.parsed! / 8807 * 100).toFixed(1)}%)`,
                 },
               },
             },
