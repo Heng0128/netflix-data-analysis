@@ -275,7 +275,6 @@ export default function MLAnalysisPage() {
 
     const m3 = chartRefs.current[2];
     if (m3) {
-      const ctx = m3.getContext('2d')!;
       charts.push(
         new Chart(m3, {
           type: 'bar',
