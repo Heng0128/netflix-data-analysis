@@ -12,6 +12,9 @@ import {
   Tooltip,
   Legend,
   Filler,
+  LineController,
+  BarController,
+  ScatterController,
 } from 'chart.js';
 import hljs from 'highlight.js';
 
@@ -24,7 +27,10 @@ Chart.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  LineController,
+  BarController,
+  ScatterController
 );
 
 Chart.defaults.color = 'rgba(255,255,255,0.65)';
