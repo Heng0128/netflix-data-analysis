@@ -7,20 +7,20 @@ const AXIS_STYLE = getAxisStyle();
 
 const DONUT_COLORS = [
   '#E50914',
-  '#F5A623',
-  '#D4A017',
+  '#FFD700',
+  '#FFC000',
   '#B81D24',
   '#CC8B3C',
-  '#FFB84D',
+  '#FFEB3B',
 ];
 
 const TREEMAP_COLORS = [
   '#E50914',
-  '#F5A623',
-  '#D4A017',
+  '#FFD700',
+  '#FFC000',
   '#B81D24',
   '#CC8B3C',
-  '#FFB84D',
+  '#FFEB3B',
 ];
 
 const CORRELATION_COUNTRIES = [
@@ -103,7 +103,7 @@ export function getLineOption(
         smooth: true,
         data: yearlyTrends.map((d) => d.tvShows),
         itemStyle: { color: CHART_COLORS.secondary },
-        areaStyle: { color: 'rgba(245,166,35,0.2)' },
+        areaStyle: { color: 'rgba(255,215,0,0.2)' },
       },
     ],
     legend: { textStyle: { color: '#fff' }, top: 0 },
@@ -204,10 +204,10 @@ export function getHeatmapOption(
       textStyle: { color: '#fff', fontSize: 10 },
       inRange: {
         color: [
-          '#D4A017',
+          '#FFC000',
           '#CC8B3C',
-          '#FFB84D',
-          '#F5A623',
+          '#FFEB3B',
+          '#FFD700',
           '#E50914',
           '#B81D24',
           '#831a1a',
@@ -294,7 +294,7 @@ export function getStackedAreaOption(
         type: 'line',
         smooth: true,
         stack: 'Total',
-        areaStyle: { color: 'rgba(245,166,35,0.5)' },
+        areaStyle: { color: 'rgba(255,215,0,0.5)' },
         itemStyle: { color: CHART_COLORS.secondary },
         data: stackedAreaData.map((d) => d.tvShows),
       },

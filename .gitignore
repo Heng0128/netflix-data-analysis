@@ -2,7 +2,7 @@
 # Dependencies
 node_modules/
 
-# Build outputs
+# Build artifacts
 dist/
 build/
 .next/
@@ -10,9 +10,9 @@ build/
 # Environment variables
 .env
 .env.local
-.env.*
+*.env.*
 
-# IDE files
+# Editor/IDE files
 .vscode/
 .idea/
 *.swp
@@ -22,7 +22,7 @@ build/
 # Logs
 *.log
 
-# Python cache (if any Python files exist in the project)
+# Python cache (if any Python files exist in project)
 __pycache__/
 *.pyc
 *.pyo
