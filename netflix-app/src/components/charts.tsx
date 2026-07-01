@@ -131,11 +131,11 @@ export function getAxisStyle() {
 
 export const CHART_COLORS = {
   primary: '#E50914',
-  secondary: '#564d4d',
-  accent: '#4A90D9',
-  warning: '#F5A623',
-  success: '#7BC67E',
-  purple: '#BD10E0',
+  secondary: '#F5A623',
+  accent: '#D4A017',
+  warning: '#B81D24',
+  success: '#FFB84D',
+  purple: '#CC8B3C',
 };
 
 export default Chart;
