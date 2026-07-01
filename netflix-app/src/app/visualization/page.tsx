@@ -85,7 +85,7 @@ export default function VisualizationPage() {
             labels: ['电影 (6,131)', '电视节目 (2,676)'],
             datasets: [{
               data: [6131, 2676],
-              backgroundColor: ['#E50914', '#4A90D9'],
+              backgroundColor: ['#E50914', '#F5A623'],
               hoverOffset: 10,
               borderWidth: 0,
             }],
@@ -169,14 +169,14 @@ export default function VisualizationPage() {
             datasets: [{
               label: '发行数量',
               data: [12,14,17,16,21,22,19,25,28,30,33,35,38,42,50,60,75,85,95,110,130,150,175,200,230,260,290,330,380,440,510,590,680,790,910,1030,1150,1280,1400,1500,1450,1350],
-              borderColor: '#4A90D9',
+              borderColor: '#F5A623',
               backgroundColor: (context) => {
                 const chart = context.chart;
                 const { chartArea } = chart;
-                if (!chartArea) return 'rgba(74,144,217,0.2)';
+                if (!chartArea) return 'rgba(245,166,35,0.2)';
                 const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                g.addColorStop(0, 'rgba(74,144,217,0.3)');
-                g.addColorStop(1, 'rgba(74,144,217,0)');
+                g.addColorStop(0, 'rgba(245,166,35,0.3)');
+                g.addColorStop(1, 'rgba(245,166,35,0)');
                 return g;
               },
               borderWidth: 2,
@@ -213,8 +213,8 @@ export default function VisualizationPage() {
               label: '内容数量',
               data: [2818, 972, 419, 226, 195, 186, 177, 134, 115, 87],
               backgroundColor: [
-                '#E50914','#e87d24','#4A90D9','#4fc3f7','#9c27b0',
-                '#7BC67E','#ff9800','#00bcd4','#f44336','#9e9e9e'
+                '#E50914','#F5A623','#E50914','#F5A623','#E50914',
+                '#F5A623','#E50914','#F5A623','#E50914','#F5A623'
               ],
               borderRadius: 6,
               borderSkipped: false,
@@ -245,8 +245,8 @@ export default function VisualizationPage() {
               label: '内容数量',
               data: [3207, 2160, 863, 799, 490, 449, 287, 280, 220, 52],
               backgroundColor: [
-                '#E50914','#e87d24','#4A90D9','#4fc3f7','#9c27b0',
-                '#7BC67E','#ff9800','#00bcd4','#f44336','#9e9e9e'
+                '#E50914','#F5A623','#E50914','#F5A623','#E50914',
+                '#F5A623','#E50914','#F5A623','#E50914','#F5A623'
               ],
               borderRadius: 6,
               borderSkipped: false,
@@ -275,7 +275,7 @@ export default function VisualizationPage() {
             datasets: [{
               label: '电影数量',
               data: [42, 186, 523, 980, 1456, 1678, 720, 312, 145, 68, 21],
-              backgroundColor: '#7BC67E',
+              backgroundColor: '#E50914',
               borderRadius: 4,
               borderSkipped: false,
             }],
@@ -303,7 +303,7 @@ export default function VisualizationPage() {
             datasets: [{
               label: '内容数量',
               data: [879, 785, 653, 528, 496, 420, 356, 298, 245, 212],
-              backgroundColor: '#4A90D9',
+              backgroundColor: '#F5A623',
               borderRadius: 4,
               borderSkipped: false,
             }],
@@ -396,7 +396,7 @@ export default function VisualizationPage() {
               {
                 label: '电视节目',
                 data: [0,1,0,1,1,3,5,17,67,133,185,212,180,172],
-                backgroundColor: '#4A90D9',
+                backgroundColor: '#F5A623',
                 borderRadius: 4,
                 borderSkipped: false,
               },
