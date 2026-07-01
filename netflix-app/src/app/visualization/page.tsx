@@ -85,7 +85,7 @@ export default function VisualizationPage() {
             labels: ['电影 (6,131)', '电视节目 (2,676)'],
             datasets: [{
               data: [6131, 2676],
-              backgroundColor: ['#E50914', '#F5A623'],
+              backgroundColor: ['#E50914', '#FFD700'],
               hoverOffset: 10,
               borderWidth: 0,
             }],
@@ -169,14 +169,14 @@ export default function VisualizationPage() {
             datasets: [{
               label: '发行数量',
               data: [12,14,17,16,21,22,19,25,28,30,33,35,38,42,50,60,75,85,95,110,130,150,175,200,230,260,290,330,380,440,510,590,680,790,910,1030,1150,1280,1400,1500,1450,1350],
-              borderColor: '#F5A623',
+              borderColor: '#FFD700',
               backgroundColor: (context) => {
                 const chart = context.chart;
                 const { chartArea } = chart;
-                if (!chartArea) return 'rgba(245,166,35,0.2)';
+                if (!chartArea) return 'rgba(255,215,0,0.2)';
                 const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                g.addColorStop(0, 'rgba(245,166,35,0.3)');
-                g.addColorStop(1, 'rgba(245,166,35,0)');
+                g.addColorStop(0, 'rgba(255,215,0,0.3)');
+                g.addColorStop(1, 'rgba(255,215,0,0)');
                 return g;
               },
               borderWidth: 2,
@@ -213,8 +213,8 @@ export default function VisualizationPage() {
               label: '内容数量',
               data: [2818, 972, 419, 226, 195, 186, 177, 134, 115, 87],
               backgroundColor: [
-                '#E50914','#F5A623','#E50914','#F5A623','#E50914',
-                '#F5A623','#E50914','#F5A623','#E50914','#F5A623'
+                '#E50914','#FFD700','#E50914','#FFD700','#E50914',
+                '#FFD700','#E50914','#FFD700','#E50914','#FFD700'
               ],
               borderRadius: 6,
               borderSkipped: false,
@@ -245,8 +245,8 @@ export default function VisualizationPage() {
               label: '内容数量',
               data: [3207, 2160, 863, 799, 490, 449, 287, 280, 220, 52],
               backgroundColor: [
-                '#E50914','#F5A623','#E50914','#F5A623','#E50914',
-                '#F5A623','#E50914','#F5A623','#E50914','#F5A623'
+                '#E50914','#FFD700','#E50914','#FFD700','#E50914',
+                '#FFD700','#E50914','#FFD700','#E50914','#FFD700'
               ],
               borderRadius: 6,
               borderSkipped: false,
@@ -303,7 +303,7 @@ export default function VisualizationPage() {
             datasets: [{
               label: '内容数量',
               data: [879, 785, 653, 528, 496, 420, 356, 298, 245, 212],
-              backgroundColor: '#F5A623',
+              backgroundColor: '#FFD700',
               borderRadius: 4,
               borderSkipped: false,
             }],
@@ -396,7 +396,7 @@ export default function VisualizationPage() {
               {
                 label: '电视节目',
                 data: [0,1,0,1,1,3,5,17,67,133,185,212,180,172],
-                backgroundColor: '#F5A623',
+                backgroundColor: '#FFD700',
                 borderRadius: 4,
                 borderSkipped: false,
               },
@@ -450,7 +450,7 @@ export default function VisualizationPage() {
 
       <div style={{ marginTop: '40px' }}>
         <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ background: 'linear-gradient(135deg,#F5A623,#D97706)', borderRadius: '8px', width: '32px', height: '32px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>&#128161;</span>
+          <span style={{ background: 'linear-gradient(135deg,#FFD700,#FFC000)', borderRadius: '8px', width: '32px', height: '32px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>&#128161;</span>
           数据分析核心发现
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>

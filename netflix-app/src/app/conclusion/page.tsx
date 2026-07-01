@@ -224,8 +224,8 @@ export default function MLAnalysisPage() {
               {
                 label: '簇1: 标准院线电影 (2613部)',
                 data: generateClusterData(2014, 108, 6, 120),
-                backgroundColor: 'rgba(245,166,35,0.4)',
-                borderColor: '#F5A623',
+                backgroundColor: 'rgba(255,215,0,0.4)',
+                borderColor: '#FFD700',
                 pointRadius: 3,
               },
               {
@@ -238,8 +238,8 @@ export default function MLAnalysisPage() {
               {
                 label: '簇3: 成人向新片 (2049部)',
                 data: generateClusterData(2017, 105, 5, 100),
-                backgroundColor: 'rgba(245,166,35,0.4)',
-                borderColor: '#F5A623',
+                backgroundColor: 'rgba(255,215,0,0.4)',
+                borderColor: '#FFD700',
                 pointRadius: 3,
               },
             ],
@@ -284,7 +284,7 @@ export default function MLAnalysisPage() {
               {
                 label: '特征重要性',
                 data: [0.8073, 0.1122, 0.0461, 0.0344],
-                backgroundColor: ['#E50914', '#F5A623', '#E50914', '#F5A623'],
+                backgroundColor: ['#E50914', '#FFD700', '#E50914', '#FFD700'],
                 borderRadius: 6,
                 borderSkipped: false,
               },
@@ -328,7 +328,7 @@ export default function MLAnalysisPage() {
               {
                 label: 'R²',
                 data: [0.2058, 0.4269, 0.4535, 0.4813],
-                backgroundColor: ['#E50914', '#F5A623', '#E50914', '#F5A623'],
+                backgroundColor: ['#E50914', '#FFD700', '#E50914', '#FFD700'],
                 borderRadius: 6,
                 borderSkipped: false,
               },
@@ -378,7 +378,7 @@ export default function MLAnalysisPage() {
               {
                 label: '平均发行年份',
                 data: [2016.8, 2014.1, 1986.5, 2016.6],
-                backgroundColor: 'rgba(245,166,35,0.8)',
+                backgroundColor: 'rgba(255,215,0,0.8)',
                 borderRadius: 4,
                 borderSkipped: false,
                 yAxisID: 'y1',
@@ -550,21 +550,21 @@ export default function MLAnalysisPage() {
             <div style={{ minWidth: '44px', height: '44px', background: 'rgba(229,9,20,.15)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>&#128309;</div>
             <div>
               <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px' }}>K-Means 聚类（K=4）&rarr; 发现 4 类自然内容群体</div>
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>基于时长、发行年份、内容年龄、评级对电影进行无监督聚类：<strong style={{ color: '#E50914' }}>短片/纪录片</strong>（低时长、近年）、<strong style={{ color: '#F5A623' }}>标准院线片</strong>（90~120min）、<strong style={{ color: '#F5A623' }}>经典老片</strong>（发行年早）、<strong style={{ color: '#E50914' }}>近年新片</strong>（2015 年后高评级）。4 簇特征鲜明，可直接用于推荐系统内容分层。</p>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>基于时长、发行年份、内容年龄、评级对电影进行无监督聚类：<strong style={{ color: '#E50914' }}>短片/纪录片</strong>（低时长、近年）、<strong style={{ color: '#FFD700' }}>标准院线片</strong>（90~120min）、<strong style={{ color: '#FFD700' }}>经典老片</strong>（发行年早）、<strong style={{ color: '#E50914' }}>近年新片</strong>（2015 年后高评级）。4 簇特征鲜明，可直接用于推荐系统内容分层。</p>
             </div>
           </div>
           <div style={{ background: 'rgba(74,144,217,.06)', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
             <div style={{ minWidth: '44px', height: '44px', background: 'rgba(74,144,217,.15)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>&#127823;</div>
             <div>
               <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px' }}>随机森林分类 &rarr; 准确率 99.55%，5 折交叉验证 97.5%</div>
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>以发行年份、评级、制作国、内容类型为特征预测内容类别，<strong style={{ color: '#F5A623' }}>内容类型（genre）是压倒性最强特征（重要性 80.7%）</strong>，说明电影和电视节目在流派分布上天然差异显著。1,762 个测试样本中仅 8 个预测错误。</p>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>以发行年份、评级、制作国、内容类型为特征预测内容类别，<strong style={{ color: '#FFD700' }}>内容类型（genre）是压倒性最强特征（重要性 80.7%）</strong>，说明电影和电视节目在流派分布上天然差异显著。1,762 个测试样本中仅 8 个预测错误。</p>
             </div>
           </div>
-          <div style={{ background: 'rgba(245,166,35,.06)', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-            <div style={{ minWidth: '44px', height: '44px', background: 'rgba(245,166,35,.15)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>&#128200;</div>
+          <div style={{ background: 'rgba(255,215,0,.06)', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+            <div style={{ minWidth: '44px', height: '44px', background: 'rgba(255,215,0,.15)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>&#128200;</div>
             <div>
               <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px' }}>回归模型对比 &rarr; 梯度提升最优（R&sup2;=0.48，RMSE=19.6 min）</div>
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>四种模型预测电影时长：线性回归 R&sup2;=0.07（最差）、决策树 0.32、随机森林 0.46、梯度提升 0.48（最优）。R&sup2; 上限说明电影时长受导演风格等元数据外因素影响更大，<strong style={{ color: '#F5A623' }}>引入用户行为数据将能大幅提升预测能力</strong>。</p>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>四种模型预测电影时长：线性回归 R&sup2;=0.07（最差）、决策树 0.32、随机森林 0.46、梯度提升 0.48（最优）。R&sup2; 上限说明电影时长受导演风格等元数据外因素影响更大，<strong style={{ color: '#FFD700' }}>引入用户行为数据将能大幅提升预测能力</strong>。</p>
             </div>
           </div>
         </div>
@@ -572,7 +572,7 @@ export default function MLAnalysisPage() {
 
       <div style={{ marginTop: '24px' }}>
         <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ background: 'linear-gradient(135deg,#F5A623,#D97706)', borderRadius: '8px', width: '32px', height: '32px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>&#128203;</span>
+          <span style={{ background: 'linear-gradient(135deg,#FFD700,#FFC000)', borderRadius: '8px', width: '32px', height: '32px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>&#128203;</span>
           结论与改进建议
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: '14px', marginBottom: '20px' }}>
@@ -581,11 +581,11 @@ export default function MLAnalysisPage() {
             <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>持续加大亚洲、拉美区域本地化内容投资。印度、韩国剧集已具备强大全球传播力，应重点倾斜资源，降低对美国内容的依赖度（现占 32%）。</p>
           </div>
           <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: '12px', padding: '18px' }}>
-            <div style={{ fontSize: '13px', color: '#F5A623', fontWeight: 700, letterSpacing: '.3px', marginBottom: '8px' }}>&#127919; 精准推荐优化</div>
+            <div style={{ fontSize: '13px', color: '#FFD700', fontWeight: 700, letterSpacing: '.3px', marginBottom: '8px' }}>&#127919; 精准推荐优化</div>
             <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>K-Means 4 个内容群体可直接用于推荐系统内容画像层。&quot;短片爱好者&quot;与&quot;长篇剧集爱好者&quot;兴趣模式截然不同，差异化推送可显著提升用户满意度。</p>
           </div>
           <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: '12px', padding: '18px' }}>
-            <div style={{ fontSize: '13px', color: '#F5A623', fontWeight: 700, letterSpacing: '.3px', marginBottom: '8px' }}>&#128106;&#8203; 家庭内容扩充</div>
+            <div style={{ fontSize: '13px', color: '#FFD700', fontWeight: 700, letterSpacing: '.3px', marginBottom: '8px' }}>&#128106;&#8203; 家庭内容扩充</div>
             <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>TV-G 和 TV-PG 评级内容合计不足 10%，而家庭订阅是流媒体盈利重要来源。建议扩充亲子向、合家欢类型内容，提升家庭用户黏性与订阅意愿。</p>
           </div>
           <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: '12px', padding: '18px' }}>

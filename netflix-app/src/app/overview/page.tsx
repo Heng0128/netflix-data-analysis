@@ -56,13 +56,13 @@ export default function OverviewPage() {
                 <td style={{ padding: "9px 16px", fontWeight: 600, color: "#fff" }}>cast</td>
                 <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>字符串</td>
                 <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>主要演员列表（逗号分隔）</td>
-                <td style={{ padding: "9px 16px", color: "#F5A623" }}>9.22%</td>
+                <td style={{ padding: "9px 16px", color: "#FFD700" }}>9.22%</td>
               </tr>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,.05)", background: "rgba(255,255,255,.02)" }}>
                 <td style={{ padding: "9px 16px", fontWeight: 600, color: "#fff" }}>country</td>
                 <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>字符串</td>
                 <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>制作国家（可多值，逗号分隔）</td>
-                <td style={{ padding: "9px 16px", color: "#F5A623" }}>9.45%</td>
+                <td style={{ padding: "9px 16px", color: "#FFD700" }}>9.45%</td>
               </tr>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,.05)" }}>
                 <td style={{ padding: "9px 16px", fontWeight: 600, color: "#fff" }}>date_added</td>
@@ -124,7 +124,7 @@ export default function OverviewPage() {
             <div style={{ marginTop: "10px", fontSize: "12px", color: "#7BC67E" }}>预期：美国为最大来源国，国际剧为最热门类型</div>
           </div>
           <div style={{ background: "rgba(245,166,35,.08)", border: "1px solid rgba(245,166,35,.2)", borderRadius: "12px", padding: "20px" }}>
-            <div style={{ fontSize: "12px", color: "#F5A623", fontWeight: 700, letterSpacing: ".5px", marginBottom: "8px" }}>目标三</div>
+            <div style={{ fontSize: "12px", color: "#FFD700", fontWeight: 700, letterSpacing: ".5px", marginBottom: "8px" }}>目标三</div>
             <div style={{ fontSize: "15px", fontWeight: 600, marginBottom: "8px" }}>异常检测与数据质量</div>
             <p style={{ fontSize: "13px", color: "rgba(255,255,255,.65)", lineHeight: 1.7 }}>识别字段混淆、缺失值分布、格式不一致等质量问题，为后续分析奠定基础</p>
             <div style={{ marginTop: "10px", fontSize: "12px", color: "#7BC67E" }}>预期：发现 rating 字段时长污染、director 高缺失率等异常</div>
