@@ -18,6 +18,7 @@ import {
   LineController,
   BarController,
   PolarAreaController,
+  RadarController,
 } from 'chart.js';
 
 Chart.register(
@@ -35,7 +36,8 @@ Chart.register(
   DoughnutController,
   LineController,
   BarController,
-  PolarAreaController
+  PolarAreaController,
+  RadarController
 );
 
 Chart.defaults.color = 'rgba(255,255,255,0.65)';
@@ -63,7 +65,7 @@ const chartData = [
   { num: '05', icon: 'user-shield', type: '柱状图', title: '年龄评级分布', subtitle: 'Netflix 内容的年龄分级构成' },
   { num: '06', icon: 'clock', type: '直方图', title: '电影时长分布', subtitle: '6,131 部电影按时长区间统计' },
   { num: '07', icon: 'tags', type: '水平柱状图', title: 'Top 10 热门类型', subtitle: '按主类型（listed_in）统计' },
-  { num: '08', icon: 'calendar-alt', type: '极坐标图', title: '月度上架分布', subtitle: 'Netflix 各月份内容上架数量' },
+  { num: '08', icon: 'calendar-alt', type: '雷达图', title: '月度上架分布', subtitle: 'Netflix 各月份内容上架数量雷达对比' },
   { num: '09', icon: 'chart-bar', type: '堆叠柱状图', title: '电影 vs 电视节目上架趋势对比', subtitle: '2008-2021 年电影与电视节目新增数量对比' },
 ];
 
@@ -324,18 +326,22 @@ export default function VisualizationPage() {
     if (c8) {
       charts.push(
         new Chart(c8, {
-          type: 'polarArea',
+          type: 'radar',
           data: {
             labels: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
             datasets: [{
+              label: '上架数量',
               data: [734, 678, 720, 692, 710, 685, 756, 789, 742, 768, 791, 842],
-              backgroundColor: [
-                'rgba(229,9,20,0.7)','rgba(232,125,36,0.7)','rgba(74,144,217,0.7)',
-                'rgba(79,195,247,0.7)','rgba(156,39,176,0.7)','rgba(123,198,126,0.7)',
-                'rgba(255,152,0,0.7)','rgba(0,188,212,0.7)','rgba(244,67,54,0.7)',
-                'rgba(158,158,158,0.7)','rgba(103,58,183,0.7)','rgba(233,30,99,0.7)'
-              ],
-              borderWidth: 0,
+              borderColor: '#E50914',
+              backgroundColor: 'rgba(229,9,20,0.25)',
+              borderWidth: 2,
+              pointBackgroundColor: '#fff',
+              pointBorderColor: '#E50914',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              fill: true,
+              tension: 0.15,
             }],
           },
           options: {
@@ -343,15 +349,28 @@ export default function VisualizationPage() {
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                position: 'right' as const,
-                labels: { padding: 10, font: { size: 11 }, usePointStyle: true },
+                display: false,
+              },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => `${ctx.label}: ${ctx.parsed.r} 部`,
+                },
               },
             },
             scales: {
               r: {
                 grid: { color: NF_GRID },
-                ticks: { display: false },
                 angleLines: { color: NF_GRID },
+                pointLabels: {
+                  color: 'rgba(255,255,255,0.7)',
+                  font: { size: 11 },
+                },
+                ticks: {
+                  color: 'rgba(255,255,255,0.4)',
+                  backdropColor: 'transparent',
+                  font: { size: 10 },
+                },
+                beginAtZero: true,
               },
             },
           },
