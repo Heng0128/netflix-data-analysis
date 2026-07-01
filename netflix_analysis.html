@@ -1205,7 +1205,7 @@ new Chart(document.getElementById('chart1'), {
     labels: ['电影 Movie', '电视节目 TV Show'],
     datasets: [{
       data: [6131, 2676],
-      backgroundColor: [NF_RED, 'rgba(74,144,217,0.75)'],
+      backgroundColor: [NF_RED, 'rgba(245,166,35,0.75)'],
       borderColor: ['rgba(255,255,255,0.08)','rgba(255,255,255,0.08)'],
       borderWidth: 2,
       hoverOffset: 12
@@ -1325,8 +1325,8 @@ new Chart(document.getElementById('chart5'), {
       data: [3214,2160,863,799,490,334,307,287,220,80,41,6,3,3],
       backgroundColor: [
         '#E50914','#E50914','#E50914','#E50914','#E50914',
-        '#e87d24','#e87d24','#e87d24','#e87d24',
-        '#6c757d','#6c757d','#e87d24','#6c757d','#6c757d'
+        '#F5A623','#F5A623','#F5A623','#F5A623',
+        '#D4A017','#D4A017','#F5A623','#D4A017','#D4A017'
       ],
       borderRadius: 5, borderSkipped: false
     }]
@@ -1442,7 +1442,7 @@ new Chart(document.getElementById('chart9'), {
       {
         label: '电视节目 TV Show',
         data: [1,0,0,0,0,5,5,26,176,349,412,592,595,505],
-        backgroundColor: 'rgba(74,144,217,0.75)',
+        backgroundColor: 'rgba(245,166,35,0.75)',
         borderRadius: 4, borderSkipped: false
       }
     ]
@@ -1560,11 +1560,11 @@ new Chart(document.getElementById('ml2'), {
       { label:'簇0: 短片与纪录片 (972部)', data:genCluster(2017,57,8,80),
         backgroundColor:'rgba(229,9,20,0.4)', borderColor:'#E50914', pointRadius:3 },
       { label:'簇1: 标准院线电影 (2613部)', data:genCluster(2014,108,6,120),
-        backgroundColor:'rgba(232,125,36,0.4)', borderColor:'#e87d24', pointRadius:3 },
+        backgroundColor:'rgba(245,166,35,0.4)', borderColor:'#F5A623', pointRadius:3 },
       { label:'簇2: 经典老片 (497部)', data:genCluster(1987,117,15,60),
-        backgroundColor:'rgba(79,195,247,0.4)', borderColor:'#4fc3f7', pointRadius:3 },
+        backgroundColor:'rgba(212,160,23,0.4)', borderColor:'#D4A017', pointRadius:3 },
       { label:'簇3: 成人向新片 (2049部)', data:genCluster(2017,105,5,100),
-        backgroundColor:'rgba(129,199,132,0.4)', borderColor:'#81c784', pointRadius:3 }
+        backgroundColor:'rgba(178,29,36,0.4)', borderColor:'#B81D24', pointRadius:3 }
     ]
   },
   options: {
@@ -1589,7 +1589,7 @@ new Chart(document.getElementById('ml3'), {
     datasets: [{
       label: '特征重要性',
       data: [0.8073, 0.1122, 0.0461, 0.0344],
-      backgroundColor: ['#E50914','#e87d24','#4fc3f7','#81c784'],
+      backgroundColor: ['#E50914','#F5A623','#D4A017','#B81D24'],
       borderRadius: 6, borderSkipped: false
     }]
   },
@@ -1616,7 +1616,7 @@ new Chart(document.getElementById('ml4'), {
     datasets: [{
       label: 'R²',
       data: [0.2058, 0.4269, 0.4535, 0.4813],
-      backgroundColor: ['#E50914','#e87d24','#4fc3f7','#81c784'],
+      backgroundColor: ['#E50914','#F5A623','#D4A017','#B81D24'],
       borderRadius: 6, borderSkipped: false
     }]
   },
@@ -1649,13 +1649,13 @@ new Chart(document.getElementById('ml5'), {
       {
         label: '平均发行年份',
         data: [2016.8, 2014.1, 1986.5, 2016.6],
-        backgroundColor: 'rgba(79,195,247,0.8)',
+        backgroundColor: 'rgba(245,166,35,0.8)',
         borderRadius: 4, borderSkipped: false, yAxisID: 'y1'
       },
       {
         label: '内容数量',
         data: [972, 2613, 497, 2049],
-        backgroundColor: 'rgba(129,199,132,0.8)',
+        backgroundColor: 'rgba(212,160,23,0.8)',
         borderRadius: 4, borderSkipped: false, yAxisID: 'y2'
       }
     ]
