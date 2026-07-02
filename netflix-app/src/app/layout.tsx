@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "katex/dist/katex.min.css";
 import "highlight.js/styles/atom-one-dark.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";

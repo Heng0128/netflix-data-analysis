@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import PageHeader from '@/components/page-header';
+import MathFormula from '@/components/math-formula';
 
 const CODE_SAMPLES: Record<string, string> = {
   '数据读取': `import pandas as pd
@@ -349,6 +350,103 @@ export default function CodeShowcase() {
               <pre className="output-content">{OUTPUT_SAMPLES[activeTab]}</pre>
             </div>
           )}
+        </div>
+
+        {/* 算法原理 — 核心公式 */}
+        <div className="mt-10">
+          <h3 className="text-white text-2xl font-bold mb-2 flex items-center gap-3">
+            <span className="w-1 h-7 rounded-full bg-[#E50914]" />
+            算法原理
+          </h3>
+          <p className="text-gray-500 text-sm mb-6 pl-[18px]">
+            本项目涉及的核心数学公式与算法原理
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* 1. 标准化 */}
+            <div className="glass-card glass-card-hover rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[#E50914]/20 text-[#E50914]">数据预处理</span>
+                <span className="text-white font-semibold text-sm">Z-Score 标准化</span>
+              </div>
+              <div className="mb-3 flex justify-center">
+                <MathFormula formula="z = \frac{x - \mu}{\sigma}" />
+              </div>
+              <p className="text-gray-500 text-xs leading-relaxed">
+                对特征进行 Z-Score 标准化，使均值为 0、标准差为 1，消除不同特征量纲差异对聚类结果的影响。
+              </p>
+            </div>
+
+            {/* 2. 欧氏距离 */}
+            <div className="glass-card glass-card-hover rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[#E50914]/20 text-[#E50914]">K-Means</span>
+                <span className="text-white font-semibold text-sm">欧氏距离</span>
+              </div>
+              <div className="mb-3 flex justify-center">
+                <MathFormula formula="d(x_i, x_j) = \sqrt{\sum_{k=1}^{n}(x_{ik} - x_{jk})^2}" />
+              </div>
+              <p className="text-gray-500 text-xs leading-relaxed">
+                计算两个样本之间的相似程度，距离越小表示样本越相似。电影中根据时长、上映年份、评级编码等特征进行距离计算。
+              </p>
+            </div>
+
+            {/* 3. K-Means 目标函数 */}
+            <div className="glass-card glass-card-hover rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[#E50914]/20 text-[#E50914]">K-Means</span>
+                <span className="text-white font-semibold text-sm">目标函数（SSE）</span>
+              </div>
+              <div className="mb-3 flex justify-center">
+                <MathFormula formula="J = \sum_{i=1}^{K}\sum_{x \in C_i} |x - \mu_i|^2" />
+              </div>
+              <p className="text-gray-500 text-xs leading-relaxed">
+                K-Means 不断调整聚类中心，使所有样本到所属聚类中心的平方距离之和（SSE）最小。SSE 越小，聚类效果越好。
+              </p>
+            </div>
+
+            {/* 4. Gini 指数 */}
+            <div className="glass-card glass-card-hover rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[#E50914]/20 text-[#E50914]">随机森林</span>
+                <span className="text-white font-semibold text-sm">Gini 指数</span>
+              </div>
+              <div className="mb-3 flex justify-center">
+                <MathFormula formula="\text{Gini} = 1 - \sum_{i=1}^{n} p_i^2" />
+              </div>
+              <p className="text-gray-500 text-xs leading-relaxed">
+                决策树采用 Gini 指数选择最优划分特征。Gini 越小表示节点纯度越高，即该节点中样本越倾向于属于同一类别。
+              </p>
+            </div>
+
+            {/* 5. Accuracy */}
+            <div className="glass-card glass-card-hover rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[#E50914]/20 text-[#E50914]">模型评估</span>
+                <span className="text-white font-semibold text-sm">准确率 Accuracy</span>
+              </div>
+              <div className="mb-3 flex justify-center">
+                <MathFormula formula="\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}" />
+              </div>
+              <p className="text-gray-500 text-xs leading-relaxed">
+                分类正确样本占全部样本的比例。本项目随机森林模型准确率达到 99.55%，验证了特征工程的有效性。
+              </p>
+            </div>
+
+            {/* 6. 交叉验证 */}
+            <div className="glass-card glass-card-hover rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[#E50914]/20 text-[#E50914]">模型评估</span>
+                <span className="text-white font-semibold text-sm">K 折交叉验证</span>
+              </div>
+              <div className="mb-3 flex justify-center">
+                <MathFormula formula="CV = \frac{1}{k} \sum_{i=1}^{k} \text{Score}_i" />
+              </div>
+              <p className="text-gray-500 text-xs leading-relaxed">
+                将数据划分为 K 折，轮流训练和测试，最终取平均准确率评估模型稳定性，避免过拟合。
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* 说明 */}
