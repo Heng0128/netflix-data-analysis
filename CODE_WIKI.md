@@ -1,791 +1,551 @@
-# Netflix 数据分析项目 · Code Wiki
+# Netflix 数据分析项目 Code Wiki
 
-> 基于 Netflix Titles Dataset 的数据可视化与机器学习分析项目
-
----
-
-## 目录
-
-1. [项目概述](#1-项目概述)
-2. [项目架构](#2-项目架构)
-3. [目录结构](#3-目录结构)
-4. [核心模块详解](#4-核心模块详解)
-5. [关键类与函数](#5-关键类与函数)
-6. [数据模型与类型定义](#6-数据模型与类型定义)
-7. [依赖关系图](#7-依赖关系图)
-8. [项目运行方式](#8-项目运行方式)
-9. [部署与配置](#9-部署与配置)
-10. [开发规范](#10-开发规范)
-
----
-
-## 1. 项目概述
+## 一、项目概述
 
 ### 1.1 项目简介
 
-本项目是一个基于 **Netflix Titles Dataset**（8,807 条记录）的完整数据分析项目，涵盖数据预处理、多维度可视化分析以及机器学习建模三大核心模块。项目采用 **Python + Pandas + Scikit-Learn** 进行数据分析，使用 **Next.js + React + ECharts/Chart.js** 构建交互式可视化前端。
+本项目是一个基于 Netflix 公开数据集的**数据可视化与机器学习分析平台**，旨在通过数据预处理、多维度可视化和机器学习建模，深入探索流媒体时代影视内容的分布特征与发展趋势。
 
-### 1.2 核心特性
+### 1.2 项目目标
 
-| 特性 | 说明 |
-|------|------|
-| 数据规模 | 8,807 条 Netflix 内容记录，12 个原始字段 + 5 个衍生字段 |
-| 可视化图表 | 9 张 ECharts 图表 + 9 张 Chart.js 图表，共 18 个可视化视图 |
-| 机器学习 | K-Means 聚类、随机森林分类、梯度提升回归三种算法 |
-| 前端架构 | Next.js 16 (App Router) + React 19 + TypeScript |
-| UI 设计 | Netflix 暗黑主题 + 玻璃拟态风格 + 动态动效 |
-| 部署支持 | 静态导出 (Static Export)，支持 GitHub Pages 部署 |
+| 目标编号 | 目标名称 | 核心内容 |
+| :--- | :--- | :--- |
+| 目标一 | 内容结构探索 | 分析电影与剧集比例、时长分布、评级构成 |
+| 目标二 | 地域与时间趋势 | 考察不同国家内容产出、年度发布趋势 |
+| 目标三 | 机器学习建模 | 使用随机森林分类算法预测内容类型 |
+| 目标四 | 策略性建议 | 基于数据洞察提出内容采购与市场布局建议 |
 
-### 1.3 分析目标
+### 1.3 数据集概况
 
-1. **内容结构探索** — 分析电影与剧集比例、时间分布，揭示内容策略演变
-2. **地域与流派分析** — 识别主要内容来源国与热门流派
-3. **数据质量检测** — 发现并修复字段污染与缺失值问题
-4. **机器学习建模** — 聚类、分类、回归三类算法应用
+- **数据来源**：Netflix Titles Dataset（Kaggle 公开数据集）
+- **记录数**：8,807 条
+- **时间范围**：1925 — 2021 年
+- **内容类型**：电影（6,131）/ 电视节目（2,676）
+- **覆盖国家**：120+ 个
 
 ---
 
-## 2. 项目架构
+## 二、项目架构
 
 ### 2.1 整体架构图
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        数据层 (Data Layer)                   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
-│  │ 原始CSV数据  │  │ Jupyter NB   │  │ 清洗后数据        │  │
-│  │ netflix_     │  │ netflix_     │  │ netflix_titles_  │  │
-│  │ titles.csv   │  │ analysis.ipynb│  │ cleaned.csv      │  │
-│  └──────┬───────┘  └──────┬───────┘  └────────┬─────────┘  │
-└─────────┼─────────────────┼───────────────────┼────────────┘
-          │                 │                   │
-┌─────────▼─────────────────▼───────────────────▼────────────┐
-│                    前端应用层 (Frontend Layer)               │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │                    Next.js App Router                 │   │
-│  │  /首页  /overview  /code  /visualization  /conclusion │   │
-│  └───────────────────────┬──────────────────────────────┘   │
-│                          │                                  │
-│  ┌───────────────────────▼──────────────────────────────┐   │
-│  │                    组件层 (Components)                 │   │
-│  │  Navbar · Footer · HeroSection · Chart · PageHeader  │   │
-│  │  VisualizationSection · AnalysisSection · ...        │   │
-│  └───────────────────────┬──────────────────────────────┘   │
-│                          │                                  │
-│  ┌───────────────────────▼──────────────────────────────┐   │
-│  │                    业务逻辑层 (Lib)                    │   │
-│  │  netflix-data.ts (数据处理) · chart-configs.ts (图表) │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        项目根目录 /workspace                      │
+├─────────────────────────────────────────────────────────────────┤
+│  netflix_titles.csv           ← 原始数据集（12 列）               │
+│  netflix_analysis.ipynb       ← Jupyter Notebook 分析报告        │
+│  netflix_analysis.html        ← HTML 分析报告                    │
+│  clean_data_v2.py             ← 数据清洗脚本                     │
+│  check_data_quality.py        ← 数据质量检查脚本                  │
+│  deep_analysis.py             ← 深度分析脚本                      │
+│  数据说明.txt                  ← 数据说明文档                     │
+├───────────────────────────────┬─────────────────────────────────┤
+│         netflix-app/          │         Next.js 前端应用          │
+│  ┌───────────────────────────┐│                                 │
+│  │  public/                  ││  静态资源与数据集                 │
+│  │    netflix_titles_cleaned.csv │← 清洗后数据集（17 列）       │
+│  │  src/                     ││                                 │
+│  │    app/                   ││  页面路由（6 个页面）            │
+│  │    components/            ││  UI 组件（12 个组件）           │
+│  │    lib/                   ││  数据处理与图表配置             │
+│  └───────────────────────────┘│                                 │
+└───────────────────────────────┴─────────────────────────────────┘
 ```
 
-### 2.2 架构层次说明
+### 2.2 目录结构详解
 
-| 层次 | 职责 | 关键文件/目录 |
-|------|------|--------------|
-| **数据层** | 原始数据存储、Notebook 分析、清洗后数据 | `netflix_titles.csv`、`netflix_analysis.ipynb`、`netflix_titles_cleaned.csv` |
-| **路由层** | 页面路由与元数据管理 | `src/app/` |
-| **组件层** | UI 组件复用与交互逻辑 | `src/components/` |
-| **业务逻辑层** | 数据处理、图表配置、统计计算 | `src/lib/` |
-| **样式层** | 全局样式、主题变量、动效定义 | `src/app/globals.css` |
+| 目录/文件 | 类型 | 职责说明 |
+| :--- | :--- | :--- |
+| `netflix-app/` | 目录 | Next.js 前端应用根目录 |
+| `netflix-app/public/` | 目录 | 静态资源（数据集、图标） |
+| `netflix-app/src/app/` | 目录 | 页面路由与布局 |
+| `netflix-app/src/components/` | 目录 | React 组件库 |
+| `netflix-app/src/lib/` | 目录 | 数据处理工具与图表配置 |
+| `clean_data_v2.py` | 文件 | 数据清洗与预处理脚本 |
+| `check_data_quality.py` | 文件 | 数据质量检查报告生成 |
+| `deep_analysis.py` | 文件 | 深度分析与填充策略评估 |
 
 ---
 
-## 3. 目录结构
+## 三、核心模块职责
 
-### 3.1 完整目录树
+### 3.1 Python 数据处理层
 
-```
-/workspace/
-├── netflix_analysis.ipynb          # Jupyter Notebook 完整分析
-├── netflix_analysis.html           # 静态 HTML 报告
-├── netflix_titles.csv              # 原始数据集
-├── 数据说明.txt                     # 数据集说明文档
-│
-└── netflix-app/                    # Next.js 前端应用
-    ├── public/                     # 静态资源
-    │   ├── netflix_titles_cleaned.csv  # 清洗后数据
-    │   ├── file.svg / globe.svg
-    │   └── ...
-    │
-    ├── src/
-    │   ├── app/                    # App Router 页面
-    │   │   ├── layout.tsx          # 根布局
-    │   │   ├── page.tsx            # 首页
-    │   │   ├── globals.css         # 全局样式
-    │   │   ├── overview/           # 需求分析页
-    │   │   ├── code/               # 预处理与代码页
-    │   │   ├── analysis/           # 深度分析页
-    │   │   ├── visualization/      # 可视化页
-    │   │   └── conclusion/         # 结论与建议页
-    │   │
-    │   ├── components/             # React 组件
-    │   │   ├── navbar.tsx          # 导航栏
-    │   │   ├── footer.tsx          # 页脚
-    │   │   ├── hero-section.tsx    # 首页 Hero 区
-    │   │   ├── charts.tsx          # ECharts 图表组件
-    │   │   ├── chart-configs.ts →  在 lib 中
-    │   │   ├── page-header.tsx     # 页面标题组件
-    │   │   ├── animated-number.tsx # 数字动画组件
-    │   │   ├── overview-section.tsx
-    │   │   ├── analysis-section.tsx
-    │   │   ├── visualization-section.tsx
-    │   │   ├── code-showcase.tsx   # 代码展示组件
-    │   │   ├── code-preprocess.tsx # 预处理代码页
-    │   │   ├── conclusion-section.tsx
-    │   │   └── home-sections.tsx
-    │   │
-    │   └── lib/                    # 业务逻辑库
-    │       ├── netflix-data.ts     # 数据加载与统计
-    │       └── chart-configs.ts    # ECharts 配置
-    │
-    ├── package.json                # 依赖配置
-    ├── next.config.ts              # Next.js 配置
-    ├── tsconfig.json               # TypeScript 配置
-    ├── eslint.config.mjs           # ESLint 配置
-    └── tailwind.config (postcss)   # 样式配置
+#### 3.1.1 数据清洗模块 [clean_data_v2.py](file:///workspace/clean_data_v2.py)
+
+**核心功能**：对原始 Netflix 数据集进行清洗和特征工程
+
+**主要处理步骤**：
+
+| 步骤 | 处理内容 | 技术实现 |
+| :--- | :--- | :--- |
+| 1 | 修复 rating 字段污染 | 检测含 "min" 的异常值，移至 duration |
+| 2 | 提取时长数值 | 正则表达式提取数字，生成 `duration_num` |
+| 3 | 解析上架日期 | `pd.to_datetime()` 解析，生成 `year_added`/`month_added` |
+| 4 | 缺失值处理 | 导演区分处理，其余填充 "Unknown" |
+| 5 | 提取主国家 | 从多国家字符串中提取首个国家 |
+
+**关键函数**：
+
+```python
+def extract_duration(row):
+    # 从 duration 字符串中提取数字
+    val = str(row['duration']) if pd.notna(row['duration']) else ''
+    nums = re.findall(r'\d+', val)
+    return int(nums[0]) if nums else np.nan
+
+def get_primary_country(country_str):
+    # 提取主国家
+    if pd.isna(country_str) or str(country_str).strip() == '' or country_str == 'Unknown':
+        return 'Unknown'
+    return str(country_str).split(',')[0].strip()
 ```
 
-### 3.2 关键目录说明
+#### 3.1.2 数据质量检查模块 [check_data_quality.py](file:///workspace/check_data_quality.py)
 
-| 目录 | 说明 | 核心文件数 |
-|------|------|-----------|
-| `src/app/` | Next.js App Router 页面，每个子目录对应一个路由 | 5 个页面 + 根布局 |
-| `src/components/` | 可复用 React 组件，按功能划分 | 14 个组件 |
-| `src/lib/` | 纯 TypeScript 业务逻辑，无 React 依赖 | 2 个核心模块 |
-| `public/` | 静态资源与 CSV 数据文件 | 1 个数据文件 + 图标 |
+**核心功能**：全面检查清洗后数据集的质量状况
+
+**检查维度**：
+
+| 检查项 | 检查内容 |
+| :--- | :--- |
+| 基本信息 | 行数、列数、列名 |
+| 缺失值 | 各字段缺失数量与比例 |
+| 重复值 | show_id 重复、完全重复行 |
+| type 字段 | 类型分布、非法值检测 |
+| rating 字段 | 时长污染检测（重点） |
+| duration | 时长范围、异常值检测 |
+| release_year | 年份范围、异常值 |
+| date_added | 日期解析、上架早于发行 |
+| primary_country | 国家分布、空值统计 |
+| show_id | 格式检查、编号连续性 |
+| description | 长度统计、超短描述 |
+| listed_in | 流派统计 |
+
+#### 3.1.3 深度分析模块 [deep_analysis.py](file:///workspace/deep_analysis.py)
+
+**核心功能**：对比原始数据与清洗后数据，评估空值填充策略的合理性
+
+**分析维度**：
+
+1. **被删除记录分析**：识别缺失的 show_id 及其原因
+2. **原始数据空值详细分析**：按内容类型统计各字段缺失率
+3. **"未知"填充合理性分析**：评估 director/country/cast 填充策略
+4. **空值处理方式评估**：对比不同填充策略（众数/空值/未知）的优劣
 
 ---
 
-## 4. 核心模块详解
+### 3.2 前端数据层
 
-### 4.1 数据处理模块 (`netflix-data.ts`)
+#### 3.2.1 数据处理与统计模块 [netflix-data.ts](file:///workspace/netflix-app/src/lib/netflix-data.ts)
 
-**文件路径**: [netflix-data.ts](file:///workspace/netflix-app/src/lib/netflix-data.ts)
+**核心功能**：服务端数据读取、统计计算、图表数据生成
 
-#### 模块职责
-
-- CSV 数据解析（手动实现 RFC 4180 兼容解析器）
-- 数据缓存管理（内存级缓存，避免重复读取）
-- 统计指标计算
-- 图表数据预处理
-- 皮尔逊相关性计算
-
-#### 核心流程
-
-```
-getNetflixRecords()
-    ↓
-parseCSV()  ← 手动 CSV 解析器（处理引号/转义）
-    ↓
-字段类型转换（数值字段自动转换）
-    ↓
-cachedRecords ← 内存缓存
-    ↓
-computeStats() / computeChartData()
-    ↓
-NetflixStats / ChartData
-```
-
-#### 关键常量
-
-| 常量 | 值 | 用途 |
-|------|----|------|
-| `CORRELATION_COUNTRIES` | 5 个国家 | 相关性热力图国家列表 |
-| `TOP_N_COUNTRIES` | 5 | Top N 国家数量 |
-| `TOP_N_RATINGS` | 10 | Top N 评级数量 |
-| `TOP_N_GENRES` | 30 | Top N 流派数量 |
-| `YEAR_RANGE_START/END` | 2008/2021 | 年度趋势年份范围 |
-| `SCATTER_SAMPLE_SIZE` | 500 | 散点图采样数量 |
-| `DURATION_RANGES` | 6 个区间 | 电影时长分段 |
-
----
-
-### 4.2 图表配置模块 (`chart-configs.ts`)
-
-**文件路径**: [chart-configs.ts](file:///workspace/netflix-app/src/lib/chart-configs.ts)
-
-#### 模块职责
-
-- 9 种 ECharts 图表配置生成
-- 统一主题风格管理
-- 响应式图表配置
-
-#### 图表类型清单
-
-| 序号 | 图表类型 | 函数名 | 数据来源 |
-|------|----------|--------|----------|
-| 1 | 饼图（环形） | `getPieOption()` | 内容类型分布 |
-| 2 | 环形图 | `getDonutOption()` | 评分分布 |
-| 3 | 折线图 | `getLineOption()` | 年度趋势 |
-| 4 | 柱状图（直方图） | `getHistogramOption()` | 电影时长分布 |
-| 5 | 散点图 | `getScatterOption()` | 年份与时长关系 |
-| 6 | 热力图 | `getHeatmapOption()` | 国家相关性 |
-| 7 | 雷达图 | `getRadarOption()` | 主要内容国家 |
-| 8 | 堆叠面积图 | `getStackedAreaOption()` | 堆叠面积趋势 |
-| 9 | 矩形树图 | `getTreemapOption()` | 国家内容占比 |
-
-#### 配色方案
+**数据结构定义**：
 
 ```typescript
-CHART_COLORS = {
-  primary: '#E50914',      // Netflix 红
-  secondary: '#FFD700',    // 金色
-  accent: '#FFC000',       // 橙黄
-  warning: '#B81D24',      // 暗红
-  success: '#FFEB3B',      // 亮黄
-  purple: '#CC8B3C',       // 金棕
+export interface NetflixRecord {
+  show_id: string;
+  type: 'Movie' | 'TV Show';
+  title: string;
+  director: string;
+  cast: string;
+  country: string;
+  date_added: string;
+  release_year: number;
+  rating: string;
+  duration: string;
+  listed_in: string;
+  description: string;
+  duration_num: number;
+  date_added_parsed: string;
+  year_added: number;
+  month_added: number;
+  primary_country: string;
+}
+
+export interface NetflixStats {
+  total: number;
+  movieCount: number;
+  tvCount: number;
+  moviePercent: number;
+  avgDuration: number;
+  peakYear: number;
+  topCountries: { country: string; count: number }[];
+}
+
+export interface ChartData {
+  typeDistribution: { name: string; value: number }[];
+  ratingDistribution: { name: string; value: number }[];
+  yearlyTrends: { year: number; movies: number; tvShows: number }[];
+  durationHistogram: { range: string; count: number }[];
+  genreWordCloud: { name: string; value: number }[];
+  scatterData: { x: number; y: number; name: string }[];
+  correlationMatrix: number[][];
+  radarData: { country: string; value: number }[];
+  stackedAreaData: { year: number; movies: number; tvShows: number }[];
+  treemapData: { name: string; value: number }[];
 }
 ```
 
+**核心函数**：
+
+| 函数名 | 功能说明 | 返回值 |
+| :--- | :--- | :--- |
+| `getNetflixRecords()` | 读取并解析 CSV 数据 | `NetflixRecord[]` |
+| `computeStats()` | 计算核心统计指标 | `NetflixStats` |
+| `computeChartData()` | 计算所有图表数据 | `ChartData` |
+| `getAllData()` | 获取全部数据（缓存） | `{ stats, chartData }` |
+| `pearson()` | 计算皮尔逊相关系数 | `number` |
+
+**缓存机制**：使用模块级变量 `cachedRecords`、`cachedStats`、`cachedChartData` 实现数据缓存，避免重复计算。
+
+#### 3.2.2 图表配置模块 [chart-configs.ts](file:///workspace/netflix-app/src/lib/chart-configs.ts)
+
+**核心功能**：定义 9 种 ECharts 图表的配置选项
+
+**支持的图表类型**：
+
+| 图表名称 | 配置函数 | ECharts 类型 |
+| :--- | :--- | :--- |
+| 内容类型分布 | `getPieOption()` | pie（环形图） |
+| 评分分布 | `getDonutOption()` | pie（环形图） |
+| 年度趋势 | `getLineOption()` | line（折线图） |
+| 电影时长分布 | `getHistogramOption()` | bar（柱状图） |
+| 年份与时长关系 | `getScatterOption()` | scatter（散点图） |
+| 国家相关性热力图 | `getHeatmapOption()` | heatmap（热力图） |
+| 主要内容国家 | `getRadarOption()` | radar（雷达图） |
+| 堆叠面积图 | `getStackedAreaOption()` | line（堆叠面积图） |
+| 国家内容占比 | `getTreemapOption()` | treemap（矩形树图） |
+
+**全局样式配置**：
+
+- 主色调：`#E50914`（Netflix 红色）
+- 辅助色：`#FFD700`（金色）
+- 背景：透明（配合暗色主题）
+- Tooltip：暗色半透明背景
+
 ---
 
-### 4.3 图表组件 (`charts.tsx`)
+### 3.3 前端组件层
 
-**文件路径**: [charts.tsx](file:///workspace/netflix-app/src/components/charts.tsx)
+#### 3.3.1 图表组件 [charts.tsx](file:///workspace/netflix-app/src/components/charts.tsx)
 
-#### 组件特性
+**核心功能**：封装 ECharts 图表组件，支持响应式和动画
 
-- **Canvas 渲染**：ECharts Canvas 渲染器
-- **响应式适配**：`ResizeObserver` + 窗口 resize 双重监听
-- **加载状态**：内置 loading 动画
-- **性能优化**：React.memo 包裹，避免不必要重渲染
-- **生命周期管理**：自动 dispose 防止内存泄漏
+**组件特性**：
 
-#### Props 接口
+- 使用 `useEffect` 初始化 ECharts 实例
+- 使用 `ResizeObserver` 实现响应式自适应
+- 使用 `requestAnimationFrame` 支持 loading 状态
+- 使用 `memo` 优化渲染性能
+
+**核心配置函数**：
+
+| 函数名 | 功能 |
+| :--- | :--- |
+| `getBaseOption()` | 获取基础配置（背景、tooltip、动画） |
+| `getAxisStyle()` | 获取坐标轴样式 |
+| `CHART_COLORS` | 颜色常量定义 |
+
+#### 3.3.2 页面组件
+
+| 组件名 | 路径 | 功能说明 |
+| :--- | :--- | :--- |
+| `Navbar` | [navbar.tsx](file:///workspace/netflix-app/src/components/navbar.tsx) | 顶部导航栏，支持路由高亮 |
+| `Footer` | [footer.tsx](file:///workspace/netflix-app/src/components/footer.tsx) | 页脚信息展示 |
+| `PageHeader` | [page-header.tsx](file:///workspace/netflix-app/src/components/page-header.tsx) | 页面标题组件（装饰性头部） |
+| `HeroSection` | [hero-section.tsx](file:///workspace/netflix-app/src/components/hero-section.tsx) | 首页英雄区域，展示关键数据统计 |
+| `OverviewSection` | [overview-section.tsx](file:///workspace/netflix-app/src/components/overview-section.tsx) | 数据概览页面内容 |
+| `AnalysisSection` | [analysis-section.tsx](file:///workspace/netflix-app/src/components/analysis-section.tsx) | 深度分析页面内容 |
+| `VisualizationSection` | [visualization-section.tsx](file:///workspace/netflix-app/src/components/visualization-section.tsx) | 可视化图表展示 |
+| `CodeShowcase` | [code-showcase.tsx](file:///workspace/netflix-app/src/components/code-showcase.tsx) | Python 代码展示与高亮 |
+| `CodePreprocess` | [code-preprocess.tsx](file:///workspace/netflix-app/src/components/code-preprocess.tsx) | 数据预处理代码展示 |
+| `ConclusionSection` | [conclusion-section.tsx](file:///workspace/netflix-app/src/components/conclusion-section.tsx) | 结论与建议页面 |
+| `AnimatedNumber` | [animated-number.tsx](file:///workspace/netflix-app/src/components/animated-number.tsx) | 数字滚动动画组件 |
+
+#### 3.3.3 数字动画组件 [animated-number.tsx](file:///workspace/netflix-app/src/components/animated-number.tsx)
+
+**核心功能**：实现数字递增动画效果
+
+**技术实现**：
+
+- 使用 `IntersectionObserver` 实现视口触发动画
+- 使用 `requestAnimationFrame` 实现平滑动画
+- 使用三次方缓动函数 `1 - Math.pow(1 - progress, 3)`
+- 使用 `memo` 优化性能
+
+---
+
+### 3.4 页面路由
+
+| 路由 | 页面组件 | 功能说明 |
+| :--- | :--- | :--- |
+| `/` | [page.tsx](file:///workspace/netflix-app/src/app/page.tsx) | 首页（Hero + 统计 + 分工） |
+| `/overview` | [overview/page.tsx](file:///workspace/netflix-app/src/app/overview/page.tsx) | 需求分析与数据集背景 |
+| `/code` | [code/page.tsx](file:///workspace/netflix-app/src/app/code/page.tsx) | 数据预处理代码展示 |
+| `/analysis` | [analysis/page.tsx](file:///workspace/netflix-app/src/app/analysis/page.tsx) | 深度分析与变量说明 |
+| `/visualization` | [visualization/page.tsx](file:///workspace/netflix-app/src/app/visualization/page.tsx) | 9 维可视化图表 |
+| `/conclusion` | [conclusion/page.tsx](file:///workspace/netflix-app/src/app/conclusion/page.tsx) | 机器学习与策略建议 |
+
+---
+
+## 四、数据流程
+
+### 4.1 数据处理流程
+
+```
+原始数据 netflix_titles.csv (12 列)
+         │
+         ▼
+  ┌───────────────┐
+  │ clean_data_v2.py │
+  │  数据清洗与修复   │
+  └───────────────┘
+         │
+         ▼
+清洗后数据 netflix_titles_cleaned.csv (17 列)
+         │
+         ├──► check_data_quality.py (质量检查)
+         │
+         ├──► deep_analysis.py (深度分析)
+         │
+         └──► netflix-app/src/lib/netflix-data.ts
+                   │
+                   ├──► computeStats()
+                   │        │
+                   │        ▼
+                   │   NetflixStats (核心统计)
+                   │
+                   └──► computeChartData()
+                            │
+                            ▼
+                       ChartData (9 种图表数据)
+```
+
+### 4.2 数据字段转换
+
+| 原始字段 | 衍生字段 | 说明 |
+| :--- | :--- | :--- |
+| `duration` | `duration_num` | 提取数值部分（分钟/季） |
+| `date_added` | `date_added_parsed` | 解析为标准日期格式 |
+| `date_added` | `year_added` | 提取年份（空值用 release_year 填充） |
+| `date_added` | `month_added` | 提取月份 |
+| `country` | `primary_country` | 提取首个国家作为主国家 |
+
+### 4.3 缺失值处理策略
+
+| 字段 | 处理策略 | 填充值 |
+| :--- | :--- | :--- |
+| `director` | 剧集用 "Not Applicable"，电影用 "Unknown" | 分类型处理 |
+| `cast` | 统一填充 | "Unknown" |
+| `country` | 统一填充 | "Unknown" |
+| `rating` | 统一填充（避免众数偏差） | "Unknown" |
+| `date_added` | 保留空值，用 release_year 近似填充 year_added | "未知" |
+
+---
+
+## 五、关键算法实现
+
+### 5.1 皮尔逊相关系数
 
 ```typescript
-interface ChartProps {
-  option: echarts.EChartsOption;  // ECharts 配置
-  className?: string;             // 自定义类名
-  height?: number | string;       // 高度
-  loading?: boolean;              // 加载状态
-  onChartReady?: (chart) => void; // 图表就绪回调
+function pearson(arr1: number[], arr2: number[]): number {
+  const n = Math.min(arr1.length, arr2.length);
+  if (n === 0) return 0;
+  
+  let sum1 = 0, sum2 = 0, sum1Sq = 0, sum2Sq = 0, pSum = 0;
+  
+  for (let i = 0; i < n; i++) {
+    const x = arr1[i], y = arr2[i];
+    sum1 += x; sum2 += y;
+    sum1Sq += x * x; sum2Sq += y * y;
+    pSum += x * y;
+  }
+  
+  const num = pSum - (sum1 * sum2) / n;
+  const den = Math.sqrt((sum1Sq - (sum1 * sum1) / n) * (sum2Sq - (sum2 * sum2) / n));
+  
+  return den === 0 ? 0 : num / den;
 }
 ```
 
----
-
-### 4.4 导航栏组件 (`navbar.tsx`)
-
-**文件路径**: [navbar.tsx](file:///workspace/netflix-app/src/components/navbar.tsx)
-
-#### 导航项配置
-
-| 路由 | 标签 |
-|------|------|
-| `/` | 首页 |
-| `/overview` | 需求分析 |
-| `/code` | 预处理与代码 |
-| `/visualization` | 可视化与发现 |
-| `/conclusion` | 机器学习与建议 |
-
-#### 交互特性
-
-- 粘性定位 (`position: sticky`)
-- 毛玻璃背景 (`backdrop-filter: blur(20px)`)
-- 当前路由高亮（红色）
-- Hover 颜色过渡动画
-
----
-
-### 4.5 数字动画组件 (`animated-number.tsx`)
-
-**文件路径**: [animated-number.tsx](file:///workspace/netflix-app/src/components/animated-number.tsx)
-
-#### 实现原理
-
-- **IntersectionObserver**：元素进入视口时触发动画
-- **requestAnimationFrame**：60fps 平滑动画
-- **缓动函数**：`easeOutCubic` (1 - (1-t)³)
-- **只执行一次**：`hasAnimated` ref 防止重复触发
-
-#### Props 接口
+### 5.2 数据分组统计
 
 ```typescript
-interface AnimatedNumberProps {
-  value: number;          // 目标数值
-  duration?: number;      // 动画时长（默认2000ms）
-  suffix?: string;        // 后缀
-  prefix?: string;        // 前缀
+function countBy<T extends object>(items: T[], key: keyof T): Record<string, number> {
+  const counts: Record<string, number> = {};
+  items.forEach((item) => {
+    const value = item[key];
+    if (value) {
+      const k = String(value);
+      counts[k] = (counts[k] || 0) + 1;
+    }
+  });
+  return counts;
 }
 ```
 
----
+### 5.3 CSV 解析器
 
-### 4.6 代码展示组件 (`code-showcase.tsx`)
-
-**文件路径**: [code-showcase.tsx](file:///workspace/netflix-app/src/components/code-showcase.tsx)
-
-#### 功能特性
-
-- 6 个 Python 代码片段 Tab 切换
-- 自定义 Python 语法高亮（正则实现）
-- 一键复制到剪贴板
-- macOS 风格窗口装饰
-
-#### 代码片段列表
-
-| Tab | 文件名 | 内容 |
-|-----|--------|------|
-| 数据读取 | `read_data.py` | Pandas 读取 CSV |
-| 数据预处理 | `preprocess.py` | 缺失值处理、特征工程 |
-| 类型统计 | `type_stats.py` | 内容类型统计与饼图 |
-| 年份趋势 | `yearly_trend.py` | 年度趋势折线图 |
-| 随机森林分类 | `random_forest.py` | 随机森林分类模型 |
-| 特征重要性 | `feature_importance.py` | 特征重要性可视化 |
+项目实现了自定义 CSV 解析器，支持：
+- 带引号的字段
+- 转义引号（""）
+- 换行符处理
 
 ---
 
-## 5. 关键类与函数
+## 六、依赖关系
 
-### 5.1 数据处理函数
+### 6.1 前端依赖
 
-#### `parseCSV(text: string): string[][]`
-
-**位置**: [netflix-data.ts#L71-L107](file:///workspace/netflix-app/src/lib/netflix-data.ts#L71-L107)
-
-手动实现的 CSV 解析器，完整支持 RFC 4180 规范：
-- 双引号字段边界识别
-- 引号转义处理（`""` → `"`）
-- 换行符字段内换行处理
-- Windows (`\r\n`) 与 Unix (`\n`) 换行兼容
-
-#### `getNetflixRecords(): NetflixRecord[]`
-
-**位置**: [netflix-data.ts#L109-L140](file:///workspace/netflix-app/src/lib/netflix-data.ts#L109-L140)
-
-从 `public/netflix_titles_cleaned.csv` 读取并解析数据，返回强类型化的记录数组。
-- 使用 `fs.readFileSync` 同步读取（服务端执行）
-- 数值字段自动类型转换
-- 内存级单例缓存（`cachedRecords`）
-
-#### `computeStats(): NetflixStats`
-
-**位置**: [netflix-data.ts#L161-L195](file:///workspace/netflix-app/src/lib/netflix-data.ts#L161-L195)
-
-计算核心统计指标：
-- 总记录数、电影/剧集数量及占比
-- 电影平均时长
-- 内容发布峰值年份
-- Top 5 内容产出国家
-
-#### `computeChartData(): ChartData`
-
-**位置**: [netflix-data.ts#L335-L365](file:///workspace/netflix-app/src/lib/netflix-data.ts#L335-L365)
-
-计算全部 9 种图表所需数据，统一出口函数。内部调用各 `compute*` 子函数。
-
-#### `pearson(arr1: number[], arr2: number[]): number`
-
-**位置**: [netflix-data.ts#L197-L221](file:///workspace/netflix-app/src/lib/netflix-data.ts#L197-L221)
-
-皮尔逊相关系数计算，用于国家间电影时长相关性分析。
-- 取值范围 [-1, 1]
-- 0 表示无相关性，±1 表示完全线性相关
-
----
-
-### 5.2 辅助工具函数
-
-#### `countBy<T>(items: T[], key: keyof T): Record<string, number>`
-
-**位置**: [netflix-data.ts#L142-L152](file:///workspace/netflix-app/src/lib/netflix-data.ts#L142-L152)
-
-通用分组计数函数，类似 SQL 的 `GROUP BY COUNT`。
-
-#### `topEntries(counts: Record<string, number>, n: number): {name, value}[]`
-
-**位置**: [netflix-data.ts#L154-L159](file:///workspace/netflix-app/src/lib/netflix-data.ts#L154-L159)
-
-按计数降序排序并取 Top N。
-
----
-
-### 5.3 React 组件
-
-#### `Chart` 组件
-
-**位置**: [charts.tsx#L14-L85](file:///workspace/netflix-app/src/components/charts.tsx#L14-L85)
-
-ECharts 封装组件，核心特性：
-- `useRef` 管理图表实例
-- `useEffect` 处理初始化/销毁/配置更新
-- `ResizeObserver` 监听容器尺寸变化
-- `memo` 高阶组件优化
-
-#### `AnimatedNumber` 组件
-
-**位置**: [animated-number.tsx#L19-L69](file:///workspace/netflix-app/src/components/animated-number.tsx#L19-L69)
-
-数字滚动动画组件：
-- IntersectionObserver 触发
-- easeOutCubic 缓动
-- 仅动画一次
-
-#### `PageHeader` 组件
-
-**位置**: [page-header.tsx#L9-L26](file:///workspace/netflix-app/src/components/page-header.tsx#L9-L26)
-
-页面统一标题组件，包含 eyebrow 标签、主标题、分隔线、副标题。
-
----
-
-## 6. 数据模型与类型定义
-
-### 6.1 NetflixRecord 接口
-
-**位置**: [netflix-data.ts#L4-L22](file:///workspace/netflix-app/src/lib/netflix-data.ts#L4-L22)
-
-```typescript
-interface NetflixRecord {
-  show_id: string;              // 唯一ID
-  type: 'Movie' | 'TV Show';    // 内容类型
-  title: string;                // 标题
-  director: string;             // 导演
-  cast: string;                 // 演员
-  country: string;              // 制作国家
-  date_added: string;           // 上架日期（原始字符串）
-  release_year: number;         // 发行年份
-  rating: string;               // 年龄评级
-  duration: string;             // 时长（原始字符串）
-  listed_in: string;            // 流派
-  description: string;          // 描述
-  duration_num: number;         // 时长数值（分钟/季）
-  date_added_parsed: string;    // 解析后日期
-  year_added: number;           // 上架年份
-  month_added: number;          // 上架月份
-  primary_country: string;      // 主要制作国
-}
-```
-
-### 6.2 NetflixStats 接口
-
-**位置**: [netflix-data.ts#L24-L32](file:///workspace/netflix-app/src/lib/netflix-data.ts#L24-L32)
-
-```typescript
-interface NetflixStats {
-  total: number;                    // 总记录数
-  movieCount: number;               // 电影数量
-  tvCount: number;                  // 剧集数量
-  moviePercent: number;             // 电影占比(%)
-  avgDuration: number;              // 平均时长（分钟）
-  peakYear: number;                 // 峰值年份
-  topCountries: {country, count}[]; // Top 5 国家
-}
-```
-
-### 6.3 ChartData 接口
-
-**位置**: [netflix-data.ts#L34-L45](file:///workspace/netflix-app/src/lib/netflix-data.ts#L34-L45)
-
-```typescript
-interface ChartData {
-  typeDistribution: {name, value}[];       // 类型分布
-  ratingDistribution: {name, value}[];     // 评分分布
-  yearlyTrends: {year, movies, tvShows}[]; // 年度趋势
-  durationHistogram: {range, count}[];     // 时长直方图
-  genreWordCloud: {name, value}[];         // 流派词云
-  scatterData: {x, y, name}[];             // 散点数据
-  correlationMatrix: number[][];           // 相关性矩阵
-  radarData: {country, value}[];           // 雷达图数据
-  stackedAreaData: {year, movies, tvShows}[]; // 堆叠面积
-  treemapData: {name, value}[];            // 矩形树图
-}
-```
-
-### 6.4 数据集字段说明
-
-| 字段 | 类型 | 缺失率 | 说明 |
-|------|------|--------|------|
-| show_id | 字符串 | 0% | 唯一标识符 |
-| type | 分类(2值) | 0% | Movie / TV Show |
-| title | 字符串 | 0% | 内容标题 |
-| director | 字符串 | 29.91% | 导演姓名（剧集填"Not Applicable"，电影填"Unknown"） |
-| cast | 字符串 | 9.22% | 主要演员列表（缺失填"Unknown"） |
-| country | 字符串 | 9.45% | 制作国家(可多值，缺失填"Unknown") |
-| date_added | 日期型 | 0.11% | 上架日期（10条缺失，未删除） |
-| release_year | 数值 | 0% | 发行年份(1925~2021) |
-| rating | 分类(15值) | 0.08% | 年龄评级（7条缺失填"Unknown"，非众数） |
-| duration | 字符串 | 0.03% | 时长（3条污染已修复） |
-| listed_in | 字符串 | 0% | 流派(可多值) |
-| description | 文本 | 0% | 内容简述 |
-| duration_num | 数值 | - | 衍生：时长数值（分钟/季） |
-| year_added | 数值 | - | 衍生：上架年份（缺失用release_year填充） |
-| month_added | 数值 | 0.11% | 衍生：上架月份（10条缺失） |
-| primary_country | 字符串 | - | 衍生：主要制作国 |
-| content_age | 数值 | - | 衍生：内容年龄 |
-
----
-
-## 7. 依赖关系图
-
-### 7.1 前端依赖 (package.json)
-
-#### 运行时依赖
-
-| 包名 | 版本 | 用途 |
-|------|------|------|
-| `next` | 16.2.9 | React 框架 (App Router) |
+| 依赖名称 | 版本 | 用途 |
+| :--- | :--- | :--- |
+| `next` | 16.2.9 | React 框架 |
 | `react` | 19.2.4 | UI 库 |
-| `react-dom` | 19.2.4 | React DOM 渲染 |
-| `echarts` | 6.1.0 | 图表库（主图表） |
+| `react-dom` | 19.2.4 | DOM 渲染 |
+| `echarts` | 6.1.0 | 可视化引擎 |
 | `echarts-for-react` | 3.0.6 | ECharts React 封装 |
-| `chart.js` | 4.5.1 | 图表库（备用图表） |
+| `chart.js` | 4.5.1 | 备选可视化库 |
 | `react-chartjs-2` | 5.3.1 | Chart.js React 封装 |
-| `highlight.js` | 11.11.1 | 代码语法高亮 |
+| `highlight.js` | 11.11.1 | 代码高亮 |
+| `tailwindcss` | ^4 | 样式框架 |
+| `@tailwindcss/postcss` | ^4 | Tailwind CSS 4 插件 |
+| `typescript` | ^5 | 类型安全 |
 
-#### 开发依赖
+### 6.2 Python 依赖
 
-| 包名 | 版本 | 用途 |
-|------|------|------|
-| `typescript` | ^5 | 类型系统 |
-| `tailwindcss` | ^4 | CSS 工具框架 |
-| `@tailwindcss/postcss` | ^4 | Tailwind PostCSS 插件 |
-| `eslint` | ^9 | 代码检查 |
-| `eslint-config-next` | 16.2.9 | Next.js ESLint 配置 |
-| `@types/node` | ^20 | Node 类型定义 |
-| `@types/react` | ^19 | React 类型定义 |
-| `@types/react-dom` | ^19 | React DOM 类型 |
-
-### 7.2 模块依赖关系
-
-```
-page.tsx (各页面)
-    ↓ 引用
-components/ (各组件)
-    ↓ 引用
-lib/netflix-data.ts  ← 数据处理
-lib/chart-configs.ts ← 图表配置
-    ↓ 引用
-components/charts.tsx ← ECharts 组件
-```
-
-### 7.3 页面组件依赖链
-
-| 页面 | 依赖组件 | 依赖数据 |
-|------|----------|----------|
-| `/` (首页) | `HeroSection` | `NetflixStats` |
-| `/overview` | `OverviewSection` | `NetflixStats` |
-| `/analysis` | `AnalysisSection` | `NetflixStats` |
-| `/visualization` | `VisualizationSection` | `ChartData` |
-| `/code` | `CodeShowcase` / `CodePreprocess` | 静态代码文本 |
-| `/conclusion` | `ConclusionSection` | `NetflixStats` |
+| 依赖名称 | 用途 |
+| :--- | :--- |
+| `pandas` | 数据处理与分析 |
+| `numpy` | 数值计算 |
+| `matplotlib` | 静态图表绘制（Notebook） |
+| `scikit-learn` | 机器学习算法 |
 
 ---
 
-## 8. 项目运行方式
+## 七、项目运行方式
 
-### 8.1 环境要求
-
-| 工具 | 最低版本 | 说明 |
-|------|----------|------|
-| Node.js | 18+ | Next.js 16 要求 |
-| npm / yarn / pnpm / bun | - | 包管理器（推荐 bun） |
-
-### 8.2 安装依赖
+### 7.1 数据预处理
 
 ```bash
-cd netflix-app
+# 进入项目根目录
+cd /workspace
 
-# 使用 npm
-npm install
+# 运行数据清洗脚本
+python clean_data_v2.py
 
-# 或使用 bun（推荐）
-bun install
+# 运行数据质量检查
+python check_data_quality.py
+
+# 运行深度分析
+python deep_analysis.py
 ```
 
-### 8.3 开发模式
+### 7.2 前端开发
 
 ```bash
+# 进入前端目录
+cd /workspace/netflix-app
+
+# 安装依赖
+npm install
+# 或
+bun install
+
 # 启动开发服务器
 npm run dev
 # 或
 bun dev
-```
 
-- 访问地址：`http://localhost:3000`
-- 支持热更新 (Fast Refresh)
-- 开发环境无 basePath
-
-### 8.4 生产构建
-
-```bash
-# 构建静态站点
+# 构建生产版本
 npm run build
-# 或
-bun run build
-```
 
-构建产物位于 `netflix-app/out/` 目录（静态导出模式）。
-
-### 8.5 本地预览构建结果
-
-```bash
 # 启动生产服务器
 npm run start
-# 或
-bun start
 ```
 
-### 8.6 代码检查
+### 7.3 访问地址
 
-```bash
-# ESLint 检查
-npm run lint
-# 或
-bun lint
-```
-
----
-
-## 9. 部署与配置
-
-### 9.1 Next.js 配置
-
-**文件**: [next.config.ts](file:///workspace/netflix-app/next.config.ts)
-
-#### 关键配置项
-
-| 配置 | 值 | 说明 |
-|------|----|------|
-| `output` | `'export'` | 静态导出模式，生成纯 HTML/CSS/JS |
-| `basePath` | `'/netflix-data-analysis'` (生产) | 部署子路径 |
-| `assetPrefix` | `'/netflix-data-analysis/'` (生产) | 静态资源前缀 |
-| `images.unoptimized` | `true` | 禁用图片优化（静态导出需要） |
-| `reactStrictMode` | `true` | React 严格模式 |
-| `compress` | `true` | 启用 gzip 压缩 |
-
-#### 环境变量
-
-| 变量 | 说明 |
-|------|------|
-| `NODE_ENV` | `production` 时启用 basePath 与 assetPrefix |
-
-### 9.2 GitHub Pages 部署
-
-项目已配置 `.github/workflows/static.yml` 用于 GitHub Pages 自动部署：
-
-1. 将代码推送到 GitHub 仓库
-2. 启用 GitHub Pages（Source: GitHub Actions）
-3. 每次 push 到主分支自动构建部署
-4. 部署路径：`https://<username>.github.io/netflix-data-analysis/`
-
-### 9.3 TypeScript 配置
-
-**文件**: [tsconfig.json](file:///workspace/netflix-app/tsconfig.json)
-
-- **target**: ES2017
-- **strict**: true（严格类型检查）
-- **paths**: `@/*` → `./src/*`（路径别名）
-- **jsx**: react-jsx
+- 开发环境：`http://localhost:3000`
+- 页面路由：
+  - 首页：`/`
+  - 需求分析：`/overview`
+  - 代码展示：`/code`
+  - 深度分析：`/analysis`
+  - 可视化：`/visualization`
+  - 结论：`/conclusion`
 
 ---
 
-## 10. 开发规范
+## 八、技术亮点
 
-### 10.1 代码风格
+### 8.1 数据处理
 
-- **TypeScript 严格模式**：所有代码必须通过类型检查
-- **ESLint**：使用 `eslint-config-next` 规则集
-- **组件命名**：PascalCase（如 `HeroSection`）
-- **函数命名**：camelCase（如 `computeStats`）
-- **常量命名**：UPPER_SNAKE_CASE（如 `CHART_COLORS`）
+1. **字段污染修复**：自动检测并修复 rating 字段中的时长数据污染
+2. **智能填充策略**：根据内容类型差异化处理缺失值（剧集/电影导演处理不同）
+3. **无损数据保留**：清洗过程不删除任何记录，仅进行修复和填充
 
-### 10.2 组件规范
+### 8.2 可视化
 
-1. **Client Component**：使用 `'use client'` 指令标记（含交互/状态的组件）
-2. **Server Component**：默认服务端组件（数据获取、静态内容）
-3. **Props 接口**：显式定义 Props 类型
-4. **默认导出**：每个组件文件默认导出主组件
+1. **双引擎支持**：同时支持 ECharts 和 Chart.js，提供交互式图表
+2. **响应式设计**：图表自动适应容器大小变化
+3. **暗色主题**：Netflix 风格的深色 UI，玻璃拟态效果
 
-### 10.3 样式规范
+### 8.3 机器学习
 
-#### CSS 架构（三层）
-
-```
-① 主题层 (CSS Variables)  →  :root 中定义所有主题变量
-② 组件层 (玻璃拟态)        →  .glass-card 等通用组件类
-③ 动效层 (关键帧)          →  @keyframes 动画定义
-```
-
-#### 主题色板
-
-| 变量名 | 值 | 用途 |
-|--------|----|------|
-| `--primary` | `#E50914` | Netflix 品牌红 |
-| `--primary-dark` | `#B20710` | 深红色（渐变/阴影） |
-| `--primary-light` | `#FF4D58` | 浅红色（hover） |
-| `--background` | `#0A0A0A` | 页面背景 |
-| `--glass-bg` | `rgba(255,255,255,.035)` | 玻璃卡片背景 |
-| `--glass-border` | `rgba(255,255,255,.08)` | 玻璃卡片边框 |
-
-### 10.4 Git 提交规范
-
-参考 `.trae/rules/git-commit-message.md` 中的约定。
+1. **随机森林分类**：准确率 99.55%，验证 genre 特征的强区分力
+2. **K-Means 聚类**：识别 4 类自然内容群体，可直接用于推荐系统
+3. **多模型对比**：线性回归、决策树、随机森林、梯度提升回归对比分析
 
 ---
 
-## 附录 A：机器学习算法概览
+## 九、关键发现与结论
 
-### A.1 K-Means 聚类
+### 9.1 内容结构
 
-- **任务**：电影内容无监督分群
-- **最佳 K**：4（肘部法则确定）
-- **特征**：时长、发行年份、内容年龄、评级
-- **4 个簇**：
-  - 簇0：短片与纪录片（972部，低时长、近年）
-  - 簇1：标准院线电影（2613部，90~120min）
-  - 簇2：经典老片（497部，发行年早）
-  - 簇3：成人向新片（2049部，近年高评级）
+- 电影占比约 69.6%（6,131 部），剧集 30.4%（2,676 部）
+- 内容上架量在 2019 年达峰值（762 部/年）
+- 美国以 2,818 部占绝对主导（32%）
 
-### A.2 随机森林分类
+### 9.2 评级分布
 
-- **任务**：预测内容类型（Movie / TV Show）
-- **准确率**：99.55%
-- **5 折交叉验证**：97.5%
-- **特征重要性 Top 1**：内容类型 genre（重要性 0.807）
+- TV-MA（成人向）3,207 部占比最高（36.4%）
+- TV-14 次之（24.5%）
+- 家庭向内容合计不足 10%
 
-### A.3 梯度提升回归
+### 9.3 时长特征
 
-- **任务**：预测电影时长
-- **最佳模型**：Gradient Boosting
-- **R²**：0.4813
-- **RMSE**：19.6 分钟
-- **对比模型**：LinearRegression (0.206)、DecisionTree (0.427)、RandomForest (0.454)
+- 电影时长集中在 90-120 分钟区间（约 51%）
+- 纪录片、戏剧、喜剧位列流派前三
 
----
+### 9.4 机器学习结果
 
-## 附录 B：数据预处理步骤
-
-### v2 版本（当前）改进点
-
-1. **保留全部记录** — 不再删除 date_added 为空的 10 条记录（含 Friends、Frasier 等经典剧集）
-2. **date_added 缺失处理** — year_added 用 release_year 近似填充，month_added 保留空值
-3. **director 分级填充** — 剧集用 "Not Applicable"（剧集导演本来就不固定），电影用 "Unknown"
-   - 注意：不用 "N/A" 因为 pandas 读取 CSV 时会将其识别为 NaN
-4. **rating 改进填充** — 用 "Unknown" 而非众数，避免引入统计偏差
-5. **country** — 用 "Unknown" 填充
-
-### 完整预处理流程
-
-1. **修复 rating 字段污染** — 3 条 Louis C.K. 记录时长数据误入 rating 列，移回 duration 列
-2. **解析日期** — `date_added` 解析为 `date_added_parsed` / `year_added` / `month_added`
-3. **date_added 缺失处理** — 10 条记录 date_added 为空，year_added 用 release_year 近似
-4. **提取数值时长** — 从 `duration` 字符串提取 `duration_num`（分钟/季数）
-5. **缺失值填充**：
-   - director：剧集 → "Not Applicable"，电影 → "Unknown"
-   - cast → "Unknown"
-   - country → "Unknown"
-   - rating → "Unknown"（不用众数，避免偏差）
-6. **特征工程**：
-   - `content_age` = 2021 - release_year
-   - `primary_country` = 多国家取首个
-   - `primary_genre` = 多流派取首个
-   - `is_movie` = 类型二值化
-   - `years_to_netflix` = 上架延迟年数
+| 算法 | 任务 | 准确率/R² | 关键发现 |
+| :--- | :--- | :--- | :--- |
+| K-Means | 电影聚类 | K=4 | 时长和发行年份是主要分群因素 |
+| 随机森林 | 内容类型预测 | 99.55% | genre 是最强特征（0.807） |
+| 梯度提升 | 时长预测 | R²=0.48 | 需要用户行为数据提升预测能力 |
 
 ---
 
-*文档生成时间：2026-07-02*
-*项目版本：0.1.0*
+## 十、策略建议
+
+1. **内容策略**：加速原创剧集投入，扩充家庭向内容矩阵
+2. **市场布局**：重点加码印度、韩国、日本本土化原创内容
+3. **算法应用**：K-Means 4 簇可用于推荐系统内容画像分层
+4. **数据治理**：加强导演元数据录入规范，建立字段校验机制
+
+---
+
+## 十一、项目分工
+
+| 成员 | 角色 | 负责内容 |
+| :--- | :--- | :--- |
+| 张泽浩 | 数据工程 & 建模 | 数据预处理、机器学习算法、报告撰写 |
+| 周宇恒 | 可视化 & 报告 | 可视化图表、前端开发、UI 设计 |
+
+---
+
+*文档生成日期：2026-07-02*
