@@ -459,7 +459,7 @@ export default function MLAnalysisPage() {
           <div className="chart-title">4 个聚类簇特征对比</div>
           <div className="chart-subtitle">各簇的平均时长与内容数量（悬停查看发行年份）</div>
           <div className="chart-wrap tall">
-            <canvas ref={(el) => { chartRefs.current[4] = el; }}></canvas>
+            <canvas ref={(el) => { chartRefs.current[3] = el; }}></canvas>
           </div>
         </div>
       </div>
