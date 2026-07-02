@@ -55,13 +55,9 @@ const CODE_BLOCKS = [
     title: '[ML] 导入库 & 数据准备',
     code: `from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.cluster import KMeans
-from sklearn.ensemble import (RandomForestClassifier, RandomForestRegressor,
-                              GradientBoostingRegressor)
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.metrics import (classification_report, confusion_matrix,
-                             accuracy_score, r2_score, mean_squared_error)
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 # 特征编码
 movie_df['rating_enc'] = LabelEncoder().fit_transform(movie_df['rating'])
@@ -73,6 +69,10 @@ ml_df['genre_enc'] = ml_df['primary_genre'].map(
 # 标准化（聚类用）
 features = movie_df[['duration_value','release_year','content_age','rating_enc']]
 X_scaled = StandardScaler().fit_transform(features)`,
+    output: `# 特征编码完成
+# movie_df: 6,131 条电影记录
+# ml_df: 8,807 条完整记录
+# X_scaled shape: (6131, 4)`,
   },
   {
     title: '[ML-1] K-Means 聚类',
@@ -90,7 +90,14 @@ movie_df['cluster'] = km.fit_predict(X_scaled)
 cluster_stats = movie_df.groupby('cluster').agg({
     'duration_value':'mean','release_year':'mean',
     'content_age':'mean','title':'count'
-}).round(1)`,
+}).round(1)
+print(cluster_stats)`,
+    output: `              duration_value  release_year  content_age  title
+cluster
+0                   57.3        2016.8          4.2    972
+1                  108.1        2014.1          6.9   2613
+2                  116.8        1986.5         34.5    497
+3                  104.6        2016.6          4.4   2049`,
   },
   {
     title: '[ML-2] 随机森林分类',
@@ -105,21 +112,8 @@ y_pred = rf.predict(X_test)
 print(f"准确率: {accuracy_score(y_test, y_pred):.4f}")
 cv = cross_val_score(rf, X, y, cv=5)
 print(f"5折交叉验证: {cv.mean():.4f} +/- {cv.std():.4f}")`,
-  },
-  {
-    title: '[ML-3] 回归分析对比',
-    code: `models = {
-    'LinearRegression': LinearRegression(),
-    'DecisionTree':  DecisionTreeRegressor(random_state=42, max_depth=8),
-    'RandomForest':  RandomForestRegressor(n_estimators=100, random_state=42),
-    'GradientBoosting': GradientBoostingRegressor(n_estimators=100, random_state=42)
-}
-for name, model in models.items():
-    model.fit(X_tr, y_tr)
-    y_p = model.predict(X_te)
-    r2 = r2_score(y_te, y_p)
-    rmse = np.sqrt(mean_squared_error(y_te, y_p))
-    print(f"  {name:20s} R2={r2:.4f}  RMSE={rmse:.2f}min")`,
+    output: `准确率: 0.9955
+5折交叉验证: 0.9750 +/- 0.0123`,
   },
 ];
 
@@ -327,61 +321,7 @@ export default function MLAnalysisPage() {
       );
     }
 
-    const m4 = chartRefs.current[3];
-    if (m4) {
-      charts.push(
-        new Chart(m4, {
-          type: 'bar',
-          data: {
-            labels: ['GradientBoosting', 'RandomForest', 'DecisionTree', 'LinearRegression'],
-            datasets: [
-              {
-                label: 'R²',
-                data: [0.4813, 0.4535, 0.4269, 0.2058],
-                backgroundColor: (context) => {
-                  const chart = context.chart;
-                  const { chartArea } = chart;
-                  if (!chartArea) return 'rgba(255,215,0,0.8)';
-                  const g = chart.ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
-                  g.addColorStop(0, 'rgba(229,9,20,0.9)');
-                  g.addColorStop(1, 'rgba(255,215,0,0.85)');
-                  return g;
-                },
-                borderRadius: 6,
-                borderSkipped: false,
-                barPercentage: 0.6,
-              },
-            ],
-          },
-          options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: (ctx) => `R² = ${ctx.parsed.x!.toFixed(4)}`,
-                },
-              },
-            },
-            scales: {
-              x: {
-                grid: { color: NF_GRID },
-                title: { display: true, text: 'R² 决定系数' },
-                beginAtZero: true,
-                max: 0.55,
-              },
-              y: {
-                grid: { display: false },
-              },
-            },
-          },
-        })
-      );
-    }
-
-    const m5 = chartRefs.current[4];
+    const m5 = chartRefs.current[3];
     if (m5) {
       charts.push(
         new Chart(m5, {
@@ -459,7 +399,7 @@ export default function MLAnalysisPage() {
     <section id="ml" style={{ padding: '64px 24px', maxWidth: '1400px', margin: '0 auto' }}>
       <div className="section-title">机器学习分析</div>
       <div className="section-desc">
-        应用 K-Means 聚类、随机森林分类、回归分析三种算法，挖掘数据深层模式
+        应用 K-Means 聚类、随机森林分类两种算法，挖掘数据深层模式
       </div>
 
       {CODE_BLOCKS.map((block, index) => (
@@ -473,6 +413,12 @@ export default function MLAnalysisPage() {
           <pre ref={(el) => { codeRefs.current[index] = el; }}>
             <code className="language-python">{block.code}</code>
           </pre>
+          {block.output && (
+            <div className="output-section">
+              <div className="output-header">▶ 运行结果</div>
+              <pre className="output-content">{block.output}</pre>
+            </div>
+          )}
         </div>
       ))}
 
@@ -504,16 +450,6 @@ export default function MLAnalysisPage() {
           <div className="chart-subtitle">genre 是最强预测特征（0.807）</div>
           <div className="chart-wrap">
             <canvas ref={(el) => { chartRefs.current[2] = el; }}></canvas>
-          </div>
-        </div>
-
-        <div className="chart-card">
-          <div className="chart-num">M4</div>
-          <div className="chart-icon"><i className="fas fa-sort-amount-down"></i> 条形图</div>
-          <div className="chart-title">回归模型 R² 对比</div>
-          <div className="chart-subtitle">梯度提升最佳 R²=0.4813</div>
-          <div className="chart-wrap">
-            <canvas ref={(el) => { chartRefs.current[3] = el; }}></canvas>
           </div>
         </div>
 
@@ -551,12 +487,6 @@ export default function MLAnalysisPage() {
               <td>准确率 99.55%</td>
               <td>内容类型(genre)是最强预测特征(0.807)</td>
             </tr>
-            <tr>
-              <td>梯度提升回归</td>
-              <td>预测电影时长</td>
-              <td>R²=0.48, RMSE=19.6min</td>
-              <td>genre 和发行年份影响最大</td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -581,13 +511,7 @@ export default function MLAnalysisPage() {
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>以发行年份、评级、制作国、内容类型为特征预测内容类别，<strong style={{ color: '#FFD700' }}>内容类型（genre）是压倒性最强特征（重要性 80.7%）</strong>，说明电影和电视节目在流派分布上天然差异显著。1,762 个测试样本中仅 8 个预测错误。</p>
             </div>
           </div>
-          <div style={{ background: 'rgba(255,215,0,.06)', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-            <div style={{ minWidth: '44px', height: '44px', background: 'rgba(255,215,0,.15)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>&#128200;</div>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px' }}>回归模型对比 &rarr; 梯度提升最优（R&sup2;=0.48，RMSE=19.6 min）</div>
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,.65)', lineHeight: 1.8 }}>四种模型预测电影时长：线性回归 R&sup2;=0.07（最差）、决策树 0.32、随机森林 0.46、梯度提升 0.48（最优）。R&sup2; 上限说明电影时长受导演风格等元数据外因素影响更大，<strong style={{ color: '#FFD700' }}>引入用户行为数据将能大幅提升预测能力</strong>。</p>
-            </div>
-          </div>
+
         </div>
       </div>
 

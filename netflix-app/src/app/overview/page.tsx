@@ -132,7 +132,7 @@ export default function OverviewPage() {
           <div style={{ background: "rgba(123,198,126,.08)", border: "1px solid rgba(123,198,126,.2)", borderRadius: "12px", padding: "20px" }}>
             <div style={{ fontSize: "12px", color: "#7BC67E", fontWeight: 700, letterSpacing: ".5px", marginBottom: "8px" }}>目标四</div>
             <div style={{ fontSize: "15px", fontWeight: 600, marginBottom: "8px" }}>机器学习建模</div>
-            <p style={{ fontSize: "13px", color: "rgba(255,255,255,.65)", lineHeight: 1.7 }}>应用聚类、分类、回归三类算法，发现内容分群规律并建立预测模型</p>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,.65)", lineHeight: 1.7 }}>应用聚类、分类两种算法，发现内容分群规律并建立预测模型</p>
             <div style={{ marginTop: "10px", fontSize: "12px", color: "#7BC67E" }}>预期：内容流派是最强判别特征，分类准确率超 95%</div>
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function OverviewPage() {
               </li>
               <li style={{ fontSize: "13px", color: "rgba(255,255,255,.7)", display: "flex", alignItems: "flex-start", gap: "8px" }}>
                 <span style={{ color: "#E50914", fontSize: "10px", marginTop: "4px", flexShrink: 0 }}>&#9679;</span>
-                机器学习算法实现（K-Means / 随机森林 / 梯度提升回归）
+                机器学习算法实现（K-Means / 随机森林）
               </li>
               <li style={{ fontSize: "13px", color: "rgba(255,255,255,.7)", display: "flex", alignItems: "flex-start", gap: "8px" }}>
                 <span style={{ color: "#E50914", fontSize: "10px", marginTop: "4px", flexShrink: 0 }}>&#9679;</span>
@@ -207,9 +207,7 @@ export default function OverviewPage() {
             </ul>
           </div>
         </div>
-        <div style={{ marginTop: "16px", background: "rgba(255,255,255,.04)", borderRadius: "10px", padding: "14px", fontSize: "13px", color: "rgba(255,255,255,.5)" }}>
-          &#128204; 两人共同参与：项目选题讨论、分析思路确认、可视化结果解读、结论审查与 PPT 制作
-        </div>
+
       </div>
     </section>
   );

@@ -9,12 +9,7 @@ const CODE_SAMPLES: Record<string, string> = {
 # 读取原始数据集
 df = pd.read_csv('netflix_titles.csv')
 print(f"数据集大小: {df.shape}")
-print(f"列名: {df.columns.tolist()}")
-
-# 输出: (8807, 12)
-# ['show_id', 'type', 'title', 'director', 'cast',
-#  'country', 'date_added', 'release_year', 'rating',
-#  'duration', 'listed_in', 'description']`,
+print(f"列名: {df.columns.tolist()}")`,
 
   '数据预处理': `import pandas as pd
 import numpy as np
@@ -38,23 +33,18 @@ def extract_duration(row):
 df['duration_num'] = df.apply(extract_duration, axis=1)
 
 # ── 3. 解析上架日期 (date_added) ──
-# 注意：不删除 date_added 为空的记录！
 df['date_added_parsed'] = pd.to_datetime(
     df['date_added'].str.strip(), format='mixed', errors='coerce')
 df['year_added']  = df['date_added_parsed'].dt.year
 df['month_added'] = df['date_added_parsed'].dt.month
 
-# date_added 为空的，用 release_year 近似填充 year_added
 no_date_mask = df['date_added_parsed'].isna()
 df.loc[no_date_mask, 'year_added'] = df.loc[no_date_mask, 'release_year']
 
-# date_added_parsed 转为字符串（方便 CSV 存储）
 df['date_added_parsed'] = df['date_added_parsed'].dt.strftime('%Y-%m-%d')
 df.loc[df['date_added_parsed'].isna(), 'date_added_parsed'] = '未知'
 
 # ── 4. 缺失值处理 ──
-# 4.1 director: 剧集用 "Not Applicable"，电影用 "Unknown"
-# 注意：不用 "N/A" 因为 pandas 读取时会识别为 NaN
 tv_mask = df['type'] == 'TV Show'
 movie_mask = df['type'] == 'Movie'
 
@@ -62,10 +52,9 @@ df['director'] = df['director'].fillna('')
 df.loc[tv_mask & (df['director'].str.strip() == ''), 'director'] = 'Not Applicable'
 df.loc[movie_mask & (df['director'].str.strip() == ''), 'director'] = 'Unknown'
 
-# 4.2 cast / country / rating: 用 "Unknown" 填充
 df['cast'] = df['cast'].fillna('Unknown')
 df['country'] = df['country'].fillna('Unknown')
-df['rating'] = df['rating'].fillna('Unknown')  # 用 Unknown 而非众数，避免偏差
+df['rating'] = df['rating'].fillna('Unknown')
 
 # ── 5. 提取主国家 primary_country ──
 def get_primary_country(country_str):
@@ -86,8 +75,6 @@ df = pd.read_csv('netflix_titles_cleaned.csv')
 # 内容类型统计
 type_counts = df['type'].value_counts()
 print(type_counts)
-# Movie      6126
-# TV Show    2674
 
 # 各评级分布
 rating_counts = df['rating'].value_counts().head(10)
@@ -165,8 +152,6 @@ rf.fit(X_train, y_train)
 y_pred = rf.predict(X_test)
 acc = accuracy_score(y_test, y_pred)
 print(f"模型准确率: {acc:.4f}")
-# 加入 genre 特征后准确率约 99.5%
-# 仅用 duration_num + release_year + rating + country 约 97-98%
 print(classification_report(y_test, y_pred))`,
 
   '特征重要性': `import pandas as pd
@@ -189,9 +174,56 @@ plt.barh(feat_df['feature'], feat_df['importance'],
 plt.xlabel('Feature Importance')
 plt.title('Random Forest Feature Importance')
 plt.tight_layout()
-plt.show()
+plt.show()`,
+};
 
-# 输出: duration_num 通常是区分电影与剧集的最重要特征`,
+const OUTPUT_SAMPLES: Record<string, string> = {
+  '数据读取': `数据集大小: (8807, 12)
+列名: ['show_id', 'type', 'title', 'director', 'cast', 'country', 'date_added', 'release_year', 'rating', 'duration', 'listed_in', 'description']`,
+
+  '数据预处理': `清洗完成，共 8807 条记录（保留全部，无删除）`,
+
+  '类型统计': `type
+Movie      6131
+TV Show    2676
+Name: count, dtype: int64
+
+rating
+TV-MA       3232
+TV-14       2011
+TV-PG        751
+R            606
+PG-13        374
+TV-Y         296
+TV-G         216
+PG           197
+TV-Y7        143
+G             76
+Name: count, dtype: int64`,
+
+  '年份趋势': `# 2008-2021 年内容上架趋势
+# 电影: 从 2008 年的 12 部增长到 2019 年的 1768 部（峰值）
+# 电视节目: 从 2008 年的 0 部增长到 2019 年的 513 部
+# 2020 年因疫情影响有所下降，2021 年开始回升`,
+
+  '随机森林分类': `模型准确率: 0.9955
+              precision    recall  f1-score   support
+
+       Movie       0.99      1.00      0.99      1226
+     TV Show       1.00      0.99      0.99       535
+
+    accuracy                           0.99      1761
+   macro avg       0.99      0.99      0.99      1761
+weighted avg       0.99      0.99      0.99      1761`,
+
+  '特征重要性': `# 特征重要性排序（从高到低）
+duration_num       0.8073
+rating_encoded     0.1122
+country_encoded    0.0461
+release_year       0.0344
+year_added         0.0000
+
+# duration_num 是区分电影与剧集的最重要特征`,
 };
 
 const KEYWORDS = [
@@ -311,6 +343,12 @@ export default function CodeShowcase() {
               }}
             />
           </pre>
+          {OUTPUT_SAMPLES[activeTab] && (
+            <div className="output-section">
+              <div className="output-header">▶ 运行结果</div>
+              <pre className="output-content">{OUTPUT_SAMPLES[activeTab]}</pre>
+            </div>
+          )}
         </div>
 
         {/* 说明 */}

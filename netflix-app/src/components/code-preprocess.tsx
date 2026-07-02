@@ -15,8 +15,9 @@ pd.set_option('display.width', 200)
 # 加载原始数据
 RAW_PATH = 'netflix_titles.csv'
 df = pd.read_csv(RAW_PATH)
-print(f"原始数据: {len(df):,} 行 × {len(df.columns)} 列")
-# 原始数据: 8,807 行 × 12 列`;
+print(f"原始数据: {len(df):,} 行 × {len(df.columns)} 列")`;
+
+const output1 = `原始数据: 8,807 行 × 12 列`;
 
 const code2 = `# 缺失值详情
 missing = df.isnull().sum()
@@ -26,25 +27,27 @@ missing_df = pd.DataFrame({
     '缺失数量': missing[missing > 0],
     '缺失率(%)': missing_pct[missing > 0]
 }).sort_values('缺失数量', ascending=False)
-print(missing_df)
+print(missing_df)`;
 
-# director    2634    29.91%
-# country    831      9.44%
-# cast     825      9.37%
-# date_added  10      0.11%
-# rating      4       0.05%
-# duration    3       0.03%`;
+const output2 = `            缺失数量  缺失率(%)
+director    2634    29.91
+country      831     9.44
+cast         825     9.37
+date_added    10     0.11
+rating         4     0.05
+duration       3     0.03`;
 
 const code3 = `# rating 字段污染检测（时长误入 rating 列）
 # 识别 rating 中含 "min" 或数字的污染记录
 polluted_mask = df['rating'].notna() & df['rating'].str.contains(r'\\d+\\s*min', case=False, na=False)
 polluted_count = polluted_mask.sum()
 print(f"发现 {polluted_count} 条 rating 污染记录")
-# 发现 3 条 rating 污染记录（Louis C.K. 相关）
 
 # release_year 范围检测
-print(f"release_year 范围：{df['release_year'].min()} ~ {df['release_year'].max()}")
-# release_year 范围：1925 ~ 2021`;
+print(f"release_year 范围：{df['release_year'].min()} ~ {df['release_year'].max()}")`;
+
+const output3 = `发现 3 条 rating 污染记录（Louis C.K. 相关）
+release_year 范围：1925 ~ 2021`;
 
 const code4 = `# ── 1. 修复 rating 字段污染 ──
 polluted_mask = df['rating'].notna() & df['rating'].str.contains(r'\\d+\\s*min', case=False, na=False)
@@ -62,23 +65,18 @@ def extract_duration(row):
 df['duration_num'] = df.apply(extract_duration, axis=1)
 
 # ── 3. 解析上架日期 (date_added) ──
-# 注意：不删除 date_added 为空的记录！
 df['date_added_parsed'] = pd.to_datetime(
     df['date_added'].str.strip(), format='mixed', errors='coerce')
 df['year_added']  = df['date_added_parsed'].dt.year
 df['month_added'] = df['date_added_parsed'].dt.month
 
-# date_added 为空的，用 release_year 近似填充 year_added
 no_date_mask = df['date_added_parsed'].isna()
 df.loc[no_date_mask, 'year_added'] = df.loc[no_date_mask, 'release_year']
 
-# date_added_parsed 转为字符串（方便 CSV 存储）
 df['date_added_parsed'] = df['date_added_parsed'].dt.strftime('%Y-%m-%d')
 df.loc[df['date_added_parsed'].isna(), 'date_added_parsed'] = '未知'
 
 # ── 4. 缺失值处理 ──
-# 4.1 director: 剧集用 "Not Applicable"，电影用 "Unknown"
-# 注意：不用 "N/A" 因为 pandas 读取时会识别为 NaN
 tv_mask = df['type'] == 'TV Show'
 movie_mask = df['type'] == 'Movie'
 
@@ -86,10 +84,9 @@ df['director'] = df['director'].fillna('')
 df.loc[tv_mask & (df['director'].str.strip() == ''), 'director'] = 'Not Applicable'
 df.loc[movie_mask & (df['director'].str.strip() == ''), 'director'] = 'Unknown'
 
-# 4.2 cast / country / rating: 用 "Unknown" 填充
 df['cast'] = df['cast'].fillna('Unknown')
 df['country'] = df['country'].fillna('Unknown')
-df['rating'] = df['rating'].fillna('Unknown')  # 用 Unknown 而非众数，避免偏差
+df['rating'] = df['rating'].fillna('Unknown')
 
 # ── 5. 提取主国家 primary_country ──
 def get_primary_country(country_str):
@@ -106,8 +103,9 @@ output_cols = [
     'duration_num', 'date_added_parsed', 'year_added', 'month_added', 'primary_country'
 ]
 df.to_csv('netflix_titles_cleaned.csv', index=False, encoding='utf-8')
-print(f"清洗后数据: {len(df):,} 行 × {len(output_cols)} 列")
-# 清洗后数据: 8,807 行 × 17 列（保留全部记录，无删除）`;
+print(f"清洗后数据: {len(df):,} 行 × {len(output_cols)} 列")`;
+
+const output4 = `清洗后数据: 8,807 行 × 17 列（保留全部记录，无删除）`;
 
 const tableData = [
   { field: 'show_id', type: 'object', nonNull: '8,807', missing: '0.00', desc: '唯一标识符' },
@@ -137,7 +135,7 @@ export default function CodePreprocess() {
   return (
     <section id="preprocess" style={{ padding: '64px 24px', maxWidth: '1400px', margin: '0 auto' }}>
       <div className="section-title">数据加载与预处理</div>
-      <div className="section-desc">对原始 Netflix 数据集进行清洗、异常修复、类型转换与特征工程，输出 22 列结构化数据</div>
+      <div className="section-desc">对原始 Netflix 数据集进行清洗、异常修复、类型转换与特征工程，输出 17 列结构化数据</div>
 
       <div className="code-container">
         <div className="code-header">
@@ -149,6 +147,10 @@ export default function CodePreprocess() {
         <pre>
           <code className="language-python">{code1}</code>
         </pre>
+        <div className="output-section">
+          <div className="output-header">▶ 运行结果</div>
+          <pre className="output-content">{output1}</pre>
+        </div>
       </div>
 
       <div className="code-container">
@@ -161,6 +163,10 @@ export default function CodePreprocess() {
         <pre>
           <code className="language-python">{code2}</code>
         </pre>
+        <div className="output-section">
+          <div className="output-header">▶ 运行结果</div>
+          <pre className="output-content">{output2}</pre>
+        </div>
       </div>
 
       <div className="code-container">
@@ -173,6 +179,10 @@ export default function CodePreprocess() {
         <pre>
           <code className="language-python">{code3}</code>
         </pre>
+        <div className="output-section">
+          <div className="output-header">▶ 运行结果</div>
+          <pre className="output-content">{output3}</pre>
+        </div>
       </div>
 
       <div className="code-container">
@@ -185,6 +195,10 @@ export default function CodePreprocess() {
         <pre>
           <code className="language-python">{code4}</code>
         </pre>
+        <div className="output-section">
+          <div className="output-header">▶ 运行结果</div>
+          <pre className="output-content">{output4}</pre>
+        </div>
       </div>
 
       <div className="data-table" style={{ marginTop: '24px' }}>

@@ -31,10 +31,10 @@ const VARIABLES = [
 
 const DERIVED_VARS = [
   { name: 'duration_num', desc: '从 duration 提取的数值时长（分钟）' },
+  { name: 'date_added_parsed', desc: '从 date_added 解析的标准日期格式' },
   { name: 'year_added', desc: '从 date_added 解析的添加年份' },
   { name: 'month_added', desc: '从 date_added 解析的添加月份' },
   { name: 'primary_country', desc: '多国家取首个作为主要制作国' },
-  { name: 'rating_encoded', desc: '评级编码后的数值特征（用于建模）' },
 ];
 
 const GOALS = [

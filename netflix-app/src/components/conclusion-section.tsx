@@ -83,7 +83,6 @@ const RECOMMENDATIONS = [
     items: [
       'K-Means 4 簇内容群体可直接用于推荐系统的内容画像分层。',
       '随机森林 99.5% 的高准确率验证了 genre 特征的强区分度，可用于内容自动归类。',
-      '回归模型 R²=0.48 的上限提示：需引入用户行为数据提升时长预测能力。',
     ],
   },
   {
@@ -242,7 +241,6 @@ export default function ConclusionSection({ stats }: Props) {
             Netflix 内容生态呈现&ldquo;电影主导、剧集增长、美国领先、亚洲崛起、成人向为主&rdquo;的整体格局。
             机器学习分析表明，<span className="text-[#E50914] font-semibold">内容流派（genre）是区分电影与剧集的最强特征（重要性 80.7%）</span>，
             4 类 K-Means 聚类群体结构清晰，均可直接应用于推荐系统优化。
-            电影时长预测 R² 上限（0.48）提示元数据层面存在信息瓶颈，引入用户行为数据可进一步提升预测能力。
           </p>
         </div>
 
