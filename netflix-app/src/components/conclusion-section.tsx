@@ -9,54 +9,53 @@ const KEY_FINDINGS = [
   {
     icon: '🎬',
     title: '内容结构',
-    stat: `${69.7}%`,
-    desc: '电影占比约 69.7%，剧集 30.3%。电影仍是 Netflix 内容主力，但剧集投入比例持续上升。',
+    stat: '69.6%',
+    desc: '电影占比约 69.6%（6,131 部），剧集 30.4%（2,676 部）。电影仍是 Netflix 内容主力，但剧集增长速度更快。',
+  },
+  {
+    icon: '📈',
+    title: '增长趋势',
+    stat: '2019 峰值',
+    desc: '内容上架量在 2019 年达峰值（762 部/年），2020 年因疫情下滑约 25%，2021 年继续回调。',
   },
   {
     icon: '🌍',
     title: '地域分布',
-    stat: '美国',
-    desc: '美国内容产出量绝对领先，占比约 36%，印度、英国、日本紧随其后，呈现"美强 + 多元"格局。',
+    stat: '美国 32%',
+    desc: '美国以 2,818 部占绝对主导（32%），印度 972 部、英国 419 部分列二三位，韩国日本快速崛起。',
   },
   {
     icon: '⭐',
     title: '评级分布',
-    stat: 'TV-MA',
-    desc: 'TV-MA（成人观众）数量最多，反映 Netflix 主打成人向内容的策略，覆盖广泛受众。',
-  },
-  {
-    icon: '📅',
-    title: '时间趋势',
-    stat: `${2019} / ${2020}`,
-    desc: '内容添加量在 2019-2020 年达到峰值，标志流媒体竞争进入白热化阶段。',
+    stat: 'TV-MA 36%',
+    desc: 'TV-MA（成人向）3,207 部占比最高（36.4%），TV-14 次之（24.5%），家庭向内容合计不足 10%。',
   },
   {
     icon: '⏱️',
     title: '时长特征',
-    stat: '99 min',
-    desc: '电影平均时长约 99.6 分钟，90-120 分钟区间最为集中，契合主流院线标准。',
+    stat: '90-120 min',
+    desc: '电影时长集中在 90-120 分钟区间（约 3,134 部，占 51%），契合主流院线标准时长。',
   },
   {
     icon: '🎭',
     title: '流派偏好',
-    stat: 'Dramas',
-    desc: '剧情类、国际电影、喜剧类内容最受欢迎，反映用户对叙事深度的偏好。',
+    stat: '纪录片第一',
+    desc: '纪录片（879）、戏剧（785）、喜剧（653）位列前三，国际内容与真实类内容需求强劲。',
   },
 ];
 
 const MODEL_METRICS = [
-  { label: '模型准确率', value: '77%', desc: '测试集准确率' },
-  { label: '精确率 (Precision)', value: '0.78', desc: '加权平均' },
-  { label: '召回率 (Recall)', value: '0.77', desc: '加权平均' },
-  { label: 'F1 分数', value: '0.77', desc: '加权平均' },
+  { label: '模型准确率', value: '99.55%', desc: '测试集准确率' },
+  { label: '5 折交叉验证', value: '97.5%', desc: 'Cross-Val Mean' },
+  { label: '最强特征 genre', value: '0.807', desc: '特征重要性' },
+  { label: '聚类最佳 K', value: '4', desc: '肘部法则确定' },
 ];
 
 const FEATURE_IMPORTANCE = [
-  { name: 'duration_num', value: 100, label: '时长（分钟）' },
-  { name: 'rating_encoded', value: 62, label: '评级编码' },
-  { name: 'release_year', value: 38, label: '发布年份' },
-  { name: 'year_added', value: 24, label: '添加年份' },
-  { name: 'country_encoded', value: 12, label: '国家编码' },
+  { name: 'primary_genre', value: 100, label: '内容类型 genre' },
+  { name: 'rating_encoded', value: 14, label: '年龄评级 rating' },
+  { name: 'primary_country', value: 6, label: '制作国家 country' },
+  { name: 'release_year', value: 4, label: '发行年份 year' },
 ];
 
 const RECOMMENDATIONS = [
@@ -64,36 +63,36 @@ const RECOMMENDATIONS = [
     icon: '📺',
     title: '内容策略',
     items: [
-      '维持电影主导地位的同时，加大原创剧集投入，平衡长短线内容生态。',
-      '聚焦 90-120 分钟主流时长区间，兼顾短剧与纪录片等新兴内容形态。',
-      '强化 TV-MA 等成人向内容的同时，拓展家庭与儿童细分市场。',
+      '保持电影内容优势的同时，加速原创剧集投入，缩小与电影的数量差距。',
+      '90-120 分钟是电影黄金时长区间，采购与自制应优先匹配该时长带。',
+      'TV-MA 成人内容已饱和，建议扩充 TV-G/TV-PG 家庭向内容矩阵。',
     ],
   },
   {
     icon: '🌐',
     title: '市场布局',
     items: [
-      '深耕美国本土市场，保持内容产出绝对优势与品牌影响力。',
-      '加速印度、韩国、日本等高增长市场的本土化内容采购与原创。',
-      '建立国际合制机制，平衡全球化分发与本土化叙事。',
+      '巩固美国本土基本盘，同时降低对单一市场的依赖（现占 32%）。',
+      '重点加码印度、韩国、日本三大高增长市场的本土化原创内容。',
+      '发挥纪录片与国际内容优势，打造差异化内容标签吸引全球用户。',
     ],
   },
   {
     icon: '🤖',
     title: '算法应用',
     items: [
-      '基于内容类型预测模型，优化推荐算法的内容分发效率。',
-      '利用特征重要性分析指导内容采购决策，识别高价值特征组合。',
-      '构建用户偏好与内容特征的匹配模型，提升个性化推荐精度。',
+      'K-Means 4 簇内容群体可直接用于推荐系统的内容画像分层。',
+      '随机森林 99.5% 的高准确率验证了 genre 特征的强区分度，可用于内容自动归类。',
+      '回归模型 R²=0.48 的上限提示：需引入用户行为数据提升时长预测能力。',
     ],
   },
   {
     icon: '💡',
-    title: '内容采购',
+    title: '数据治理',
     items: [
-      '优先采购剧情类、国际电影与喜剧类内容，匹配主流用户偏好。',
-      '关注时长在 90-120 分钟的电影与 1-3 季的剧集，符合用户习惯。',
-      '建立动态采购模型，根据年度趋势与地域热度调整投入比例。',
+      'director 字段缺失率高达 30%，建议加强电视节目导演元数据录入规范。',
+      '建立 rating/duration 字段校验机制，避免类似 3 条 Louis C.K. 记录的污染问题。',
+      '补充 content_age、years_to_netflix 等衍生字段，丰富内容特征维度。',
     ],
   },
 ];
@@ -107,7 +106,7 @@ export default function ConclusionSection({ stats }: Props) {
         <PageHeader
           eyebrow="Conclusion"
           title="结论与展望"
-          subtitle="数据驱动的洞察总结与策略建议"
+          subtitle="基于 9 维可视化分析与机器学习建模的数据驱动洞察"
         />
 
         {/* 主结论卡 */}
@@ -120,12 +119,12 @@ export default function ConclusionSection({ stats }: Props) {
             <span className="text-[#E50914] font-semibold">
               {stats.total.toLocaleString()}
             </span>{' '}
-            条 Netflix 内容的深度分析，我们揭示了流媒体时代的内容趋势：
-            <span className="text-white font-semibold">电影主导、剧集崛起、美国领先</span>。
+            条 Netflix 内容的 9 维可视化分析，我们揭示了流媒体内容生态的核心特征：
+            <span className="text-white font-semibold">电影主导、美国领先、成人向为主、纪录片最热</span>。
           </p>
           <p className="text-gray-400 leading-relaxed">
-            数据驱动决策贯穿内容生命周期，理解内容分布是优化推荐算法与投资策略的关键。
-            未来趋势指向更多国际内容、短剧与原创制作的持续投入。
+            机器学习进一步验证了内容流派的强区分力（随机森林准确率 99.5%），
+            K-Means 聚类识别出 4 类天然内容群体，均可直接应用于推荐系统优化与内容采购决策。
           </p>
         </div>
 
@@ -133,7 +132,7 @@ export default function ConclusionSection({ stats }: Props) {
         <div className="mb-10">
           <h3 className="text-white text-2xl font-bold mb-6 flex items-center gap-3">
             <span className="w-1 h-7 rounded-full bg-[#E50914]" />
-            关键发现
+            关键发现（基于可视化图表）
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {KEY_FINDINGS.map((f) => (
@@ -158,7 +157,7 @@ export default function ConclusionSection({ stats }: Props) {
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#E50914] to-[#B20710] flex items-center justify-center text-white font-bold">
               🤖
             </div>
-            <h3 className="text-white text-xl font-semibold">随机森林模型结果</h3>
+            <h3 className="text-white text-xl font-semibold">机器学习模型结果</h3>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
@@ -167,7 +166,7 @@ export default function ConclusionSection({ stats }: Props) {
                 key={m.label}
                 className="text-center p-4 rounded-xl bg-white/[0.02] border border-white/5"
               >
-                <div className="text-3xl font-bold text-[#E50914] mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-[#E50914] mb-1">
                   {m.value}
                 </div>
                 <div className="text-white text-sm font-medium">{m.label}</div>
@@ -176,7 +175,7 @@ export default function ConclusionSection({ stats }: Props) {
             ))}
           </div>
 
-          <h4 className="text-white font-semibold mb-4">特征重要性排序</h4>
+          <h4 className="text-white font-semibold mb-4">特征重要性排序（随机森林分类）</h4>
           <div className="space-y-3">
             {FEATURE_IMPORTANCE.map((f) => (
               <div key={f.name} className="flex items-center gap-4">
@@ -190,12 +189,15 @@ export default function ConclusionSection({ stats }: Props) {
                     style={{ width: `${f.value}%` }}
                   />
                 </div>
-                <div className="w-10 text-right text-[#E50914] font-semibold text-sm">
+                <div className="w-14 text-right text-[#E50914] font-semibold text-sm">
                   {f.value}%
                 </div>
               </div>
             ))}
           </div>
+          <p className="text-gray-500 text-xs mt-4">
+            * 以 genre 特征重要性为基准（100%），其余特征按比例归一化展示
+          </p>
         </div>
 
         {/* 商业建议 */}
@@ -237,16 +239,16 @@ export default function ConclusionSection({ stats }: Props) {
           <div className="text-4xl mb-4">🎯</div>
           <h3 className="text-white text-xl font-semibold mb-3">核心结论</h3>
           <p className="text-gray-400 leading-relaxed max-w-2xl mx-auto">
-            Netflix 内容生态呈现&ldquo;电影主导、剧集增长、美国领先、全球多元&rdquo;的特征。
-            通过随机森林模型，我们以{' '}
-            <span className="text-[#E50914] font-semibold">77%</span> 的准确率
-            验证了内容类型的可预测性，为后续推荐系统与采购决策提供了量化依据。
+            Netflix 内容生态呈现&ldquo;电影主导、剧集增长、美国领先、亚洲崛起、成人向为主&rdquo;的整体格局。
+            机器学习分析表明，<span className="text-[#E50914] font-semibold">内容流派（genre）是区分电影与剧集的最强特征（重要性 80.7%）</span>，
+            4 类 K-Means 聚类群体结构清晰，均可直接应用于推荐系统优化。
+            电影时长预测 R² 上限（0.48）提示元数据层面存在信息瓶颈，引入用户行为数据可进一步提升预测能力。
           </p>
         </div>
 
         {/* 页脚信息 */}
         <div className="text-center text-gray-500 text-xs sm:text-sm glass-card rounded-xl py-4 px-6">
-          数据来源：Netflix Titles Dataset &nbsp;|&nbsp; 分析工具：Python + ECharts + Next.js
+          数据来源：Netflix Titles Dataset &nbsp;|&nbsp; 分析工具：Python + ECharts + Chart.js + Next.js
         </div>
       </div>
     </section>
