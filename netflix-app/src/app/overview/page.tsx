@@ -207,9 +207,7 @@ export default function OverviewPage() {
             </ul>
           </div>
         </div>
-        <div style={{ marginTop: "16px", background: "rgba(255,255,255,.04)", borderRadius: "10px", padding: "14px", fontSize: "13px", color: "rgba(255,255,255,.5)" }}>
-          &#128204; 两人共同参与：项目选题讨论、分析思路确认、可视化结果解读、结论审查与 PPT 制作
-        </div>
+
       </div>
     </section>
   );
