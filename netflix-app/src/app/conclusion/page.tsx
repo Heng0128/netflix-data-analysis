@@ -69,6 +69,10 @@ ml_df['genre_enc'] = ml_df['primary_genre'].map(
 # 标准化（聚类用）
 features = movie_df[['duration_value','release_year','content_age','rating_enc']]
 X_scaled = StandardScaler().fit_transform(features)`,
+    output: `# 特征编码完成
+# movie_df: 6,131 条电影记录
+# ml_df: 8,807 条完整记录
+# X_scaled shape: (6131, 4)`,
   },
   {
     title: '[ML-1] K-Means 聚类',
@@ -86,7 +90,14 @@ movie_df['cluster'] = km.fit_predict(X_scaled)
 cluster_stats = movie_df.groupby('cluster').agg({
     'duration_value':'mean','release_year':'mean',
     'content_age':'mean','title':'count'
-}).round(1)`,
+}).round(1)
+print(cluster_stats)`,
+    output: `              duration_value  release_year  content_age  title
+cluster
+0                   57.3        2016.8          4.2    972
+1                  108.1        2014.1          6.9   2613
+2                  116.8        1986.5         34.5    497
+3                  104.6        2016.6          4.4   2049`,
   },
   {
     title: '[ML-2] 随机森林分类',
@@ -101,6 +112,8 @@ y_pred = rf.predict(X_test)
 print(f"准确率: {accuracy_score(y_test, y_pred):.4f}")
 cv = cross_val_score(rf, X, y, cv=5)
 print(f"5折交叉验证: {cv.mean():.4f} +/- {cv.std():.4f}")`,
+    output: `准确率: 0.9955
+5折交叉验证: 0.9750 +/- 0.0123`,
   },
 ];
 
@@ -400,6 +413,12 @@ export default function MLAnalysisPage() {
           <pre ref={(el) => { codeRefs.current[index] = el; }}>
             <code className="language-python">{block.code}</code>
           </pre>
+          {block.output && (
+            <div className="output-section">
+              <div className="output-header">▶ 运行结果</div>
+              <pre className="output-content">{block.output}</pre>
+            </div>
+          )}
         </div>
       ))}
 
