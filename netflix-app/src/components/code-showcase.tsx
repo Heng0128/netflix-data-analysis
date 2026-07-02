@@ -34,14 +34,25 @@ df['date_added_parsed'] = pd.to_datetime(df['date_added'], errors='coerce')
 df['year_added']  = df['date_added_parsed'].dt.year
 df['month_added'] = df['date_added_parsed'].dt.month
 
+# 3.1 date_added 缺失的用 release_year 近似填充
+# （不删除行，保留所有数据）
+df['year_added'] = df['year_added'].fillna(df['release_year'])
+
 # 4. 多国家取主要制作国
 df['primary_country'] = df['country'].str.split(',').str[0].str.strip()
 
 # 5. 缺失值填充
-df['director'].fillna('未知', inplace=True)
-df['cast'].fillna('未知', inplace=True)
-df['country'].fillna('未知', inplace=True)
-df['rating'].fillna(df['rating'].mode()[0], inplace=True)
+# 剧集导演缺失用 "Not Applicable"（剧集本来就常缺导演，不适用单一导演）
+# 电影导演缺失用 "Unknown"
+# 注意：不用 "N/A" 因为 pandas 读取时会识别为 NaN
+tv_mask = df['type'] == 'TV Show'
+movie_mask = df['type'] == 'Movie'
+df.loc[tv_mask, 'director'] = df.loc[tv_mask, 'director'].fillna('Not Applicable')
+df.loc[movie_mask, 'director'] = df.loc[movie_mask, 'director'].fillna('Unknown')
+
+df['cast'].fillna('Unknown', inplace=True)
+df['country'].fillna('Unknown', inplace=True)
+df['rating'].fillna('Unknown', inplace=True)  # 用 Unknown 而非众数，避免偏差
 
 df.to_csv('netflix_titles_cleaned.csv', index=False)
 print(f"清洗完成，共 {len(df)} 条记录")`,

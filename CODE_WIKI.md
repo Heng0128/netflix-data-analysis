@@ -23,13 +23,13 @@
 
 ### 1.1 项目简介
 
-本项目是一个基于 **Netflix Titles Dataset**（8,809 条记录）的完整数据分析项目，涵盖数据预处理、多维度可视化分析以及机器学习建模三大核心模块。项目采用 **Python + Pandas + Scikit-Learn** 进行数据分析，使用 **Next.js + React + ECharts/Chart.js** 构建交互式可视化前端。
+本项目是一个基于 **Netflix Titles Dataset**（8,807 条记录）的完整数据分析项目，涵盖数据预处理、多维度可视化分析以及机器学习建模三大核心模块。项目采用 **Python + Pandas + Scikit-Learn** 进行数据分析，使用 **Next.js + React + ECharts/Chart.js** 构建交互式可视化前端。
 
 ### 1.2 核心特性
 
 | 特性 | 说明 |
 |------|------|
-| 数据规模 | 8,809 条 Netflix 内容记录，12 个原始字段 + 5 个衍生字段 |
+| 数据规模 | 8,807 条 Netflix 内容记录，12 个原始字段 + 5 个衍生字段 |
 | 可视化图表 | 9 张 ECharts 图表 + 9 张 Chart.js 图表，共 18 个可视化视图 |
 | 机器学习 | K-Means 聚类、随机森林分类、梯度提升回归三种算法 |
 | 前端架构 | Next.js 16 (App Router) + React 19 + TypeScript |
@@ -501,18 +501,18 @@ interface ChartData {
 | show_id | 字符串 | 0% | 唯一标识符 |
 | type | 分类(2值) | 0% | Movie / TV Show |
 | title | 字符串 | 0% | 内容标题 |
-| director | 字符串 | 29.91% | 导演姓名 |
-| cast | 字符串 | 9.22% | 主要演员列表 |
-| country | 字符串 | 9.45% | 制作国家(可多值) |
-| date_added | 日期型 | 0.11% | 上架日期 |
+| director | 字符串 | 29.91% | 导演姓名（剧集填"Not Applicable"，电影填"Unknown"） |
+| cast | 字符串 | 9.22% | 主要演员列表（缺失填"Unknown"） |
+| country | 字符串 | 9.45% | 制作国家(可多值，缺失填"Unknown") |
+| date_added | 日期型 | 0.11% | 上架日期（10条缺失，未删除） |
 | release_year | 数值 | 0% | 发行年份(1925~2021) |
-| rating | 分类(14值) | 0.04% | 年龄评级 |
-| duration | 字符串 | 0.04% | 时长 |
+| rating | 分类(15值) | 0.08% | 年龄评级（7条缺失填"Unknown"，非众数） |
+| duration | 字符串 | 0.03% | 时长（3条污染已修复） |
 | listed_in | 字符串 | 0% | 流派(可多值) |
 | description | 文本 | 0% | 内容简述 |
-| duration_num | 数值 | - | 衍生：时长数值 |
-| year_added | 数值 | - | 衍生：上架年份 |
-| month_added | 数值 | - | 衍生：上架月份 |
+| duration_num | 数值 | - | 衍生：时长数值（分钟/季） |
+| year_added | 数值 | - | 衍生：上架年份（缺失用release_year填充） |
+| month_added | 数值 | 0.11% | 衍生：上架月份（10条缺失） |
 | primary_country | 字符串 | - | 衍生：主要制作国 |
 | content_age | 数值 | - | 衍生：内容年龄 |
 
@@ -758,11 +758,27 @@ bun lint
 
 ## 附录 B：数据预处理步骤
 
-1. **修复 rating 字段污染** — 3 条记录时长数据误入 rating 列
-2. **解析日期** — `date_added` 解析为年份/月份
-3. **提取数值时长** — 从 `duration` 字符串提取分钟数
-4. **缺失值填充** — director/cast/country 填充 "Unknown"，rating 填充众数
-5. **特征工程**：
+### v2 版本（当前）改进点
+
+1. **保留全部记录** — 不再删除 date_added 为空的 10 条记录（含 Friends、Frasier 等经典剧集）
+2. **date_added 缺失处理** — year_added 用 release_year 近似填充，month_added 保留空值
+3. **director 分级填充** — 剧集用 "Not Applicable"（剧集导演本来就不固定），电影用 "Unknown"
+   - 注意：不用 "N/A" 因为 pandas 读取 CSV 时会将其识别为 NaN
+4. **rating 改进填充** — 用 "Unknown" 而非众数，避免引入统计偏差
+5. **country** — 用 "Unknown" 填充
+
+### 完整预处理流程
+
+1. **修复 rating 字段污染** — 3 条 Louis C.K. 记录时长数据误入 rating 列，移回 duration 列
+2. **解析日期** — `date_added` 解析为 `date_added_parsed` / `year_added` / `month_added`
+3. **date_added 缺失处理** — 10 条记录 date_added 为空，year_added 用 release_year 近似
+4. **提取数值时长** — 从 `duration` 字符串提取 `duration_num`（分钟/季数）
+5. **缺失值填充**：
+   - director：剧集 → "Not Applicable"，电影 → "Unknown"
+   - cast → "Unknown"
+   - country → "Unknown"
+   - rating → "Unknown"（不用众数，避免偏差）
+6. **特征工程**：
    - `content_age` = 2021 - release_year
    - `primary_country` = 多国家取首个
    - `primary_genre` = 多流派取首个
