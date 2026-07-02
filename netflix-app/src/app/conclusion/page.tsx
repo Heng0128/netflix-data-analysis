@@ -431,6 +431,10 @@ export default function MLAnalysisPage() {
           <div className="chart-wrap">
             <canvas ref={(el) => { chartRefs.current[0] = el; }}></canvas>
           </div>
+          <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(229,9,20,.06)', borderRadius: '8px', borderLeft: '3px solid #E50914' }}>
+            <div style={{ fontSize: '11px', color: '#E50914', fontWeight: 700, marginBottom: '6px', letterSpacing: '.5px' }}>分析结论</div>
+            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,.75)', lineHeight: 1.6, margin: 0 }}>SSE 在 K=2→3 时下降最快，K=4 处出现明显拐点（肘部），之后下降趋于平缓。选择 K=4 既避免了过度细分，又能捕捉到电影内容的 4 类自然群体结构。</p>
+          </div>
         </div>
 
         <div className="chart-card">
@@ -440,6 +444,10 @@ export default function MLAnalysisPage() {
           <div className="chart-subtitle">发行年份 vs 时长，4 个自然分群</div>
           <div className="chart-wrap">
             <canvas ref={(el) => { chartRefs.current[1] = el; }}></canvas>
+          </div>
+          <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(229,9,20,.06)', borderRadius: '8px', borderLeft: '3px solid #E50914' }}>
+            <div style={{ fontSize: '11px', color: '#E50914', fontWeight: 700, marginBottom: '6px', letterSpacing: '.5px' }}>分析结论</div>
+            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,.75)', lineHeight: 1.6, margin: 0 }}>4 个簇在「发行年份 × 时长」平面上分离清晰：经典老片（1987 年、117min）独立于右上角，短片/纪录片（57min）聚集于底部，标准院线片与成人向新片按时长和年份形成两个相邻但可分的群体。</p>
           </div>
         </div>
 
@@ -451,6 +459,10 @@ export default function MLAnalysisPage() {
           <div className="chart-wrap">
             <canvas ref={(el) => { chartRefs.current[2] = el; }}></canvas>
           </div>
+          <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(229,9,20,.06)', borderRadius: '8px', borderLeft: '3px solid #E50914' }}>
+            <div style={{ fontSize: '11px', color: '#E50914', fontWeight: 700, marginBottom: '6px', letterSpacing: '.5px' }}>分析结论</div>
+            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,.75)', lineHeight: 1.6, margin: 0 }}>内容类型（genre）以 80.7% 的重要性占据绝对主导地位，说明电影和电视节目在流派分布上存在天然差异。年龄评级（11.2%）次之，而制作国家和发行年份贡献极小（合计 &lt; 10%），对区分内容类型帮助有限。</p>
+          </div>
         </div>
 
         <div className="chart-card full-width">
@@ -460,6 +472,10 @@ export default function MLAnalysisPage() {
           <div className="chart-subtitle">各簇的平均时长与内容数量（悬停查看发行年份）</div>
           <div className="chart-wrap tall">
             <canvas ref={(el) => { chartRefs.current[3] = el; }}></canvas>
+          </div>
+          <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(229,9,20,.06)', borderRadius: '8px', borderLeft: '3px solid #E50914' }}>
+            <div style={{ fontSize: '11px', color: '#E50914', fontWeight: 700, marginBottom: '6px', letterSpacing: '.5px' }}>分析结论</div>
+            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,.75)', lineHeight: 1.6, margin: 0 }}>标准院线片（簇1）数量最多达 2,613 部，平均时长 108min，是 Netflix 内容主力。经典老片（簇2）虽仅 497 部但平均时长最长（117min），平均发行年份 1987 年，具有独特的怀旧价值。短片/纪录片（簇0）平均时长仅 57min，是差异化最明显的群体。成人向新片（簇3）2,049 部，集中在 2016-2017 年，反映 Netflix 近年加大成人内容投入。</p>
           </div>
         </div>
       </div>

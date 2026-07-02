@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { href: "/", label: "首页" },
+  { href: "/data-overview", label: "数据概况" },
   { href: "/overview", label: "需求分析" },
   { href: "/code", label: "预处理与代码" },
   { href: "/visualization", label: "可视化与发现" },

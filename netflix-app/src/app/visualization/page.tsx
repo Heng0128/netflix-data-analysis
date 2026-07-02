@@ -58,15 +58,15 @@ const NF_RED = '#E50914';
 const NF_GRID = 'rgba(255,255,255,0.05)';
 
 const chartData = [
-  { num: '01', icon: 'pie-chart', type: '环形图', title: '电影 vs 电视节目占比', subtitle: 'Netflix 内容类型整体分布' },
-  { num: '02', icon: 'chart-line', type: '折线图', title: '历年内容上架趋势', subtitle: '2008-2021 年 Netflix 新增内容数量' },
-  { num: '03', icon: 'layer-group', type: '面积图', title: '内容发行年份分布', subtitle: '1980-2021 年发行的内容数量' },
-  { num: '04', icon: 'globe', type: '水平柱状图', title: 'Top 10 内容制作国家/地区', subtitle: '按主要制作国统计内容数量' },
-  { num: '05', icon: 'user-shield', type: '极坐标图', title: '年龄评级分布', subtitle: 'Netflix 内容的年龄分级构成' },
-  { num: '06', icon: 'clock', type: '直方图', title: '电影时长分布', subtitle: '6,131 部电影按时长区间统计' },
-  { num: '07', icon: 'tags', type: '雷达图', title: 'Top 8 流派对比', subtitle: '按主类型（listed_in）统计' },
-  { num: '08', icon: 'chart-scatter', type: '散点图', title: '发行年份 vs 时长', subtitle: '电影发行年份与时长关系散点分布' },
-  { num: '09', icon: 'chart-area', type: '堆叠面积图', title: '电影 vs 电视节目上架趋势对比', subtitle: '2008-2021 年电影与电视节目新增数量对比' },
+  { num: '01', icon: 'pie-chart', type: '环形图', title: '电影 vs 电视节目占比', subtitle: 'Netflix 内容类型整体分布', analysis: '电影占比 69.6%，电视节目仅 30.4%，Netflix 以电影内容为主，符合其"影院级体验"定位。' },
+  { num: '02', icon: 'chart-line', type: '折线图', title: '历年内容上架趋势', subtitle: '2008-2021 年 Netflix 新增内容数量', analysis: '2015-2019 年呈指数增长，2019 年达峰值 1,768 部。2020 年因疫情下滑 23%，2021 年已开始回暖。' },
+  { num: '03', icon: 'layer-group', type: '面积图', title: '内容发行年份分布', subtitle: '1980-2021 年发行的内容数量', analysis: '2010 年后内容数量激增，2018-2019 年达到顶峰，反映 Netflix 近年加大原创内容投入。' },
+  { num: '04', icon: 'globe', type: '水平柱状图', title: 'Top 10 内容制作国家/地区', subtitle: '按主要制作国统计内容数量', analysis: '美国以 2,818 部占 32% 绝对主导，印度 972 部居第二，亚洲内容（韩日）增长显著。' },
+  { num: '05', icon: 'user-shield', type: '极坐标图', title: '年龄评级分布', subtitle: 'Netflix 内容的年龄分级构成', analysis: 'TV-MA（36.4%）与 TV-14（24.5%）合计超 60%，表明 Netflix 以成年观众为核心目标群体。' },
+  { num: '06', icon: 'clock', type: '直方图', title: '电影时长分布', subtitle: '6,131 部电影按时长区间统计', analysis: '80-120 分钟电影占比最高（约 50%），符合标准电影时长，平均时长 99.6 分钟。' },
+  { num: '07', icon: 'tags', type: '雷达图', title: 'Top 8 流派对比', subtitle: '按主类型（listed_in）统计', analysis: '纪录片（879）和戏剧（785）最受欢迎，国际剧（International Movies）增长迅速。' },
+  { num: '08', icon: 'chart-scatter', type: '散点图', title: '发行年份 vs 时长', subtitle: '电影发行年份与时长关系散点分布', analysis: '近年电影时长趋于集中（90-120 分钟），早期电影时长差异较大，反映现代电影标准化趋势。' },
+  { num: '09', icon: 'chart-area', type: '堆叠面积图', title: '电影 vs 电视节目上架趋势对比', subtitle: '2008-2021 年电影与电视节目新增数量对比', analysis: '电影始终占主导，但电视节目增速更快（2019-2021），Netflix 正加强电视剧集布局。' },
 ];
 
 export default function VisualizationPage() {
@@ -505,6 +505,10 @@ export default function VisualizationPage() {
             <div className="chart-subtitle">{item.subtitle}</div>
             <div className="chart-wrap">
               <canvas ref={(el) => { canvasRefs.current[index] = el; }}></canvas>
+            </div>
+            <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(229,9,20,.06)', borderRadius: '8px', borderLeft: '3px solid #E50914' }}>
+              <div style={{ fontSize: '11px', color: '#E50914', fontWeight: 700, marginBottom: '6px', letterSpacing: '.5px' }}>分析结论</div>
+              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,.75)', lineHeight: 1.6, margin: 0 }}>{item.analysis}</p>
             </div>
           </div>
         ))}
