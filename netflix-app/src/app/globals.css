@@ -544,3 +544,24 @@ footer .nf-mini{
   .chart-wrap{height:280px}
   .chart-wrap.tall{height:320px}
 }
+
+/* ═══════════════════════════════════════════════════
+   MATH FORMULA — KaTeX 公式样式优化
+   ═══════════════════════════════════════════════════ */
+.katex-display{
+  margin:0 !important;
+  padding:12px 0;
+}
+.katex{
+  font-size:1.1em !important;
+  color:#fff !important;
+}
+.katex .mord,
+.katex .mbin,
+.katex .mrel,
+.katex .mopen,
+.katex .mclose,
+.katex .mpunct,
+.katex .minner{
+  color:#fff !important;
+}
