@@ -137,7 +137,7 @@ export default function CodePreprocess() {
   return (
     <section id="preprocess" style={{ padding: '64px 24px', maxWidth: '1400px', margin: '0 auto' }}>
       <div className="section-title">数据加载与预处理</div>
-      <div className="section-desc">对原始 Netflix 数据集进行清洗、异常修复、类型转换与特征工程，输出 22 列结构化数据</div>
+      <div className="section-desc">对原始 Netflix 数据集进行清洗、异常修复、类型转换与特征工程，输出 17 列结构化数据</div>
 
       <div className="code-container">
         <div className="code-header">
