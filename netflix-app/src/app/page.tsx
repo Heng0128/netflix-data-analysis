@@ -13,7 +13,7 @@ export default function Home() {
           <div className="stat-label">总记录数</div>
         </div>
         <div className="stat-item">
-          <div className="stat-num">12 → 22</div>
+          <div className="stat-num">12 → 17</div>
           <div className="stat-label">字段（原始→清洗后）</div>
         </div>
         <div className="stat-item">
