@@ -6,7 +6,7 @@ import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "Netflix 电影和电视节目数据分析",
-  description: "基于 8,809 条 Netflix 内容数据的深度探索 · 数据预处理 + 9 维可视化分析",
+  description: "基于 8,807 条 Netflix 内容数据的深度探索 · 数据预处理 + 9 维可视化分析",
 };
 
 export const viewport: Viewport = {

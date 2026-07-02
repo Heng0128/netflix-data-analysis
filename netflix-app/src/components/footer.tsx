@@ -9,7 +9,7 @@ export default function Footer() {
         需求分析 &nbsp;·&nbsp; 数据预处理 &nbsp;·&nbsp; 可视化 &nbsp;·&nbsp; 机器学习 &nbsp;·&nbsp; 结论
       </p>
       <p style={{ marginTop: "8px", fontSize: "12px", color: "rgba(255,255,255,.3)" }}>
-        数据来源：Netflix Titles Dataset &nbsp;·&nbsp; 8,809 条记录
+        数据来源：Netflix Titles Dataset &nbsp;·&nbsp; 8,807 条记录
       </p>
     </footer>
   );

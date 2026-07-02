@@ -14,7 +14,7 @@ export default function OverviewPage() {
         </h3>
         <p style={{ color: "rgba(255,255,255,.75)", lineHeight: 1.9, marginBottom: "20px" }}>
           Netflix 是全球最大的流媒体平台，截至 2021 年中期拥有超过 2 亿全球订阅用户，平台上可访问超过 8,000 部电影和电视节目。
-          本项目使用的 <strong style={{ color: "#E50914" }}>Netflix Titles Dataset</strong> 包含 <strong style={{ color: "#fff" }}>8,809 条记录</strong>，
+          本项目使用的 <strong style={{ color: "#E50914" }}>Netflix Titles Dataset</strong> 包含 <strong style={{ color: "#fff" }}>8,807 条记录</strong>，
           完整记录了 Netflix 平台上所有已上线内容的元数据，数据来源为 Kaggle 公开数据集，截止日期 2021 年中。
         </p>
         <div style={{ overflowX: "auto" }}>
@@ -31,7 +31,7 @@ export default function OverviewPage() {
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,.05)" }}>
                 <td style={{ padding: "9px 16px", fontWeight: 600, color: "#fff" }}>show_id</td>
                 <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>字符串</td>
-                <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>每条内容的唯一标识符（s1~s8809）</td>
+                <td style={{ padding: "9px 16px", color: "rgba(255,255,255,.6)" }}>每条内容的唯一标识符（s1~s8807）</td>
                 <td style={{ padding: "9px 16px", color: "#7BC67E" }}>0%</td>
               </tr>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,.05)", background: "rgba(255,255,255,.02)" }}>
@@ -148,7 +148,7 @@ export default function OverviewPage() {
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
               <div style={{ width: "44px", height: "44px", background: "linear-gradient(135deg,#E50914,#B20710)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "18px", boxShadow: "0 0 16px rgba(229,9,20,.3)", flexShrink: 0 }}>A</div>
               <div>
-                <div style={{ fontSize: "16px", fontWeight: 700 }}>成员 A</div>
+                <div style={{ fontSize: "16px", fontWeight: 700 }}>张泽浩</div>
                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,.5)", marginTop: "2px" }}>数据工程 &amp; 建模</div>
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function OverviewPage() {
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
               <div style={{ width: "44px", height: "44px", background: "linear-gradient(135deg,#4A90D9,#2563EB)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "18px", boxShadow: "0 0 16px rgba(74,144,217,.3)", flexShrink: 0 }}>B</div>
               <div>
-                <div style={{ fontSize: "16px", fontWeight: 700 }}>成员 B</div>
+                <div style={{ fontSize: "16px", fontWeight: 700 }}>周宇恒</div>
                 <div style={{ fontSize: "12px", color: "rgba(255,255,255,.5)", marginTop: "2px" }}>可视化 &amp; 报告</div>
               </div>
             </div>
