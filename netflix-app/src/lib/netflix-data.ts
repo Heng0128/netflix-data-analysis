@@ -181,7 +181,7 @@ export function computeStats(): NetflixStats {
 
   const countryCounts: Record<string, number> = {};
   records.forEach((r) => {
-    if (r.primary_country && r.primary_country !== '未知') {
+    if (r.primary_country && r.primary_country !== 'Unknown') {
       countryCounts[r.primary_country] = (countryCounts[r.primary_country] || 0) + 1;
     }
   });
@@ -322,7 +322,7 @@ function computeCorrelationMatrix(records: NetflixRecord[]) {
 function computeTopCountries(records: NetflixRecord[], n: number) {
   const countryCounts: Record<string, number> = {};
   records.forEach((r) => {
-    if (r.primary_country && r.primary_country !== '未知') {
+    if (r.primary_country && r.primary_country !== 'Unknown') {
       countryCounts[r.primary_country] = (countryCounts[r.primary_country] || 0) + 1;
     }
   });

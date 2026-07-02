@@ -52,6 +52,10 @@ df_clean['date_added'] = pd.to_datetime(
 df_clean['year_added']  = df_clean['date_added'].dt.year
 df_clean['month_added'] = df_clean['date_added'].dt.month
 
+# 重要：不删除 date_added 为空的行！
+# 用 release_year 近似填充 year_added，保留全部数据
+df_clean['year_added'] = df_clean['year_added'].fillna(df_clean['release_year'])
+
 # ── duration 拆分 ──
 def parse_duration(row):
     val = str(row['duration']) if pd.notna(row['duration']) else ''
@@ -63,9 +67,17 @@ def parse_duration(row):
 df_clean['duration_value'] = df_clean.apply(parse_duration, axis=1)
 
 # ── 缺失值填充 ──
-for col in ['director','cast','country']:
-    df_clean[col] = df_clean[col].fillna('Unknown')
-df_clean['rating'] = df_clean['rating'].fillna(df_clean['rating'].mode()[0])
+# 剧集导演用 "Not Applicable"（剧集本来就常缺导演，不适用单一导演）
+# 注意：不用 "N/A" 因为 pandas 读取时会识别为 NaN
+tv_mask = df_clean['type'] == 'TV Show'
+movie_mask = df_clean['type'] == 'Movie'
+df_clean.loc[tv_mask, 'director'] = df_clean.loc[tv_mask, 'director'].fillna('Not Applicable')
+df_clean.loc[movie_mask, 'director'] = df_clean.loc[movie_mask, 'director'].fillna('Unknown')
+
+df_clean['cast'] = df_clean['cast'].fillna('Unknown')
+df_clean['country'] = df_clean['country'].fillna('Unknown')
+# rating 用 "Unknown" 而非众数，避免引入偏差
+df_clean['rating'] = df_clean['rating'].fillna('Unknown')
 
 # ── 特征工程 ──
 df_clean['content_age'] = 2021 - df_clean['release_year']
@@ -78,22 +90,23 @@ df_clean['years_to_netflix'] = df_clean['year_added'] - df_clean['release_year']
 df_clean.loc[df_clean['years_to_netflix'] < 0, 'years_to_netflix'] = np.nan
 
 print(f"清洗后数据集：{df_clean.shape}")
+print(f"  → 保留全部 {len(df_clean):,} 条记录，无删除")
 df_clean`;
 
 const tableData = [
   { field: 'show_id', type: 'object', nonNull: '8,807', missing: '0.00', desc: '唯一标识符' },
   { field: 'type', type: 'object', nonNull: '8,807', missing: '0.00', desc: '电影 / 电视节目' },
   { field: 'title', type: 'object', nonNull: '8,807', missing: '0.00', desc: '标题名称' },
-  { field: 'director', type: 'object', nonNull: '8,807', missing: '0.00', desc: '导演（已填充 Unknown）' },
+  { field: 'director', type: 'object', nonNull: '8,807', missing: '0.00', desc: '导演（剧集Not Applicable，电影Unknown）' },
   { field: 'cast', type: 'object', nonNull: '8,807', missing: '0.00', desc: '演员（已填充 Unknown）' },
   { field: 'country', type: 'object', nonNull: '8,807', missing: '0.00', desc: '制作国家（已填充 Unknown）' },
-  { field: 'date_added', type: 'datetime64', nonNull: '8,797', missing: '0.11', desc: '上架日期（已解析）' },
+  { field: 'date_added', type: 'datetime64', nonNull: '8,797', missing: '0.11', desc: '上架日期（已解析，空值保留）' },
   { field: 'release_year', type: 'int64', nonNull: '8,807', missing: '0.00', desc: '发行年份 1925~2021' },
-  { field: 'rating', type: 'object', nonNull: '8,807', missing: '0.00', desc: '年龄评级（众数填充）' },
+  { field: 'rating', type: 'object', nonNull: '8,807', missing: '0.00', desc: '年龄评级（Unknown 填充，非众数）' },
   { field: 'duration_value', type: 'int64', nonNull: '8,807', missing: '0.00', desc: '时长数值（分钟/季）' },
-  { field: 'year_added', type: 'float64', nonNull: '8,797', missing: '0.11', desc: '上架年份（衍生）' },
-  { field: 'month_added', type: 'float64', nonNull: '8,797', missing: '0.11', desc: '上架月份（衍生）' },
-  { field: 'primary_country', type: 'object', nonNull: '8,805', missing: '0.02', desc: '主要制作国（衍生）' },
+  { field: 'year_added', type: 'float64', nonNull: '8,807', missing: '0.00', desc: '上架年份（空值用发行年填充）' },
+  { field: 'month_added', type: 'float64', nonNull: '8,797', missing: '0.11', desc: '上架月份（衍生，10条为空）' },
+  { field: 'primary_country', type: 'object', nonNull: '8,807', missing: '0.00', desc: '主要制作国（衍生）' },
   { field: 'primary_genre', type: 'object', nonNull: '8,807', missing: '0.00', desc: '主要类型（衍生）' },
   { field: 'content_age', type: 'int64', nonNull: '8,807', missing: '0.00', desc: '内容年龄（衍生）' },
   { field: 'is_movie', type: 'int32', nonNull: '8,807', missing: '0.00', desc: '是否电影（衍生）' },

@@ -3,8 +3,8 @@ import PageHeader from '@/components/page-header';
 
 const TEAM_MEMBERS = [
   {
-    avatar: 'A',
-    name: '成员 1',
+    avatar: '张',
+    name: '张泽浩',
     role: '数据预处理',
     color: 'from-[#E50914] to-[#B20710]',
     tasks: [
@@ -15,8 +15,8 @@ const TEAM_MEMBERS = [
     ],
   },
   {
-    avatar: 'B',
-    name: '成员 2',
+    avatar: '周',
+    name: '周宇恒',
     role: '算法与前端',
     color: 'from-[#4A90D9] to-[#2C5F94]',
     tasks: [
