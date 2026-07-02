@@ -9,23 +9,24 @@
   /* Netflix 品牌色 */
   --primary:#E50914;
   --primary-dark:#B20710;
-  --primary-light:#FF4D58;
+  --primary-light:#FF3B45;
   --background:#0A0A0A;
   --bg-surface:#0F0F0F;
   --foreground:#FFFFFF;
   --text-dim:rgba(255,255,255,.65);
   --text-muted:rgba(255,255,255,.45);
 
-  /* 玻璃拟态 */
-  --glass-bg:rgba(255,255,255,.035);
+  /* 玻璃拟态 - 苹果风格升级 */
+  --glass-bg:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+  --glass-bg-solid:rgba(255,255,255,.035);
   --glass-bg-hover:rgba(255,255,255,.065);
-  --glass-border:rgba(255,255,255,.08);
-  --glass-blur:16px;
+  --glass-border:rgba(255,255,255,.12);
+  --glass-blur:24px;
 
-  /* 红色光效 */
-  --red-glow:rgba(229,9,20,.35);
-  --red-glow-soft:rgba(229,9,20,.15);
-  --red-border:rgba(229,9,20,.3);
+  /* 红色光效 - 克制版本 */
+  --red-glow:rgba(229,9,20,.18);
+  --red-glow-soft:rgba(229,9,20,.08);
+  --red-border:rgba(229,9,20,.35);
 
   /* 图表色板 */
   --chart-1:#E50914;
@@ -34,10 +35,23 @@
   --chart-4:#7BC67E;
   --chart-5:#BD10E0;
 
-  /* 阴影 */
+  /* 阴影 - 柔和高级 */
   --shadow-sm:0 2px 8px rgba(0,0,0,.3);
   --shadow-md:0 8px 32px rgba(0,0,0,.4);
-  --shadow-red:0 8px 40px rgba(229,9,20,.2);
+  --shadow-red:0 8px 30px rgba(229,9,20,.15);
+  --shadow-card:0 8px 30px rgba(0,0,0,.35),0 0 15px rgba(229,9,20,.12);
+}
+
+/* ── ⑩ 背景层次 - 固定背景光晕 ── */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(229,9,20,.08),transparent 45%),
+    radial-gradient(circle at 80% 60%,rgba(74,144,217,.05),transparent 45%);
+  pointer-events:none;
+  z-index:-1;
 }
 
 /* ── 基础重置 ── */
@@ -83,31 +97,41 @@ body{
    ═══════════════════════════════════════════════════ */
 .hero{
   position:relative;
-  padding:100px 24px 70px;
+  padding:120px 24px 80px;
   text-align:center;
   overflow:hidden;
   background:
     radial-gradient(ellipse 80% 60% at 50% 0%,
-      rgba(229,9,20,.18),transparent 60%),
+      rgba(229,9,20,.12),transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 80%,
-      rgba(229,9,20,.08),transparent 60%),
+      rgba(229,9,20,.05),transparent 60%),
     radial-gradient(ellipse 60% 40% at 20% 60%,
-      rgba(74,144,217,.05),transparent 60%),
+      rgba(74,144,217,.04),transparent 60%),
     var(--background);
 }
-/* 动态网格背景 */
+/* 动态网格背景 - 降低不透明度 */
 .hero::after{
   content:'';
   position:absolute;
   inset:0;
   background-image:
-    linear-gradient(rgba(229,9,20,.05) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(229,9,20,.05) 1px,transparent 1px);
+    linear-gradient(rgba(229,9,20,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(229,9,20,.03) 1px,transparent 1px);
   background-size:40px 40px;
   animation:grid-move 8s linear infinite;
   pointer-events:none;
   mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,#000,transparent);
   -webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,#000,transparent);
+}
+/* 噪点纹理 - 提升质感 */
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+  pointer-events:none;
 }
 .hero > *{position:relative;z-index:1}
 
@@ -133,9 +157,9 @@ body{
   animation:shimmer 4s linear infinite;
 }
 
-/* 闪光标题动画 */
+/* 闪光标题动画 - 更大字体 */
 .hero h1{
-  font-size:38px;
+  font-size:clamp(42px,6vw,72px);
   font-weight:800;
   margin-bottom:14px;
   background:linear-gradient(90deg,
@@ -152,7 +176,7 @@ body{
 }
 .hero p{
   color:var(--text-dim);
-  font-size:16px;
+  font-size:clamp(16px,2.5vw,20px);
   max-width:640px;
   margin:0 auto;
 }
@@ -173,19 +197,19 @@ body{
 .stat-item{
   text-align:center;
   padding:20px 32px;
-  background:var(--glass-bg);
+  background:var(--glass-bg-solid);
   backdrop-filter:blur(var(--glass-blur));
   -webkit-backdrop-filter:blur(var(--glass-blur));
   border:1px solid var(--glass-border);
-  border-radius:16px;
-  transition:all .35s cubic-bezier(.4,0,.2,1);
+  border-radius:20px;
+  transition:all .35s cubic-bezier(.2,.8,.2,1);
   min-width:140px;
 }
 .stat-item:hover{
   background:var(--glass-bg-hover);
   border-color:var(--red-border);
-  transform:translateY(-4px);
-  box-shadow:var(--shadow-red);
+  transform:translateY(-6px) scale(1.01);
+  box-shadow:var(--shadow-card);
 }
 .stat-num{
   font-size:40px;
@@ -194,7 +218,7 @@ body{
   -webkit-background-clip:text;
   background-clip:text;
   -webkit-text-fill-color:transparent;
-  text-shadow:0 0 30px var(--red-glow-soft);
+  text-shadow:0 0 20px var(--red-glow-soft);
   letter-spacing:-1px;
 }
 .stat-label{
@@ -229,7 +253,7 @@ section{
   height:30px;
   background:linear-gradient(180deg,var(--primary),var(--primary-dark));
   border-radius:3px;
-  box-shadow:0 0 12px var(--red-glow);
+  box-shadow:0 0 8px var(--red-glow);
 }
 .section-desc{
   color:var(--text-dim);
@@ -245,13 +269,16 @@ section{
   background:rgba(13,17,23,.7);
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
-  border-radius:14px;
+  border-radius:20px;
   border:1px solid var(--glass-border);
   margin-bottom:24px;
   overflow:hidden;
-  transition:border-color .3s;
+  transition:border-color .3s,transform .35s cubic-bezier(.2,.8,.2,1);
 }
-.code-container:hover{border-color:var(--red-border)}
+.code-container:hover{
+  border-color:var(--red-border);
+  transform:translateY(-3px);
+}
 .code-header{
   display:flex;
   align-items:center;
@@ -311,13 +338,13 @@ section{
   gap:24px;
 }
 .chart-card{
-  background:var(--glass-bg);
+  background:var(--glass-bg-solid);
   backdrop-filter:blur(var(--glass-blur));
   -webkit-backdrop-filter:blur(var(--glass-blur));
-  border-radius:16px;
-  padding:26px;
+  border-radius:24px;
+  padding:28px;
   border:1px solid var(--glass-border);
-  transition:all .35s cubic-bezier(.4,0,.2,1);
+  transition:all .35s cubic-bezier(.2,.8,.2,1);
   position:relative;
   overflow:hidden;
   animation:float-in .5s ease-out backwards;
@@ -332,7 +359,7 @@ section{
   opacity:0;
   transition:opacity .35s;
 }
-/* 右上角光晕 */
+/* 右上角光晕 - 降低强度 */
 .chart-card::after{
   content:'';
   position:absolute;
@@ -346,8 +373,8 @@ section{
 .chart-card:hover{
   background:var(--glass-bg-hover);
   border-color:var(--red-border);
-  transform:translateY(-6px);
-  box-shadow:var(--shadow-md),0 0 0 1px rgba(229,9,20,.12);
+  transform:translateY(-6px) scale(1.01);
+  box-shadow:var(--shadow-card);
 }
 .chart-card:hover::before,
 .chart-card:hover::after{opacity:1}
@@ -400,10 +427,10 @@ section{
    TABLE — 玻璃数据表
    ═══════════════════════════════════════════════════ */
 .data-table{
-  background:var(--glass-bg);
+  background:var(--glass-bg-solid);
   backdrop-filter:blur(var(--glass-blur));
   -webkit-backdrop-filter:blur(var(--glass-blur));
-  border-radius:16px;
+  border-radius:24px;
   border:1px solid var(--glass-border);
   overflow:hidden;
 }
@@ -435,18 +462,20 @@ tbody tr:last-child td{border-bottom:none}
 
 /* glass-card 通用玻璃卡片 */
 .glass-card{
-  background:var(--glass-bg);
+  background:var(--glass-bg-solid);
   backdrop-filter:blur(var(--glass-blur));
   -webkit-backdrop-filter:blur(var(--glass-blur));
   border:1px solid var(--glass-border);
+  border-radius:24px;
 }
 .glass-card-hover{
-  transition:all .35s cubic-bezier(.4,0,.2,1);
+  transition:all .35s cubic-bezier(.2,.8,.2,1);
 }
 .glass-card-hover:hover{
   background:var(--glass-bg-hover);
   border-color:var(--red-border);
-  box-shadow:var(--shadow-md);
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-card);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -473,13 +502,13 @@ footer .nf-mini{
   display:inline-flex;
   align-items:center;justify-content:center;
   width:48px;height:48px;
-  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  background:linear-gradient(135deg,var(--primary),var(--primary-light));
   color:#fff;
   font-weight:900;
   font-size:26px;
   border-radius:12px;
   margin-bottom:12px;
-  box-shadow:0 0 30px var(--red-glow-soft);
+  box-shadow:0 0 20px var(--red-glow-soft);
   animation:pulse-glow 3s ease-in-out infinite;
 }
 
