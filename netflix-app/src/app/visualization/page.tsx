@@ -65,7 +65,7 @@ const chartData = [
   { num: '05', icon: 'user-shield', type: '柱状图', title: '年龄评级分布', subtitle: 'Netflix 内容的年龄分级构成' },
   { num: '06', icon: 'clock', type: '直方图', title: '电影时长分布', subtitle: '6,131 部电影按时长区间统计' },
   { num: '07', icon: 'tags', type: '水平柱状图', title: 'Top 10 热门类型', subtitle: '按主类型（listed_in）统计' },
-  { num: '08', icon: 'calendar-alt', type: '雷达图', title: '月度上架分布', subtitle: 'Netflix 各月份内容上架数量雷达对比' },
+  { num: '08', icon: 'calendar-alt', type: '柱状图', title: '月度上架分布', subtitle: 'Netflix 各月份内容上架数量对比' },
   { num: '09', icon: 'chart-bar', type: '堆叠柱状图', title: '电影 vs 电视节目上架趋势对比', subtitle: '2008-2021 年电影与电视节目新增数量对比' },
 ];
 
@@ -326,50 +326,36 @@ export default function VisualizationPage() {
     if (c8) {
       charts.push(
         new Chart(c8, {
-          type: 'radar',
+          type: 'bar',
           data: {
             labels: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
             datasets: [{
               label: '上架数量',
               data: [734, 678, 720, 692, 710, 685, 756, 789, 742, 768, 791, 842],
-              borderColor: '#E50914',
-              backgroundColor: 'rgba(229,9,20,0.25)',
-              borderWidth: 2,
-              pointBackgroundColor: '#fff',
-              pointBorderColor: '#E50914',
-              pointBorderWidth: 2,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              fill: true,
-              tension: 0.15,
+              backgroundColor: [
+                '#E50914','#FFD700','#E50914','#FFD700','#E50914','#FFD700',
+                '#E50914','#FFD700','#E50914','#FFD700','#E50914','#FFD700'
+              ],
+              borderRadius: 6,
+              borderSkipped: false,
             }],
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                display: false,
-              },
+              legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => `${ctx.label}: ${ctx.parsed.r} 部`,
+                  label: (ctx) => `${ctx.label}: ${ctx.parsed!.y} 部`,
                 },
               },
             },
             scales: {
-              r: {
+              x: { grid: { display: false } },
+              y: {
                 grid: { color: NF_GRID },
-                angleLines: { color: NF_GRID },
-                pointLabels: {
-                  color: 'rgba(255,255,255,0.7)',
-                  font: { size: 11 },
-                },
-                ticks: {
-                  color: 'rgba(255,255,255,0.4)',
-                  backdropColor: 'transparent',
-                  font: { size: 10 },
-                },
+                title: { display: true, text: '上架数量' },
                 beginAtZero: true,
               },
             },
