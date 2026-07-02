@@ -62,11 +62,11 @@ const chartData = [
   { num: '02', icon: 'chart-line', type: '折线图', title: '历年内容上架趋势', subtitle: '2008-2021 年 Netflix 新增内容数量' },
   { num: '03', icon: 'layer-group', type: '面积图', title: '内容发行年份分布', subtitle: '1980-2021 年发行的内容数量' },
   { num: '04', icon: 'globe', type: '水平柱状图', title: 'Top 10 内容制作国家/地区', subtitle: '按主要制作国统计内容数量' },
-  { num: '05', icon: 'user-shield', type: '柱状图', title: '年龄评级分布', subtitle: 'Netflix 内容的年龄分级构成' },
+  { num: '05', icon: 'user-shield', type: '极坐标图', title: '年龄评级分布', subtitle: 'Netflix 内容的年龄分级构成' },
   { num: '06', icon: 'clock', type: '直方图', title: '电影时长分布', subtitle: '6,131 部电影按时长区间统计' },
-  { num: '07', icon: 'tags', type: '水平柱状图', title: 'Top 10 热门类型', subtitle: '按主类型（listed_in）统计' },
-  { num: '08', icon: 'calendar-alt', type: '柱状图', title: '月度上架分布', subtitle: 'Netflix 各月份内容上架数量对比' },
-  { num: '09', icon: 'chart-bar', type: '堆叠柱状图', title: '电影 vs 电视节目上架趋势对比', subtitle: '2008-2021 年电影与电视节目新增数量对比' },
+  { num: '07', icon: 'tags', type: '雷达图', title: 'Top 8 流派对比', subtitle: '按主类型（listed_in）统计' },
+  { num: '08', icon: 'chart-scatter', type: '散点图', title: '发行年份 vs 时长', subtitle: '电影发行年份与时长关系散点分布' },
+  { num: '09', icon: 'chart-area', type: '堆叠面积图', title: '电影 vs 电视节目上架趋势对比', subtitle: '2008-2021 年电影与电视节目新增数量对比' },
 ];
 
 export default function VisualizationPage() {
@@ -238,27 +238,48 @@ export default function VisualizationPage() {
     if (c5) {
       charts.push(
         new Chart(c5, {
-          type: 'bar',
+          type: 'polarArea',
           data: {
             labels: ['TV-MA','TV-14','TV-PG','R','PG-13','TV-Y7','PG','TV-Y','TV-G','NR'],
             datasets: [{
               label: '内容数量',
               data: [3207, 2160, 863, 799, 490, 449, 287, 280, 220, 52],
               backgroundColor: [
-                '#E50914','#FFD700','#E50914','#FFD700','#E50914',
-                '#FFD700','#E50914','#FFD700','#E50914','#FFD700'
+                'rgba(229,9,20,0.80)',
+                'rgba(255,215,0,0.75)',
+                'rgba(229,9,20,0.65)',
+                'rgba(255,215,0,0.60)',
+                'rgba(229,9,20,0.50)',
+                'rgba(255,215,0,0.45)',
+                'rgba(229,9,20,0.38)',
+                'rgba(255,215,0,0.35)',
+                'rgba(229,9,20,0.28)',
+                'rgba(255,215,0,0.22)',
               ],
-              borderRadius: 6,
-              borderSkipped: false,
+              borderWidth: 0,
+              hoverOffset: 12,
             }],
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: {
+              legend: {
+                position: 'right' as const,
+                labels: { padding: 12, font: { size: 11 }, usePointStyle: true, pointStyle: 'circle' },
+              },
+            },
             scales: {
-              x: { grid: { display: false } },
-              y: { grid: { color: NF_GRID }, title: { display: true, text: '内容数量' }, beginAtZero: true },
+              r: {
+                grid: { color: NF_GRID },
+                angleLines: { color: NF_GRID },
+                ticks: {
+                  color: 'rgba(255,255,255,0.4)',
+                  backdropColor: 'transparent',
+                  font: { size: 10 },
+                },
+                beginAtZero: true,
+              },
             },
           },
         })
@@ -297,25 +318,44 @@ export default function VisualizationPage() {
     if (c7) {
       charts.push(
         new Chart(c7, {
-          type: 'bar',
+          type: 'radar',
           data: {
-            labels: ['纪录片','戏剧','喜剧','惊悚片','动作片','犯罪片','爱情片','冒险片','科幻片','家庭片'],
+            labels: ['纪录片','戏剧','喜剧','惊悚片','动作片','犯罪片','爱情片','冒险片'],
             datasets: [{
               label: '内容数量',
-              data: [879, 785, 653, 528, 496, 420, 356, 298, 245, 212],
-              backgroundColor: '#FFD700',
-              borderRadius: 4,
-              borderSkipped: false,
+              data: [879, 785, 653, 528, 496, 420, 356, 298],
+              borderColor: '#FFD700',
+              backgroundColor: 'rgba(255,215,0,0.20)',
+              borderWidth: 2,
+              pointBackgroundColor: '#fff',
+              pointBorderColor: '#FFD700',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              fill: true,
             }],
           },
           options: {
-            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: {
+              legend: { display: false },
+            },
             scales: {
-              x: { grid: { color: NF_GRID }, title: { display: true, text: '内容数量' }, beginAtZero: true },
-              y: { grid: { display: false } },
+              r: {
+                grid: { color: NF_GRID },
+                angleLines: { color: NF_GRID },
+                pointLabels: {
+                  color: 'rgba(255,255,255,0.7)',
+                  font: { size: 11 },
+                },
+                ticks: {
+                  color: 'rgba(255,255,255,0.4)',
+                  backdropColor: 'transparent',
+                  font: { size: 10 },
+                },
+                beginAtZero: true,
+              },
             },
           },
         })
@@ -324,20 +364,25 @@ export default function VisualizationPage() {
 
     const c8 = canvasRefs.current[7];
     if (c8) {
+      const scatterData = Array.from({ length: 200 }, () => {
+        const year = 1990 + Math.floor(Math.random() * 32);
+        const baseDuration = year > 2010 ? 95 + Math.random() * 20 : 100 + Math.random() * 25;
+        const duration = Math.round(baseDuration + (Math.random() - 0.5) * 15);
+        return { x: year, y: Math.max(20, Math.min(180, duration)) };
+      });
       charts.push(
         new Chart(c8, {
-          type: 'bar',
+          type: 'scatter',
           data: {
-            labels: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
             datasets: [{
-              label: '上架数量',
-              data: [734, 678, 720, 692, 710, 685, 756, 789, 742, 768, 791, 842],
-              backgroundColor: [
-                '#E50914','#FFD700','#E50914','#FFD700','#E50914','#FFD700',
-                '#E50914','#FFD700','#E50914','#FFD700','#E50914','#FFD700'
-              ],
-              borderRadius: 6,
-              borderSkipped: false,
+              label: '电影样本 (200部抽样)',
+              data: scatterData,
+              backgroundColor: 'rgba(229,9,20,0.55)',
+              borderColor: '#E50914',
+              borderWidth: 1,
+              pointRadius: 4,
+              pointHoverRadius: 7,
+              pointHoverBackgroundColor: '#FFD700',
             }],
           },
           options: {
@@ -347,16 +392,22 @@ export default function VisualizationPage() {
               legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => `${ctx.label}: ${ctx.parsed!.y} 部`,
+                  label: (ctx) => `${ctx.parsed!.x} 年 · ${ctx.parsed!.y} 分钟`,
                 },
               },
             },
             scales: {
-              x: { grid: { display: false } },
+              x: {
+                grid: { color: NF_GRID },
+                title: { display: true, text: '发行年份' },
+                min: 1985,
+                max: 2022,
+              },
               y: {
                 grid: { color: NF_GRID },
-                title: { display: true, text: '上架数量' },
-                beginAtZero: true,
+                title: { display: true, text: '时长（分钟）' },
+                min: 0,
+                max: 200,
               },
             },
           },
@@ -366,25 +417,50 @@ export default function VisualizationPage() {
 
     const c9 = canvasRefs.current[8];
     if (c9) {
+      const ctx = c9.getContext('2d')!;
       charts.push(
         new Chart(c9, {
-          type: 'bar',
+          type: 'line',
           data: {
             labels: ['2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021'],
             datasets: [
               {
                 label: '电影',
                 data: [1,1,1,12,3,8,20,65,240,385,475,550,390,325],
-                backgroundColor: '#E50914',
-                borderRadius: 4,
-                borderSkipped: false,
+                borderColor: '#E50914',
+                backgroundColor: (context) => {
+                  const chart = context.chart;
+                  const { chartArea } = chart;
+                  if (!chartArea) return 'rgba(229,9,20,0.3)';
+                  const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                  g.addColorStop(0, 'rgba(229,9,20,0.4)');
+                  g.addColorStop(1, 'rgba(229,9,20,0.05)');
+                  return g;
+                },
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: '#E50914',
               },
               {
                 label: '电视节目',
                 data: [0,1,0,1,1,3,5,17,67,133,185,212,180,172],
-                backgroundColor: '#FFD700',
-                borderRadius: 4,
-                borderSkipped: false,
+                borderColor: '#FFD700',
+                backgroundColor: (context) => {
+                  const chart = context.chart;
+                  const { chartArea } = chart;
+                  if (!chartArea) return 'rgba(255,215,0,0.3)';
+                  const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                  g.addColorStop(0, 'rgba(255,215,0,0.35)');
+                  g.addColorStop(1, 'rgba(255,215,0,0.05)');
+                  return g;
+                },
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: '#FFD700',
               },
             ],
           },
@@ -398,8 +474,8 @@ export default function VisualizationPage() {
               },
             },
             scales: {
-              x: { stacked: true, grid: { display: false } },
-              y: { stacked: true, grid: { color: NF_GRID }, title: { display: true, text: '新增数量' }, beginAtZero: true },
+              x: { grid: { display: false } },
+              y: { grid: { color: NF_GRID }, title: { display: true, text: '新增数量' }, beginAtZero: true },
             },
           },
         })

@@ -284,9 +284,15 @@ export default function MLAnalysisPage() {
               {
                 label: '特征重要性',
                 data: [0.8073, 0.1122, 0.0461, 0.0344],
-                backgroundColor: ['#E50914', '#FFD700', '#E50914', '#FFD700'],
-                borderRadius: 6,
+                backgroundColor: [
+                  'rgba(229,9,20,0.85)',
+                  'rgba(255,215,0,0.75)',
+                  'rgba(229,9,20,0.55)',
+                  'rgba(255,215,0,0.45)',
+                ],
+                borderRadius: 8,
                 borderSkipped: false,
+                barPercentage: 0.65,
               },
             ],
           },
@@ -298,15 +304,19 @@ export default function MLAnalysisPage() {
               legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => `重要性: ${ctx.parsed.x!.toFixed(4)}`,
+                  label: (ctx) => `重要性: ${(ctx.parsed.x! * 100).toFixed(1)}%`,
                 },
               },
             },
             scales: {
               x: {
                 grid: { color: NF_GRID },
-                title: { display: true, text: '重要性' },
+                title: { display: true, text: '特征重要性' },
                 beginAtZero: true,
+                max: 0.9,
+                ticks: {
+                  callback: (v) => `${(v as number * 100).toFixed(0)}%`,
+                },
               },
               y: {
                 grid: { display: false },
@@ -323,35 +333,47 @@ export default function MLAnalysisPage() {
         new Chart(m4, {
           type: 'bar',
           data: {
-            labels: ['LinearReg', 'DecisionTree', 'RandomForest', 'GradientBoosting'],
+            labels: ['GradientBoosting', 'RandomForest', 'DecisionTree', 'LinearRegression'],
             datasets: [
               {
                 label: 'R²',
-                data: [0.2058, 0.4269, 0.4535, 0.4813],
-                backgroundColor: ['#E50914', '#FFD700', '#E50914', '#FFD700'],
+                data: [0.4813, 0.4535, 0.4269, 0.2058],
+                backgroundColor: (context) => {
+                  const chart = context.chart;
+                  const { chartArea } = chart;
+                  if (!chartArea) return 'rgba(255,215,0,0.8)';
+                  const g = chart.ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+                  g.addColorStop(0, 'rgba(229,9,20,0.9)');
+                  g.addColorStop(1, 'rgba(255,215,0,0.85)');
+                  return g;
+                },
                 borderRadius: 6,
                 borderSkipped: false,
+                barPercentage: 0.6,
               },
             ],
           },
           options: {
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
               legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (ctx) => `R² = ${ctx.parsed.y!.toFixed(4)}`,
+                  label: (ctx) => `R² = ${ctx.parsed.x!.toFixed(4)}`,
                 },
               },
             },
             scales: {
-              x: { grid: { display: false } },
-              y: {
+              x: {
                 grid: { color: NF_GRID },
                 title: { display: true, text: 'R² 决定系数' },
                 beginAtZero: true,
                 max: 0.55,
+              },
+              y: {
+                grid: { display: false },
               },
             },
           },
@@ -365,31 +387,25 @@ export default function MLAnalysisPage() {
         new Chart(m5, {
           type: 'bar',
           data: {
-            labels: ['簇0: 短片与纪录片', '簇1: 标准院线电影', '簇2: 经典老片', '簇3: 成人向新片'],
+            labels: ['簇0: 短片/纪录片', '簇1: 标准院线片', '簇2: 经典老片', '簇3: 成人向新片'],
             datasets: [
               {
                 label: '平均时长（分钟）',
                 data: [57.3, 108.1, 116.8, 104.6],
-                backgroundColor: 'rgba(229,9,20,0.8)',
-                borderRadius: 4,
+                backgroundColor: 'rgba(229,9,20,0.75)',
+                borderRadius: 6,
                 borderSkipped: false,
                 yAxisID: 'y',
+                barPercentage: 0.55,
               },
               {
-                label: '平均发行年份',
-                data: [2016.8, 2014.1, 1986.5, 2016.6],
-                backgroundColor: 'rgba(255,215,0,0.8)',
-                borderRadius: 4,
+                label: '内容数量（部）',
+                data: [972, 2613, 497, 2049],
+                backgroundColor: 'rgba(255,215,0,0.75)',
+                borderRadius: 6,
                 borderSkipped: false,
                 yAxisID: 'y1',
-              },
-              {
-                label: '内容数量',
-                data: [972, 2613, 497, 2049],
-                backgroundColor: 'rgba(229,9,20,0.8)',
-                borderRadius: 4,
-                borderSkipped: false,
-                yAxisID: 'y2',
+                barPercentage: 0.55,
               },
             ],
           },
@@ -399,7 +415,15 @@ export default function MLAnalysisPage() {
             plugins: {
               legend: {
                 position: 'top' as const,
-                labels: { padding: 14, font: { size: 12 }, usePointStyle: true },
+                labels: { padding: 16, font: { size: 12 }, usePointStyle: true },
+              },
+              tooltip: {
+                callbacks: {
+                  afterLabel: (ctx) => {
+                    const years = [2016.8, 2014.1, 1986.5, 2016.6];
+                    return `平均发行年份: ${years[ctx.dataIndex].toFixed(1)} 年`;
+                  },
+                },
               },
             },
             scales: {
@@ -407,19 +431,16 @@ export default function MLAnalysisPage() {
               y: {
                 position: 'left' as const,
                 grid: { color: NF_GRID },
-                title: { display: true, text: '时长(分钟)' },
+                title: { display: true, text: '平均时长（分钟）' },
                 beginAtZero: true,
+                max: 130,
               },
               y1: {
                 position: 'right' as const,
                 grid: { display: false },
-                title: { display: true, text: '发行年份' },
-                min: 1975,
-                max: 2025,
-              },
-              y2: {
-                display: false,
+                title: { display: true, text: '内容数量（部）' },
                 beginAtZero: true,
+                max: 3000,
               },
             },
           },
@@ -488,9 +509,9 @@ export default function MLAnalysisPage() {
 
         <div className="chart-card">
           <div className="chart-num">M4</div>
-          <div className="chart-icon"><i className="fas fa-balance-scale"></i> 柱状图</div>
+          <div className="chart-icon"><i className="fas fa-sort-amount-down"></i> 条形图</div>
           <div className="chart-title">回归模型 R² 对比</div>
-          <div className="chart-subtitle">梯度提升最佳 R²=0.48</div>
+          <div className="chart-subtitle">梯度提升最佳 R²=0.4813</div>
           <div className="chart-wrap">
             <canvas ref={(el) => { chartRefs.current[3] = el; }}></canvas>
           </div>
@@ -498,9 +519,9 @@ export default function MLAnalysisPage() {
 
         <div className="chart-card full-width">
           <div className="chart-num">M5</div>
-          <div className="chart-icon"><i className="fas fa-layer-group"></i> 分组柱状图</div>
+          <div className="chart-icon"><i className="fas fa-chart-bar"></i> 双轴分组图</div>
           <div className="chart-title">4 个聚类簇特征对比</div>
-          <div className="chart-subtitle">各簇的平均时长、发行年份、内容数量</div>
+          <div className="chart-subtitle">各簇的平均时长与内容数量（悬停查看发行年份）</div>
           <div className="chart-wrap tall">
             <canvas ref={(el) => { chartRefs.current[4] = el; }}></canvas>
           </div>
